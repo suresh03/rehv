@@ -1,0 +1,378 @@
+[
+  {
+    "id": "0",
+    "department": "Operations",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Administration/Support"
+      },
+      {
+        "id": "1",
+        "name": "Production employee"
+      },
+      {
+        "id": "2",
+        "name": "Customer Service employee"
+      },
+      {
+        "id": "3",
+        "name": "Front-Line Employee"
+      },
+      {
+        "id": "4",
+        "name": "Technician"
+      },
+      {
+        "id": "5",
+        "name": "Supervisor"
+      },
+      {
+        "id": "6",
+        "name": "Team Leader"
+      }
+    ]
+  },
+  {
+    "id": "1",
+    "department": "Management",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Other"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "department": "R&D & I.T.",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Administration/Support"
+      },
+      {
+        "id": "1",
+        "name": "Specialist"
+      },
+      {
+        "id": "2",
+        "name": "Developer"
+      },
+      {
+        "id": "3",
+        "name": "Scientist"
+      },
+      {
+        "id": "4",
+        "name": "Software Engineer"
+      },
+      {
+        "id": "5",
+        "name": "Network Administration"
+      },
+      {
+        "id": "6",
+        "name": "Project Management"
+      },
+      {
+        "id": "7",
+        "name": "Technician"
+      },
+      {
+        "id": "8",
+        "name": "Designer"
+      },
+      {
+        "id": "9",
+        "name": "Analyst"
+      },
+      {
+        "id": "10",
+        "name": "Architect"
+      },
+      {
+        "id": "11",
+        "name": "Supervisor"
+      },
+      {
+        "id": "12",
+        "name": "Team Leader"
+      },
+      {
+        "id": "13",
+        "name": "Management"
+      },
+      {
+        "id": "14",
+        "name": "Other"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "department": "Purchasing",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Administration/Support"
+      },
+      {
+        "id": "1",
+        "name": "Buyer"
+      },
+      {
+        "id": "2",
+        "name": "Specialist"
+      },
+      {
+        "id": "3",
+        "name": "Team Leader"
+      },
+      {
+        "id": "4",
+        "name": "Management"
+      },
+      {
+        "id": "5",
+        "name": "Purchasing Manager"
+      },
+      {
+        "id": "6",
+        "name": "Management"
+      },
+      {
+        "id": "7",
+        "name": "Other"
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "department": "Sales",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Administration/Support"
+      },
+      {
+        "id": "1",
+        "name": "Inside Sales"
+      },
+      {
+        "id": "2",
+        "name": "Field Sales"
+      },
+      {
+        "id": "3",
+        "name": "Analyst"
+      },
+      {
+        "id": "4",
+        "name": "Account Executive/Manager"
+      },
+      {
+        "id": "5",
+        "name": "Solutions Engineer"
+      },
+      {
+        "id": "6",
+        "name": "Sales Manager"
+      },
+      {
+        "id": "7",
+        "name": "Business Development"
+      },
+      {
+        "id": "8",
+        "name": "Technical Support"
+      },
+      {
+        "id": "9",
+        "name": "Team Leader"
+      },
+      {
+        "id": "10",
+        "name": "Management"
+      },
+      {
+        "id": "11",
+        "name": "Other"
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "department": "Marketing",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Administration/Support"
+      },
+      {
+        "id": "1",
+        "name": "Content writer"
+      },
+      {
+        "id": "2",
+        "name": "Media/Public Relations"
+      },
+      {
+        "id": "3",
+        "name": "Designer"
+      },
+      {
+        "id": "4",
+        "name": "Analyst"
+      },
+      {
+        "id": "5",
+        "name": "Marketing Manager"
+      },
+      {
+        "id": "6",
+        "name": "Team Leader"
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "department": "Management",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Team Leader"
+      },
+      {
+        "id": "1",
+        "name": "Other"
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "department": "H.R.",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Administration/Support"
+      },
+      {
+        "id": "1",
+        "name": "Compensation"
+      },
+      {
+        "id": "2",
+        "name": "Training & Development"
+      },
+      {
+        "id": "3",
+        "name": "Recruitment"
+      },
+      {
+        "id": "4",
+        "name": "HR Generalist/Consultant"
+      },
+      {
+        "id": "5",
+        "name": "Org Development"
+      },
+      {
+        "id": "6",
+        "name": "Team Leader"
+      },
+      {
+        "id": "7",
+        "name": "Management"
+      },
+      {
+        "id": "8",
+        "name": "Other"
+      }
+    ]
+  },
+  {
+    "id": "8",
+    "department": "Finance",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Administration/Support"
+      },
+      {
+        "id": "1",
+        "name": "Accounting"
+      },
+      {
+        "id": "2",
+        "name": "Audit"
+      },
+      {
+        "id": "3",
+        "name": "Finance Controls"
+      },
+      {
+        "id": "4",
+        "name": "Risk Mgt."
+      },
+      {
+        "id": "5",
+        "name": "Treasury"
+      },
+      {
+        "id": "6",
+        "name": "Team Leader"
+      },
+      {
+        "id": "7",
+        "name": "Management"
+      },
+      {
+        "id": "8",
+        "name": "Other"
+      }
+    ]
+  },
+  {
+    "id": "9",
+    "department": "Distribution",
+    "designation": [
+      {
+        "id": "0",
+        "name": "Administration/Support"
+      },
+      {
+        "id": "1",
+        "name": "Supply Chain/Logistics"
+      },
+      {
+        "id": "2",
+        "name": "Analyst"
+      },
+      {
+        "id": "3",
+        "name": "Receiving"
+      },
+      {
+        "id": "4",
+        "name": "Storage"
+      },
+      {
+        "id": "5",
+        "name": "Delivery"
+      },
+      {
+        "id": "6",
+        "name": "Supervisor"
+      },
+      {
+        "id": "7",
+        "name": "Management"
+      },
+      {
+        "id": "8",
+        "name": "Other"
+      }
+    ]
+  }
+]

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "218143144530",
+    "project_id": "rehvup-mobile",
+    "storage_bucket": "rehvup-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218143144530:android:f4e4c7f7e785605674fd8b",
+        "android_client_info": {
+          "package_name": "com.rehvup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "218143144530-ltnnuq91c35diqhtn00fnsejqdb60kmp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rehvup",
+            "certificate_hash": "5048cf5bb1c45a1a5646ee96a7a923a94637f6ce"
+          }
+        },
+        {
+          "client_id": "218143144530-koeilhmpdg0p961nc8gcj5e49ldelg8s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIaGk8fK_v6mK_35zSHXv9GQHB61xBS3M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "218143144530-koeilhmpdg0p961nc8gcj5e49ldelg8s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "218143144530-qlhjtbq1doke4l6fjtli62sf46153f05.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.RehvUp",
+                "app_store_id": "159968947"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
