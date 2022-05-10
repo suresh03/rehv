@@ -409,6 +409,7 @@ export default function PostDetailScreen({ navigation, route }) {
     })
     .catch((err) => {
       err && console.log(err);
+      shareApiHit(item)
     });
   };
 

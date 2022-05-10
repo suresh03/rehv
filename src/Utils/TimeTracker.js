@@ -9,12 +9,21 @@ import useApiServices from "../Services/useApiServices";
 export function TimeTrackerProvider(props) {
   const [isActive, setIsActive] = useState(false);
   const [appState, setAppState] = useState(AppState.currentState);
-  const { ApiGetMethod } = useApiServices();
+  const { ApiPostMethod } = useApiServices();
   const [startTime, setStartTime] = useState(null);
 
-  const submitToServer = () => {
+  const submitToServer = async () => {
     let diffInMinute = moment().diff(startTime, "minute");
-    console.log("diffInMinute", diffInMinute);
+    console.log("diffInMinute", typeof diffInMinute);
+    if (diffInMinute != null || diffInMinute != NaN) {
+      try {
+        ApiPostMethod("user/spendingTimes", {
+          spendTimes: diffInMinute,
+        });
+      } catch (error) {
+        console.log("spendingTimes => ", error);
+      }
+    }
   };
 
   useFocusEffect(

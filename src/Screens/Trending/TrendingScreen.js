@@ -40,9 +40,7 @@ export default function TrendingScreen({ navigation }) {
   const [CommunityList, setCommunityList] = useState([]);
   const [selectedCommunityId, setSelectedCommunityId] = useState("");
   const { likeOrCommentHome } = useCommunityServices();
-  const [membersList, setMembersList] = useState([]);
-  const [managementIds, setManagementIds] = useState([]);
-  const [commIds, setCommIds] = useState([]);
+
   const { user } = useAppValue();
   const { role } = user;
   console.log("role", role);
@@ -56,30 +54,24 @@ export default function TrendingScreen({ navigation }) {
     return unsubscribe;
   }, [selectedCommunityId]);
 
-  const getSelectedCommunity = () => {
+  const getSelectedCommunity = async () => {
     if (role === "MANAGER") {
-      ApiGetMethod(`user/allCommunityList`)
-        .then((res) => {
-          setCommunityList(res.data.list);
-          console.log("MANAGER", res.data.list);
-        })
-        .catch((error) => {
-          console.assert(error);
-          Alert.alert("Message", error);
-        })
-        .finally(() => setLoading(false));
+      try {
+        const res = await ApiGetMethod(`user/topCommunity`);
+        setCommunityList(res.data.list);
+        console.log("MANAGER getSelectedCommunity", res.data.list);
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       let payload = "Employee";
-      ApiGetMethod(`user/allCommunityList?type=${payload}`)
-        .then((res) => {
-          setCommunityList(res.data.list);
-          console.log("Employee", res.data.list);
-        })
-        .catch((error) => {
-          console.assert(error);
-          Alert.alert("Message", error);
-        })
-        .finally(() => setLoading(false));
+      try {
+        const res = await ApiGetMethod(`user/topCommunity?type=${payload}`);
+        setCommunityList(res.data.list);
+        console.log("Employee getSelectedCommunity", res.data.list);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -112,7 +104,7 @@ export default function TrendingScreen({ navigation }) {
   const likeOrCommentAction = async (action, val, postId, index) => {
     console.log(action, val, postId, index);
     let dataValue = postData;
-    dataValue[index].isLikes = !dataValue[index].isLikes;
+    dataValue[index].isLikes = !dataValue[index]?.isLikes;
     dataValue[index].totalLikes = dataValue[index].isLikes
       ? dataValue[index].totalLikes + 1
       : dataValue[index].totalLikes - 1;
@@ -127,11 +119,11 @@ export default function TrendingScreen({ navigation }) {
       .finally(() => console.log());
   };
 
-  const profileClick = (role, _id) => {
+  const profileClick = (item,role, _id) => {
     if (role.toLowerCase() == "excoach") {
-      navigation.navigate("ExCoachProfileScreen", { _id });
+      navigation.navigate("ExCoachProfileScreen", {item, _id });
     } else {
-      navigation.navigate("MemberProfileScreen", { _id });
+      navigation.navigate("MemberProfileScreen", {item, _id });
     }
   };
 
@@ -186,7 +178,7 @@ export default function TrendingScreen({ navigation }) {
           showsHorizontalScrollIndicator={false}
         >
           {Children.toArray(
-            CommunityList.map((item, Index) => {
+            CommunityList?.map((item, Index) => {
               let UserProfile = item.data.slice(0, 4);
 
               return (
@@ -218,7 +210,7 @@ export default function TrendingScreen({ navigation }) {
                         style={{
                           marginVertical: 10,
                           width:
-                            item.data[0].name.length > 14 ? wp(35) : wp(22),
+                            item.data[0]?.name.length > 14 ? wp(35) : wp(22),
                         }}
                       >
                         <Text
@@ -230,7 +222,7 @@ export default function TrendingScreen({ navigation }) {
                           }}
                           numberOfLines={2}
                         >
-                          {item.data[0].name}
+                          {item?.data[0]?.name}
                         </Text>
                       </View>
                       <View
@@ -239,7 +231,7 @@ export default function TrendingScreen({ navigation }) {
                             item.isJoined == true ? "#fff" : "#4D39E9",
                           height: hp(3.2),
                           borderRadius: Scaler(5),
-                          borderWidth: item.isJoined == true ? 0.8 : 0,
+                          borderWidth: item?.isJoined == true ? 0.8 : 0,
                           borderColor: "lightgrey",
                         }}
                       >
@@ -268,35 +260,38 @@ export default function TrendingScreen({ navigation }) {
                           width: wp(40),
                         }}
                       >
-                        {UserProfile.map((items) => {
-                          return (
-                            <View style={{ width: "23%" }}>
-                              {items.userData.profilePic.trim() == "" ||
-                              items.userData.profilePic == null ||
-                              items.userData.profilePic?.indexOf("https://") !=
-                                0 ||
-                              items.userData.profilePic == undefined ? (
-                                <FastImage
-                                  style={{
-                                    width: Scaler(30),
-                                    height: Scaler(30),
-                                    borderRadius: Scaler(30),
-                                  }}
-                                  source={profilePic}
-                                />
-                              ) : (
-                                <FastImage
-                                  style={{
-                                    width: Scaler(30),
-                                    height: Scaler(30),
-                                    borderRadius: Scaler(30),
-                                  }}
-                                  source={{ uri: items.userData.profilePic }}
-                                />
-                              )}
-                            </View>
-                          );
-                        })}
+                        {Children.toArray(
+                          UserProfile?.map((items) => {
+                            return (
+                              <View style={{ width: "23%" }}>
+                                {items.userData?.profilePic.trim() == "" ||
+                                items.userData?.profilePic == null ||
+                                items.userData?.profilePic?.indexOf(
+                                  "https://"
+                                ) != 0 ||
+                                items.userData?.profilePic == undefined ? (
+                                  <FastImage
+                                    style={{
+                                      width: Scaler(30),
+                                      height: Scaler(30),
+                                      borderRadius: Scaler(30),
+                                    }}
+                                    source={profilePic}
+                                  />
+                                ) : (
+                                  <FastImage
+                                    style={{
+                                      width: Scaler(30),
+                                      height: Scaler(30),
+                                      borderRadius: Scaler(30),
+                                    }}
+                                    source={{ uri: items?.userData?.profilePic }}
+                                  />
+                                )}
+                              </View>
+                            );
+                          })
+                        )}
                       </View>
                       <Text
                         style={{
@@ -311,7 +306,7 @@ export default function TrendingScreen({ navigation }) {
                           fontWeight: "500",
                         }}
                       >
-                        {item.data.length} {Lang.MEMBERS}
+                        {item?.data?.length} {Lang.MEMBERS}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -326,7 +321,7 @@ export default function TrendingScreen({ navigation }) {
             color: "#110D26",
             fontSize: Scaler(18),
             fontFamily: "Poppins-Medium",
-            top: hp(-4),
+            top: hp(-3),
           }}
         >
           {Lang.TrendingPosts}
@@ -389,7 +384,7 @@ export default function TrendingScreen({ navigation }) {
         <StatusBar barStyle="light-content" />
         <TrendingPostcard
           data={postData}
-          profileClick={(role, id) => profileClick(role, id)}
+          profileClick={(item,role, id) => profileClick(item,role, id)}
           onLike={(action, val, postId, index) =>
             likeOrCommentAction(action, val, postId, index)
           }

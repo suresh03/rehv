@@ -1,51 +1,32 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   Pressable,
-  Platform,
   ActivityIndicator,
   Dimensions,
-  StatusBar,
   FlatList,
-  ScrollView,
-  useWindowDimensions,
   StyleSheet,
 } from "react-native";
 import BottomSheet from "react-native-simple-bottom-sheet";
 import { getFontSize } from "../../../Components/SharedComponents/ResponsiveSize";
-import {
-  oneIcon,
-  twoIcon,
-  threeIcon,
-  nineIcon,
-  elevenIcon,
-  fiveIcon,
-  sevenIcon,
-  twelveIcon,
-  thirteenIcon,
-  fourteenIcon,
-  eightIcon,
-  tenIcon,
-} from "../../../Assets/icon";
+
 import FlipCard from "react-native-flip-card-plus";
 import useApiServices from "../../../Services/useApiServices";
 import Lang from "../../../Language";
+import FastImage from "react-native-fast-image";
 const { width } = Dimensions.get("window");
 export default function Persona(props) {
   const panelRef = useRef(null);
   const [getSelected, setSelected] = useState(null);
   const [getAndroidShield, setAndroidShield] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [IsNailed, setIsNailed] = useState(false);
-  const [IsMaker, setIsMaker] = useState(false);
   const [UserData, setUserData] = useState([]);
-  const [isMoverShaker, setisMoverShaker] = useState(false);
-  const [isNewJoiner, setisNewJoiner] = useState(false);
-  const [isTrendsetter, setisTrendsetter] = useState(false);
+  const [isMoverShaker, setIsMoverShaker] = useState(false);
+  const [isNewJoiner, setIsNewJoiner] = useState(false);
+  const [isTrendsetter, setIsTrendsetter] = useState(false);
   const [badge, setBadges] = useState({});
   const rankingOptions = [
     {
@@ -75,7 +56,7 @@ export default function Persona(props) {
 
   useEffect(() => {
     getUserDetails();
-    getBadges();
+
     let rank = rankingOptions;
     rank[0].isMoverShaker = isMoverShaker;
     rank[1].isNewJoiner = isNewJoiner;
@@ -85,13 +66,17 @@ export default function Persona(props) {
   }, [isMoverShaker, isNewJoiner, isTrendsetter]);
 
   const getUserDetails = () => {
-    ApiGetMethod(`user/getUserDetails`).then((res) => {
-      console.log("res.data[0]", res.data[0]);
-      setisMoverShaker(res.data[0].isMoverShaker);
-      setisNewJoiner(res.data[0].isNewJoiner);
-      setisTrendsetter(res.data[0].isTrendsetter);
-      setBadges(res.data[0]);
-    });
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        console.log("res.data[0]", res.data[0]);
+        setIsMoverShaker(res.data[0].isMoverShaker);
+        setIsNewJoiner(res.data[0].isNewJoiner);
+        setIsTrendsetter(res.data[0].isTrendsetter);
+        setBadges(res.data[0]);
+      })
+      .finally(() => {
+        getBadges();
+      });
   };
 
   const getBadges = () => {
@@ -144,8 +129,8 @@ export default function Persona(props) {
         <FlipCard
           flipDirection={"h"}
           style={{
-            width: Dimensions.get("screen").width / 4,
-            height: Dimensions.get("screen").width / 4,
+            width: width / 4,
+            height: width / 4,
             top: -35,
             borderWidth: 0,
           }}
@@ -157,9 +142,9 @@ export default function Persona(props) {
         >
           <Pressable
             style={{
-              width: Dimensions.get("screen").width / 4,
-              height: Dimensions.get("screen").width / 4,
-              borderRadius: Dimensions.get("screen").width / 4,
+              width: width / 4,
+              height: width / 4,
+              borderRadius: width / 4,
               backgroundColor: "#fff",
               borderWidth: 3,
               borderColor: "#FFFF",
@@ -178,21 +163,21 @@ export default function Persona(props) {
               flipViewRef.current.flipHorizontal();
             }}
           >
-            <Image
+            <FastImage
               source={
                 isString(getSelected?.logoFront) === true
                   ? { uri: getSelected?.logoFront }
                   : getSelected?.logoFront
               }
               style={{ width: "75%", height: "75%" }}
-              resizeMode="contain"
+              resizeMode={FastImage.resizeMode.contain}
             />
           </Pressable>
           <Pressable
             style={{
-              width: Dimensions.get("screen").width / 4,
-              height: Dimensions.get("screen").width / 4,
-              borderRadius: Dimensions.get("screen").width / 4,
+              width: width / 4,
+              height: width / 4,
+              borderRadius: width / 4,
               backgroundColor: "#fff",
               borderWidth: 3,
               borderColor: "#FFFF",
@@ -211,7 +196,7 @@ export default function Persona(props) {
               flipViewRef.current.flipHorizontal();
             }}
           >
-            <Image
+            <FastImage
               // source={{ uri: getSelected?.logoBack }}
               source={
                 isString2(getSelected?.logoBack) === true
@@ -219,7 +204,7 @@ export default function Persona(props) {
                   : getSelected?.logoBack
               }
               style={{ width: "75%", height: "75%" }}
-              resizeMode="contain"
+              resizeMode={FastImage.resizeMode.contain}
             />
           </Pressable>
         </FlipCard>
@@ -250,10 +235,10 @@ export default function Persona(props) {
               top: 20,
             }}
           >
-            <Image
+            <FastImage
               source={{ uri: getSelected?.picture }}
               style={{ width: 22, height: 22 }}
-              resizeMode="contain"
+              resizeMode={FastImage.resizeMode.contain}
             />
             <Text
               style={{
@@ -318,7 +303,7 @@ export default function Persona(props) {
               onPress={() => firstThreeImageAction(item)}
               style={styles.imageContainer}
             >
-              <Image
+              <FastImage
                 source={item.logoFront}
                 style={{
                   width: "75%",
@@ -330,7 +315,7 @@ export default function Persona(props) {
                       ? 1
                       : 0.3,
                 }}
-                resizeMode="contain"
+                resizeMode={FastImage.resizeMode.contain}
               />
             </TouchableOpacity>
           );
@@ -372,7 +357,7 @@ export default function Persona(props) {
                   onPress={() => firstThreeImageAction2(item)}
                   style={styles.imageContainer}
                 >
-                  <Image
+                  <FastImage
                     source={{ uri: item.logoFront }}
                     style={{
                       width: "75%",
@@ -383,13 +368,13 @@ export default function Persona(props) {
                           ? 1
                           : 0.3,
                     }}
-                    resizeMode="contain"
+                    resizeMode={FastImage.resizeMode.contain}
                   />
                 </TouchableOpacity>
               );
             }}
             numColumns={3}
-            keyExtractor={(item) => item.title}
+            keyExtractor={(item, index) => index.toString()}
             ListHeaderComponent={() => listHeader()}
           />
         )}
@@ -413,8 +398,8 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "29%",
-    height: Dimensions.get("screen").width / 3.8,
-    borderRadius: Dimensions.get("screen").width / 4,
+    height: width / 3.8,
+    borderRadius: width / 4,
     backgroundColor: "#fff",
     borderWidth: 3,
     borderColor: "rgba(0,0,0,0.05)",

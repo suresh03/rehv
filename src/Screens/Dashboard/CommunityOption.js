@@ -12,7 +12,6 @@ import {
   ActivityIndicator,
   FlatList,
   StyleSheet,
-  ViewPagerAndroid,
 } from "react-native";
 import { backblack, profilePic, star, marketingIcon } from "../../Assets/icon";
 import { getFontSize } from "../../Components/SharedComponents/ResponsiveSize";
@@ -21,74 +20,63 @@ import { useSelector } from "react-redux";
 import useApiServices from "../../Services/useApiServices";
 import Lang from "../../Language";
 
-export default function InsightCompany({ navigation }) {
+export default function InsightCompany({ navigation, route }) {
   const [getCommunitites, setCommunities] = useState([]);
   const [getDescStatus, setDescStatus] = useState(false);
   const panelRef = useRef(null);
   const communityId = useSelector((state) => state.selectedCommunity);
   const { ApiGetMethod } = useApiServices();
   const [getMemberList, setMemberList] = useState([]);
-  const [memberListImages, setMemberListImages] = useState([]);
+  const [getMemberListImages, setMemberListImages] = useState([]);
   const [isLoading, setLoading] = useState(true);
+  const [LangType, setLangType] = useState("")
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol)
+      })
+      .finally(() => console.log("success"));
+  };
 
   useEffect(() => {
-    getCommunityMembers();
+    if (route.params.flag === "company") {
+      if (route.params.name === "Aggregate") {
+        console.log("hii");
+        getCommunityMembersAggregate();
+      } else {
+        getCommunityMembersCompany();
+      }
+    } else {
+      getCommunityMembers();
+    }
   }, []);
 
+  const minToHrMin = (minutes) => {
+    let h = Math.round(minutes / 60);
+    let m = Math.round(minutes % 60);
+    h = h < 10 ? "0" + h : h;
+    m = m < 10 ? "0" + m : m;
+    return h + ":" + m + " hrs";
+  };
+
   const getCommunityMembers = () => {
-    console.log("communityId._id", communityId._id)
-    // ApiGetMethod(`post/companyBaseCommunityById?communityId=${communityId._id}`).then(
-    //   (res) => {
-    //     console.log("get post/ActivitiesPostData list => ", res.data);
-    //     setMemberList(res.data);
-    //     let mlist = res.data.memberList;
-    //     mlist.length = 4;
-    //     let data = res.data;
-    //     setMemberListImages(mlist);
-    //     if (global.isPersonal === true) {
-    //       setCommunities([
-    //         { title: Lang.POST, value: data.totalPost },
-    //         {
-    //           title: `Rehvups ${Lang.RECEIVED}`,
-    //           value: data.totalLikeReceived,
-    //         },
-    //         { title: `Rehvups ${Lang.GIVEN}`, value: data.totalLikesGiven },
-    //         { title: Lang.APPEARENCE_NEWSFEED, value: data.totalHome },
-    //         { title: Lang.TREND_BOARD, value: data.totalTranding },
-    //         { title: Lang.RCVD_COMMENTS, value: data.totalCommentReceived },
-    //         { title: Lang.POST_SHARED, value: data.totalSharedPost },
-    //       ]);
-    //     } else {
-    //       setCommunities([
-    //         { title: Lang.POST, value: data.totalPost },
-    //         {
-    //           title: `Rehvups ${Lang.RECEIVED}`,
-    //           value: data.totalLikeReceived,
-    //         },
-    //         { title: `Rehvups ${Lang.GIVEN}`, value: data.totalLikesGiven },
-    //         { title: Lang.APPEARENCE_NEWSFEED, value: data.totalHome },
-    //         { title: Lang.TREND_BOARD, value: data.totalTranding },
-    //         { title: Lang.RCVD_COMMENTS, value: data.totalCommentReceived },
-    //         { title: Lang.POST_SHARED, value: data.totalSharedPost },
-    //         { title: Lang.AVG_TIME_SPENT, value: data.avgTime },
-    //         { title: Lang.TOTAL_TIME_SPENT, value: data.totalTime },
-    //       ]);
-    //     }
-    //     setLoading(false);
-    //   }
-    // );
     if (
       communityId === "Manager" ||
       communityId === "Employee" ||
       communityId === "All"
     ) {
-      ApiGetMethod(`post/companyAggregationDetails?type=${communityId}`).then(
+      ApiGetMethod(`post/personalAggregationDetails?type=${communityId}`).then(
         (res) => {
-          console.log("post/personalAggregationDetails => ", res.data);
+          console.log("get post/ActivitiesPostData list => ", res.data);
           setMemberList(res.data);
           let mlist = res.data.memberList;
-          // mlist.length = 4;
+          mlist.length = 4;
           let data = res.data;
+          console.log("mlist", mlist, res.data);
           setMemberListImages(mlist);
           if (global.isPersonal === true) {
             setCommunities([
@@ -115,8 +103,11 @@ export default function InsightCompany({ navigation }) {
               { title: Lang.TREND_BOARD, value: data.totalTranding },
               { title: Lang.RCVD_COMMENTS, value: data.totalCommentReceived },
               { title: Lang.POST_SHARED, value: data.totalSharedPost },
-              { title: Lang.AVG_TIME_SPENT, value: data.avgTime },
-              { title: Lang.TOTAL_TIME_SPENT, value: data.totalTime },
+              { title: Lang.AVG_TIME_SPENT, value: minToHrMin(data.avgTime) },
+              {
+                title: Lang.TOTAL_TIME_SPENT,
+                value: minToHrMin(data?.totalTime),
+              },
             ]);
           }
           setLoading(false);
@@ -124,13 +115,14 @@ export default function InsightCompany({ navigation }) {
       );
     } else {
       ApiGetMethod(
-        `post/companyBaseCommunityById?communityId=${communityId._id}`
+        `post/personalDetailsById?communityId=${communityId._id}`
       ).then((res) => {
         console.log("get post/ActivitiesPostData list => ", res.data);
         setMemberList(res.data);
         let mlist = res.data.memberList;
         mlist.length = 4;
         let data = res.data;
+        console.log("mlist22", mlist, res.data);
         setMemberListImages(mlist);
         if (global.isPersonal === true) {
           setCommunities([
@@ -157,8 +149,11 @@ export default function InsightCompany({ navigation }) {
             { title: Lang.TREND_BOARD, value: data.totalTranding },
             { title: Lang.RCVD_COMMENTS, value: data.totalCommentReceived },
             { title: Lang.POST_SHARED, value: data.totalSharedPost },
-            { title: Lang.AVG_TIME_SPENT, value: data.avgTime },
-            { title: Lang.TOTAL_TIME_SPENT, value: data.totalTime },
+            { title: Lang.AVG_TIME_SPENT, value: minToHrMin(data.avgTime) },
+            {
+              title: Lang.TOTAL_TIME_SPENT,
+              value: minToHrMin(data?.totalTime),
+            },
           ]);
         }
         setLoading(false);
@@ -166,8 +161,103 @@ export default function InsightCompany({ navigation }) {
     }
   };
 
+  const getCommunityMembersCompany = () => {
+    console.log("communityId._id", communityId._id);
+    ApiGetMethod(
+      `post/companyBaseCommunityById?communityId=${communityId._id}`
+    ).then((res) => {
+      console.log("get post/ActivitiesPostData list => ", res.data);
+      setMemberList(res.data);
+      let mlist = res.data.memberList;
+      mlist.length = 4;
+      let data = res.data;
+
+      setMemberListImages(mlist);
+      if (global.isPersonal === true) {
+        setCommunities([
+          { title: Lang.POST, value: data.totalPost },
+          {
+            title: `Rehvups ${Lang.RECEIVED}`,
+            value: data.totalLikeReceived,
+          },
+          { title: `Rehvups ${Lang.GIVEN}`, value: data.totalLikesGiven },
+          { title: Lang.APPEARENCE_NEWSFEED, value: data.totalHome },
+          { title: Lang.TREND_BOARD, value: data.totalTranding },
+          { title: Lang.RCVD_COMMENTS, value: data.totalCommentReceived },
+          { title: Lang.POST_SHARED, value: data.totalSharedPost },
+        ]);
+      } else {
+        setCommunities([
+          { title: Lang.POST, value: data.totalPost },
+          {
+            title: `Rehvups ${Lang.RECEIVED}`,
+            value: data.totalLikeReceived,
+          },
+          { title: `Rehvups ${Lang.GIVEN}`, value: data.totalLikesGiven },
+          { title: Lang.APPEARENCE_NEWSFEED, value: data.totalHome },
+          { title: Lang.TREND_BOARD, value: data.totalTranding },
+          { title: Lang.RCVD_COMMENTS, value: data.totalCommentReceived },
+          { title: Lang.POST_SHARED, value: data.totalSharedPost },
+          { title: Lang.AVG_TIME_SPENT, value: minToHrMin(data.avgTime) },
+          { title: Lang.TOTAL_TIME_SPENT, value: minToHrMin(data?.totalTime) },
+        ]);
+      }
+      setLoading(false);
+    });
+  };
+
+  const getCommunityMembersAggregate = () => {
+    console.log("communityId._id", communityId._id);
+    ApiGetMethod(`post/companyAggregationDetails?type=${communityId}`).then(
+      (res) => {
+        console.log("get post/ActivitiesPostData list => ", res.data);
+        setMemberList(res.data);
+        let mlist = res.data.memberList;
+        mlist.length = 4;
+        let data = res.data;
+
+        setMemberListImages(mlist);
+        if (global.isPersonal === true) {
+          setCommunities([
+            { title: Lang.POST, value: data.totalPost },
+            {
+              title: `Rehvups ${Lang.RECEIVED}`,
+              value: data.totalLikeReceived,
+            },
+            { title: `Rehvups ${Lang.GIVEN}`, value: data.totalLikesGiven },
+            { title: Lang.APPEARENCE_NEWSFEED, value: data.totalHome },
+            { title: Lang.TREND_BOARD, value: data.totalTranding },
+            { title: Lang.RCVD_COMMENTS, value: data.totalCommentReceived },
+            { title: Lang.POST_SHARED, value: data.totalSharedPost },
+          ]);
+        } else {
+          setCommunities([
+            { title: Lang.POST, value: data.totalPost },
+            {
+              title: `Rehvups ${Lang.RECEIVED}`,
+              value: data.totalLikeReceived,
+            },
+            { title: `Rehvups ${Lang.GIVEN}`, value: data.totalLikesGiven },
+            { title: Lang.APPEARENCE_NEWSFEED, value: data.totalHome },
+            { title: Lang.TREND_BOARD, value: data.totalTranding },
+            { title: Lang.RCVD_COMMENTS, value: data.totalCommentReceived },
+            { title: Lang.POST_SHARED, value: data.totalSharedPost },
+            { title: Lang.AVG_TIME_SPENT, value: minToHrMin(data.avgTime) },
+            {
+              title: Lang.TOTAL_TIME_SPENT,
+              value: minToHrMin(data?.totalTime),
+            },
+          ]);
+        }
+        setLoading(false);
+      }
+    );
+  };
+
   const renderBigButton = (title) => {
-    console.log("images", memberListImages.length);
+    var images = getMemberListImages;
+    console.log("images", images.length);
+    let memberCounter = getMemberList.totalCommunityMember - 4;
     return (
       <View
         style={[
@@ -204,7 +294,16 @@ export default function InsightCompany({ navigation }) {
             <Text
               style={{
                 fontSize: getFontSize(20),
-                color: communityId === "Employee" ? "#4D39E9" : communityId === "Manager" ? "#5E8B00" : communityId === "All" ? "#0089BD" : communityId.type === "Employee" ? "#4D39E9" : "#5E8B00",
+                color:
+                  communityId === "Employee"
+                    ? "#4D39E9"
+                    : communityId === "Manager"
+                    ? "#5E8B00"
+                    : communityId === "All"
+                    ? "#0089BD"
+                    : communityId.type === "Employee"
+                    ? "#4D39E9"
+                    : "#5E8B00",
                 fontFamily: "Poppins-bold",
                 fontWeight: "bold",
               }}
@@ -237,74 +336,73 @@ export default function InsightCompany({ navigation }) {
             <View
               style={{
                 width: "80%",
-                flexDirection: memberListImages.length > 0 ? "row" : "column",
-                justifyContent:
-                  memberListImages.length > 0 ? "space-between" : "flex-start",
-                alignItems:
-                  memberListImages.length > 0 ? "center" : "flex-start",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              <View style={{ height: memberListImages.length > 0 ? 28 : 0, }}>
-                {memberListImages.length > 0
-                  ? memberListImages.map((item, index) => {
-                      console.log(
-                        "memberListImages.length - 1",
-                        memberListImages.length - 6, memberListImages
-                      );
-                      return (
-                        <View
-                          style={{
-                            width: 28,
-                            height: 28,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            position: "absolute",
-                            marginLeft: index === 0 ? 0 : index * 15,
-                            borderRadius: 20,
-                            backgroundColor: "lightgrey",
-                            overflow: "hidden",
-                            borderWidth: 2,
-                            borderColor: "#fff",
-                          }}
-                        >
-                          {index != memberListImages.length - 1 ? (
-                            <Image
-                              source={
-                                item.userData.profilePic === "" ||
-                                item.userData.profilePic?.indexOf("https://") !=
-                                  0 ||
-                                item.userData.profilePic == null ||
-                                item.userData.profilePic == undefined
-                                  ? profilePic
-                                  : { uri: item.userData.profilePic }
-                              }
-                              resizeMode="contain"
-                              style={{ width: 30, height: 30 }}
-                            />
-                          ) : (
-                            <Text
-                              style={{
-                                fontSize: getFontSize(10),
-                                color: "#110D26",
-                                fontFamily: "Poppins-Medium",
-                              }}
-                            >
-                              {getMemberList.totalCommunityMember - 4}+
-                            </Text>
-                          )}
-                        </View>
-                      );
-                    })
-                  : null}
-              </View>
-
+              {images.length > 0
+                ? images.map((item, index) => {
+                    console.log(
+                      "getMemberListImages.length - 1",
+                      getMemberListImages.length - 1
+                    );
+                    return (
+                      <View
+                        style={{
+                          width: 30,
+                          height: 30,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          position: "absolute",
+                          marginLeft: index === 0 ? 0 : index * 15,
+                          borderRadius: 20,
+                          backgroundColor: "lightgray",
+                          overflow: "hidden",
+                          borderWidth: 2,
+                          borderColor: "#fff",
+                        }}
+                      >
+                        {index != getMemberListImages.length - 1 ? (
+                          <Image
+                            source={
+                              item.userData.profilePic === ""
+                                ? profilePic
+                                : { uri: item.userData.profilePic }
+                            }
+                            resizeMode="contain"
+                            style={{ width: 30, height: 30 }}
+                          />
+                        ) : (
+                          <Text
+                            style={{
+                              fontSize: getFontSize(10),
+                              color: "#110D26",
+                              fontFamily: "Poppins-Medium",
+                            }}
+                          >
+                            {memberCounter > 0 ? memberCounter : 0}+
+                          </Text>
+                        )}
+                      </View>
+                    );
+                  })
+                : null}
               <Text
                 style={{
                   fontSize: getFontSize(20),
                   marginLeft: "80%",
                   width: "40%",
                   color:
-                  communityId === "Employee" ? "#4D39E9" : communityId === "Manager" ? "#5E8B00" : communityId === "All" ? "#0089BD" : communityId.type === "Employee" ? "#4D39E9" : "#5E8B00",
+                    communityId === "Employee"
+                      ? "#4D39E9"
+                      : communityId === "Manager"
+                      ? "#5E8B00"
+                      : communityId === "All"
+                      ? "#0089BD"
+                      : communityId.type === "Employee"
+                      ? "#4D39E9"
+                      : "#5E8B00",
                   fontFamily: "Poppins-bold",
                   fontWeight: "bold",
                 }}
@@ -377,29 +475,34 @@ export default function InsightCompany({ navigation }) {
                 <Image
                   style={[
                     styles.all_image,
-                    { marginRight: 5, width: 35, height: 35 },
+                    { marginRight: 5, width: 35, height: 35, },
                   ]}
-                  source={communityId === "Employee" || communityId === "Manager" || communityId === "All" ? marketingIcon : { uri: communityId.picture }}
+                  source={
+                    communityId === "Employee" ||
+                    communityId === "Manager" ||
+                    communityId === "All"
+                      ? require("../../Assets/Images/aggregate.png")
+                      : { uri: communityId.picture }
+                  }
                   resizeMode="contain"
                 />
                 <Text
-                numberOfLines={1}
+                  numberOfLines={1}
                   style={{
                     fontSize: getFontSize(18),
                     fontFamily: "Poppins-SemiBold",
                     color: "#000",
                     textAlign: "center",
-                    maxWidth: "65%"
+                    maxWidth: "65%",
                   }}
                 >
                   {communityId === "Manager" ||
                   communityId === "Employee" ||
                   communityId === "All"
-                    ? "Agragate stats"
-                    : communityId.langType === "en"
+                    ? "Aggregate stats"
+                    : LangType === "en"
                     ? communityId.name
                     : communityId.frenchName}
-                    
                 </Text>
               </View>
             </View>
@@ -417,7 +520,7 @@ export default function InsightCompany({ navigation }) {
                     textAlign: "center",
                   }}
                 >
-                  {communityId.description}
+                  {LangType == "en" ? communityId.description:communityId.frenchDescription}
                 </Text>
               ) : (
                 <Text
@@ -431,7 +534,7 @@ export default function InsightCompany({ navigation }) {
                     textAlign: "center",
                   }}
                 >
-                  {communityId.description}
+                  {LangType == "en" ? communityId.description:communityId.frenchDescription}
                 </Text>
               )}
             </TouchableOpacity>
@@ -458,7 +561,16 @@ export default function InsightCompany({ navigation }) {
                         <Text
                           style={{
                             fontSize: getFontSize(20),
-                            color:communityId === "Employee" ? "#4D39E9" : communityId === "Manager" ? "#5E8B00" : communityId === "All" ? "#0089BD" : communityId.type === "Employee" ? "#4D39E9" : "#5E8B00",
+                            color:
+                              communityId === "Employee"
+                                ? "#4D39E9"
+                                : communityId === "Manager"
+                                ? "#5E8B00"
+                                : communityId === "All"
+                                ? "#0089BD"
+                                : communityId.type === "Employee"
+                                ? "#4D39E9"
+                                : "#5E8B00",
                             fontFamily: "Poppins-bold",
                             fontWeight: "bold",
                           }}

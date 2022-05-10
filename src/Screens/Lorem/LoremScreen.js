@@ -14,7 +14,7 @@ import { loremIcon, giftIcon } from "../../Assets/icon";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Body from "../../Components/SharedComponents/Body";
 import ChangeStyle from "../../Components/CustomComponents/ChangeStyle";
-import { HeaderCustom } from "../../Components/CustomHeader/HeaderBack";
+import { HeaderCustomLearn } from "../../Components/CustomHeader/HeaderBack";
 import { useRoute } from "@react-navigation/native";
 import Scaler from "../../Utils/Scaler";
 import { useTheme } from "react-native-paper";
@@ -23,9 +23,11 @@ import Lang from "../../Language";
 
 const slides = [loremIcon];
 import { whiteback } from "../../Assets/icon";
+import ImageBackground from "react-native/Libraries/Image/ImageBackground";
 export default function LoremSlider({ navigation, route }) {
-  const { name, description, picture, communityImage,  totalMembers } = route.params.item;
-  console.log("item", route.params.item)
+  const { name, description, picture, communityImage, totalMembers } =
+    route.params.item;
+  console.log("item", route.params.item);
   const theme = useTheme();
   return (
     <View style={CommonStyle.container}>
@@ -42,26 +44,39 @@ export default function LoremSlider({ navigation, route }) {
         inactiveDotColor="lightgrey"
         dotStyle={ChangeStyle.sliderimgStyle}
       /> */}
-
-      <Image source={{uri:communityImage}} style={{ height: hp(61), width: "100%" }} />
-      <HeaderCustom
-        back_navstyle={{ marginTop: Platform.OS === "ios" ? hp(-58) : hp(-62) }}
-        back_whiteColor={() => navigation.goBack()}
-      />
-
+      <View style={{ height:hp(61) }}>
+        <ImageBackground
+          source={{ uri: communityImage }}
+          style={{ height: "100%", width: "100%" }}
+          imageStyle={{height: "100%", width: "100%"}}
+          >
+          <HeaderCustomLearn
+            backButtonStyle={{
+              zIndex: 2,
+              position: "absolute",
+              top: Scaler(42),
+              width:35,
+              resizeMode:'contain'
+            }}
+            onBackPress={() => navigation.goBack()}
+          />
+        </ImageBackground>
+      </View>
       <View style={ChangeStyle.lorembackgroundStyle}>
         <Body>
           <View style={ChangeStyle.loremViewStyle}>
             <View style={[ChangeStyle.boxStyle]}>
+            <View style={{width:"25%"}}>
               <Image
                 style={{ height: Scaler(52), width: Scaler(52) }}
                 source={{uri:picture}}
                 resizeMode={"contain"}
               />
+              </View>
               <View
                 style={{
                   alignSelf: "center",
-                  width: Scaler(150),
+                  width: "75%",
                   alignItems: "center",
                   //paddingHorizontal: 5,
                 }}
@@ -73,6 +88,7 @@ export default function LoremSlider({ navigation, route }) {
                       textAlign: "left",
                       fontSize: Scaler(13),
                       color: "#000",
+                      right:4
                     },
                   ]}
                 >

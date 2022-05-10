@@ -4,15 +4,11 @@ import Scaler from "../../../Utils/Scaler";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { profilePic } from "../../../Assets/icon";
 import Lang from "../../../Language";
-import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "react-native-paper";
 
 export default function UserRowView(props) {
   const theme = useTheme();
   const [item] = useState(props.data);
-  console.log("item => ", item);
-  const navigation = useNavigation();
-
   return (
     <View
       style={{

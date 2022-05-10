@@ -1,17 +1,20 @@
 import axios from "axios";
 import UltimateConfig from "react-native-ultimate-config";
 import { useAppValue, useResetAppState } from "../Recoil/appAtom";
+import { useResetSocketState } from "../Recoil/socketAtom";
 import { removeFromLocal, storeToLocal } from "../Utils/LocalStorage";
 import SnackbarHandler from "../Utils/SnackbarHandler";
+
 //Developent URL Details
 const rootApi = UltimateConfig.API_URL;
-//const rootApi = "https://rehapi.appstudiointernal.ca/"
 
+//const rootApi = "https://rehapi.appstudiointernal.ca/"
+console.log("rootApi", rootApi);
 export default function useApiServices() {
   const appValue = useAppValue();
   const { token } = appValue;
   const resetAppState = useResetAppState();
-
+  const resetSocketState = useResetSocketState();
   const _logout = async (message) => {
     SnackbarHandler.errorToast("Message", message);
     try {
@@ -22,6 +25,7 @@ export default function useApiServices() {
       console.log(error);
     }
     resetAppState();
+    resetSocketState();
   };
 
   const ApiPostMethod = async (url, body) => {
@@ -224,8 +228,6 @@ export default function useApiServices() {
       return data;
     }
   };
-
-  
 
   return {
     ApiPostMethod,

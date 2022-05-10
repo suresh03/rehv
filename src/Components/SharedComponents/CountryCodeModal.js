@@ -71,6 +71,7 @@ export const GlobalInput = (props) => {
           underlineColorAndroid="transparent"
           autoCapitalize="none"
           autoCorrect={false}
+          returnKeyType={'done'}
           keyboardType={props.keyboardType ?? "default"}
         />
       </View>

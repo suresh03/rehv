@@ -6,7 +6,6 @@ import {
   CountryCode,
   GlobalInput,
 } from "../../Components/SharedComponents/CountryCodeModal";
-import { responsiveSize } from "../../Components/SharedComponents/ResponsiveSize";
 import Spacer from "../../Components/SharedComponents/Space";
 import { TextField } from "../../Components/SharedComponents/TextField";
 import { CustomButton } from "../../Components/SharedComponents/Button";
@@ -70,8 +69,8 @@ export default function EnterPhoneNumber({ navigation, route }) {
         }
       })
       .catch((error) => {
-        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message??'');
-console.log('error?.message',error?.message)
+        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
+        console.log("error?.message", error?.message);
       })
       .finally(setLoading(false));
   };
@@ -103,7 +102,7 @@ console.log('error?.message',error?.message)
         headerViewStyle={{ backgroundColor: "#fff" }}
       />
       <Body>
-        <Padding horizontal size={responsiveSize(25)}>
+        <Padding horizontal size={Scaler(25)}>
           <Text style={CommonStyle.tittleStyle}>{Lang.PHONE_NUMBER}</Text>
           <Spacer size={Scaler(20)} />
           <TextField

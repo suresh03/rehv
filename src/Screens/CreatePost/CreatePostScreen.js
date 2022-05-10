@@ -48,6 +48,19 @@ export default function CreatePostScreen({ navigation, route }) {
   const [postDescription, setPostDescription] = useState("");
   const [postUrl, setPostUrl] = useState("");
   const setModalVisible = useSetCreatePostState();
+  const [LangType, setLangType] = useState("");
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol);
+      })
+      .finally(() => console.log("success"));
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -186,13 +199,29 @@ export default function CreatePostScreen({ navigation, route }) {
           setPostUrl("");
           setImageServerUrl([]);
         } else {
-          SnackbarHandler.errorToast(Lang.MESSAGE, res.message);
+          //SnackbarHandler.errorToast(Lang.MESSAGE, res.message);
+          Alert.alert(Lang.MESSAGE, res.message, [
+            {
+              text: "Ok",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel",
+            },
+          ]);
           console.log("res.message =>", res.message);
+          setLoading(false);
         }
       })
       .catch((error) => {
-        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
+        // SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
+        Alert.alert(Lang.MESSAGE, res.message, [
+          {
+            text: "Ok",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+        ]);
         console.log("error?.message", error?.message);
+        setLoading(false);
       })
       .finally(() => setLoading(false));
   };
@@ -292,7 +321,7 @@ export default function CreatePostScreen({ navigation, route }) {
         (acc, item) => acc.concat(item._id),
         []
       );
-      console.log("data ", temp);
+      console.log("relateddata ", temp, res);
       setRelatedData(temp);
     });
   };
@@ -433,7 +462,7 @@ export default function CreatePostScreen({ navigation, route }) {
         cameraOpen={cameraOpen}
         relatedToggle={relatedToggle}
         relatedData={relatedData}
-        selectedCommunity={selectedCommunity.name}
+        selectedCommunity={Lang.getLanguage() === 'fr' ? selectedCommunity.frenchName : selectedCommunity.name}
         postDescription={postDescription}
         postUrl={postUrl}
         ImageUpload={ImageUpload}

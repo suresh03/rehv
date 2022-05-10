@@ -112,6 +112,7 @@ export default function SignInForm() {
               token: res.data.accessToken,
             });
             storeToLocal("token", res.data.accessToken);
+            storeToLocal("isNotification", JSON.stringify(res.data.isNotification));
             navigation.navigate("EnterPhoneNumber");
             SnackbarHandler.normalToast(
               Lang.MESSAGE,
@@ -170,7 +171,7 @@ export default function SignInForm() {
     validateFields().then((res) => {
       if (res == true) {
         if (
-          getErrorsInField("email").length == 0 &&
+          getErrorsInField("D").length == 0 &&
           getErrorsInField("password").length == 0
         ) {
           signIn();
@@ -258,7 +259,7 @@ export default function SignInForm() {
         <Text
           style={{
             ...DayTheme.fonts.regular,
-            color: "gray",
+            color: "#000",
             fontSize: Scaler(13),
           }}
         >

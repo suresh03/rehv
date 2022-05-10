@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useTheme } from "react-native-paper";
-import { View, TextInput, TouchableOpacity } from "react-native";
+import { View, TextInput, TouchableOpacity, Keyboard } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -20,7 +20,7 @@ function ChatToolBar(props) {
       style={{
         backgroundColor: "#fff",
         width: wp(100),
-        height: hp(10),
+        minHeight: hp(10),
         elevation: 5,
         borderTopWidth: 0.5,
         borderTopColor: "#ffff",
@@ -71,25 +71,29 @@ function ChatToolBar(props) {
             width: wp(65),
             borderRadius: 10,
             left: wp(2),
-            padding: 10,
+            paddingHorizontal: 10,
+            paddingVertical: Scaler(20),
+
           }}
+          multiline={true}
           editable={!loading}
           placeholder="Type here"
           placeholderTextColor="#7F8190"
           value={draftMessage}
           onChangeText={(text) => setDraftMessage(text)}
           returnKeyType="done"
+          onSubmitEditing={()=>Keyboard.dismiss()}
         />
         <TouchableOpacity disabled={loading} onPress={() => sendChat()}>
           <FastImage
             source={messageSendIcon}
             resizeMode={"contain"}
             style={{
-              height: hp(5.5),
-              width: wp(15),
-              alignItems: "center",
+              height: Scaler(50),
+              width: Scaler(50),
+              resizeMode: "cover",
+              borderRadius: Scaler(25),
               left: wp(3),
-              top: hp(1),
             }}
           />
         </TouchableOpacity>

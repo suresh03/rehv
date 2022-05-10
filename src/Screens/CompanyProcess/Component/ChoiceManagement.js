@@ -47,7 +47,7 @@ function ChoiceManagement(props) {
           <Text
             style={commonStyle.tittleStyle}
           >
-            {`${Lang.MEMBERS}\n${Lang.COMMUNITIES}`}
+            {`${Lang.MANAGEMENT}\n${Lang.COMMUNITIES}`}
           </Text>
           <Pressable onPress={() => setIconToggle(!iconToggle)}>
             <Image

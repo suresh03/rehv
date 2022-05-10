@@ -24,6 +24,7 @@ const ValidationConstants = {
       year: Lang.year,
       empStartMonth: Lang.currMonth,
       empStartYear: Lang.currYear,
+      postUrl: Lang.postUrl,
     },
     fr: {
       numbers: Lang.numbers,
@@ -44,6 +45,7 @@ const ValidationConstants = {
       year: Lang.year,
       empStartMonth: Lang.currMonth,
       empStartYear: Lang.currYear,
+      postUrl: Lang.postUrl,
     },
   }, // rules for validations messages for validation errors
   labels: {
@@ -59,6 +61,7 @@ const ValidationConstants = {
     twitter: "Twitter",
     empStartMonth: "Current Month",
     empStartYear: "Current Year",
+    postUrl: "postUrl",
   },
   deviceLocale: "en",
   rules: {
@@ -137,6 +140,8 @@ const ValidationConstants = {
     month: /^(0?[1-9]|1[012])$/,
     //year: /^\d{4}$/,
     year: /^(19|20)\d{2}$/,
+    postUrl:
+      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g,
   },
 };
 

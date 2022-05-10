@@ -24,13 +24,9 @@ import {
   croshGray,
   profilePic,
   Edit,
-  oneIcon,
-  twoIcon,
-  threeIcon,
-  fourIcon,
-  fiveIcon,
-  sevenIcon,
-  twelveIcon,
+  newJoinerFront,
+  trendSetterFront,
+  moversFront,
 } from "../../Assets/icon";
 import {
   widthPercentageToDP as wp,
@@ -49,9 +45,10 @@ import useCommunityServices from "../../ServiceHooks/useCommunityServices";
 import MyPostCard from "../Dashboard/Components/MyPostCard";
 import FastImage from "react-native-fast-image";
 import SnackbarHandler from "../../Utils/SnackbarHandler";
-
+import EmptyCardView from "../../Components/CustomComponents/EmptyCardView";
 
 export default function DashboardScreen({ navigation }) {
+  const [EsPoints, setEsPoints] = useState();
   const [postButton, setpostButton] = useState(true);
   const [activitiesButton, setactivitiesButton] = useState(false);
   const [requestButton, setrequestButton] = useState(false);
@@ -69,45 +66,16 @@ export default function DashboardScreen({ navigation }) {
   const [department, setDepartment] = useState("");
   const [followers, setFollowers] = useState("");
   const [following, setFollowing] = useState("");
-  const [getAchievements, setAchievements] = useState([
-    {
-      title: "1",
-      image: oneIcon,
-    },
-    {
-      title: "2",
-      image: twoIcon,
-    },
-    {
-      title: "3",
-      image: oneIcon,
-    },
-    {
-      title: "4",
-      image: threeIcon,
-    },
-    {
-      title: "5",
-      image: twelveIcon,
-    },
-    {
-      title: "6",
-      image: fiveIcon,
-    },
-    {
-      title: "7",
-      image: fourIcon,
-    },
-    {
-      title: "8",
-      image: sevenIcon,
-    },
-  ]);
+  const [getAchievements, setAchievements] = useState([]);
   const { likeOrCommentHome } = useCommunityServices();
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const bottomSheetRef = useRef(null);
   const [lengthMore, setLengthMore] = useState(false);
   const [textShown, setTextShown] = useState(false); //To show ur remaining Text
+  const [Ranking, setRanking] = useState("");
+  const [isTrendsetter, setIsTrendsetter] = useState(false);
+  const [isMoverShaker, setIsMoverShaker] = useState(false);
+  const [isNewJoiner, setIsNewJoiner] = useState(true);
 
   const colorChange = (type) => {
     if (type == "post") {
@@ -136,28 +104,63 @@ export default function DashboardScreen({ navigation }) {
   const getMyProfile = async () => {
     try {
       const resp = await ApiGetMethod(`user/getUserDetails`);
-      console.log("resp", resp);
+      console.log("respss", resp);
       const profile = resp.data[0];
       setName(profile.name + " " + profile.lastName);
       setProfilePic(profile.profilePic);
       setRole(profile.role);
+      setRanking(profile.ranking);
       setDepartment(profile.department);
       setDescription(profile.profileDescription);
       setFollowers(profile.followers);
       setFollowing(profile.following);
+      setIsTrendsetter(profile.isTrendsetter);
+      setIsMoverShaker(profile.isMoverShaker);
+      setIsNewJoiner(profile.isNewJoiner);
+
       getRequestListFunction();
       global.userDepartment = profile.role;
       global.loginCompany = profile.companyName;
       global.companyDescription = profile.profileDescription;
       global.userId = profile._id;
+      setEsPoints(resp.data[0].esPoints);
     } catch (error) {
       console.log(error);
     }
   };
 
+  const getBadgesAndMedalsList = async () => {
+    ApiGetMethod(`post/getBadgesAndMedalsList`).then((res) => {
+      let temp = [...res.data];
+      if (isTrendsetter) {
+        temp.push({
+          logoFront: require("../../Assets/Images/logoFrontt.png"),
+        });
+        temp = [
+          ...temp,
+          {
+            logoFront: require("../../Assets/Images/logoFrontt.png"),
+          },
+        ];
+      }
+      if (isMoverShaker) {
+        temp.push({
+          logoFront: require("../../Assets/Images/logoFrontm.png"),
+        });
+      }
+      if (isNewJoiner) {
+        temp.push({
+          logoFront: require("../../Assets/Images/logoFrontn.png"),
+        });
+      }
+      console.log("getBadgesAndMedalsList => ", temp);
+      setAchievements(temp);
+    });
+  };
+
   const getMyPostList = () => {
     ApiGetMethod(`post/myPostList`).then((res) => {
-      console.log("get post/myPostList list => ", JSON.stringify(res));
+      // console.log("get post/myPostList list => ", JSON.stringify(res));
       let temp = [...res.data.myPost];
       temp.map((item) => {
         if (item.eventType == "POST") {
@@ -180,9 +183,13 @@ export default function DashboardScreen({ navigation }) {
   const getMyActivities = () => {
     ApiGetMethod(`post/activitiesList`).then((res) => {
       console.log("get post/ActivitiesPostData list => ", res);
+
       setActivitiesPostData(res.data.activitiesList);
     });
   };
+  useEffect(() => {
+    getBadgesAndMedalsList();
+  }, [isTrendsetter, isNewJoiner, isMoverShaker]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -198,8 +205,7 @@ export default function DashboardScreen({ navigation }) {
   }, []);
 
   const likeOrCommentAction = async (action, val, postId, index, flag) => {
-    console.log("wkfposwkfoikwj", action, val, postId, index);
-    let dataValue = flag === "MyPost" ? postData:ActivitiesPostData;
+    let dataValue = flag === "MyPost" ? postData : ActivitiesPostData;
     dataValue[index].isLikes = !dataValue[index].isLikes;
     dataValue[index].totalLikes = dataValue[index].isLikes
       ? dataValue[index].totalLikes + 1
@@ -215,11 +221,11 @@ export default function DashboardScreen({ navigation }) {
       .finally(() => console.log());
   };
 
-  const profileClick = (role, _id) => {
+  const profileClick = (item, role, _id) => {
     if (role.toLowerCase() == "excoach") {
-      navigation.navigate("ExCoachProfileScreen", { _id });
+      navigation.navigate("ExCoachProfileScreen", { item, _id });
     } else {
-      navigation.navigate("MemberProfileScreen", { _id });
+      navigation.navigate("MemberProfileScreen", { item, _id });
     }
   };
 
@@ -266,8 +272,6 @@ export default function DashboardScreen({ navigation }) {
       setAcceptBtnLoading(false);
     }
   };
-
-
 
   const renderFollowRequest = ({ item, Index }) => {
     return (
@@ -326,7 +330,7 @@ export default function DashboardScreen({ navigation }) {
                 width: "50%",
                 alignItems: "flex-start",
                 justifyContent: "center",
-                marginLeft:Scaler(8)
+                marginLeft: Scaler(8),
               }}
             >
               <Text
@@ -346,6 +350,7 @@ export default function DashboardScreen({ navigation }) {
                 }}
               >
                 {item?.userData[0]?.department}
+                {/* {item?.userData[0]?.postCreatedUserType} */}
               </Text>
             </View>
             <View
@@ -386,7 +391,7 @@ export default function DashboardScreen({ navigation }) {
                   <Text
                     style={{
                       color: "#fff",
-                      fontSize: Scaler(16),
+                      fontSize: Scaler(14),
                       paddingHorizontal: Scaler(10),
                       textAlign: "center",
                       fontFamily: "Poppins-Medium",
@@ -437,54 +442,57 @@ export default function DashboardScreen({ navigation }) {
 
   const renderAcheivements = () => {
     return (
-      <View style={{}}>
-        <View
-          style={{
-            width: "100%",
-            paddingHorizontal: wp(7),
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text
+      <>
+        <View style={{}}>
+          <View
             style={{
-              fontSize: Scaler(18),
-              fontFamily: "Poppins-SemiBold",
-              color: "#000",
-            }}
-          >
-            {Lang.ACHIEVEMENTS}
-          </Text>
-          <TouchableOpacity
-            //onPress={() => navigation.navigate("FollowingScreen")}
-            onPress={() => navigation.navigate("Acheivement")}
-            style={{
-              paddingHorizontal: 10,
-              height: 30,
+              width: "100%",
+              paddingHorizontal: wp(7),
+              marginTop: 10,
+              flexDirection: "row",
               alignItems: "center",
-              justifyContent: "center",
-              alignSelf: "center",
-              borderRadius: 5,
-              backgroundColor: "#EEEBFF",
+              justifyContent: "space-between",
+              left:-10
             }}
           >
             <Text
               style={{
-                color: "#4D39E9",
-                textAlign: "center",
-                fontSize: Scaler(12),
-                fontFamily: "Poppins-Medium",
+                fontSize: Scaler(18),
+                fontFamily: "Poppins-SemiBold",
+                color: "#000",
               }}
             >
-              {Lang.VIEW_ALL}
+              {Lang.ACHIEVEMENTS}
             </Text>
-          </TouchableOpacity>
-        </View>
-        {getAchievements.length > 0 ? (
+            <TouchableOpacity
+              //onPress={() => navigation.navigate("FollowingScreen")}
+              onPress={() => navigation.navigate("Acheivement")}
+              style={{
+                paddingHorizontal: 10,
+                height: 30,
+                alignItems: "center",
+                justifyContent: "center",
+                alignSelf: "center",
+                borderRadius: 5,
+                backgroundColor: "#EEEBFF",
+                left:14
+              }}
+            >
+              <Text
+                style={{
+                  color: "#4D39E9",
+                  textAlign: "center",
+                  fontSize: Scaler(12),
+                  fontFamily: "Poppins-Medium",
+                }}
+              >
+                {Lang.VIEW_ALL}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <View>
-            <View style={{}}>
+            <View style={{left:-10}}>
               <Text
                 style={{
                   fontSize: Scaler(14),
@@ -497,53 +505,76 @@ export default function DashboardScreen({ navigation }) {
                 {Lang.RECENT}
               </Text>
             </View>
-            <View
-              style={{
-                width: "100%",
-                paddingHorizontal: wp(7),
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {Children.toArray(
-                  getAchievements.map((item) => {
-                    return (
-                      <View
-                        style={{
-                          width: 50,
-                          height: 50,
-                          borderRadius: 25,
-                          margin: 5,
-                        }}
-                      >
-                        <FastImage
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            resizeMode: "contain",
-                          }}
-                          source={item.image}
-                          resizeMode={FastImage.resizeMode.contain}
-                        />
-                      </View>
-                    );
-                  })
-                )}
-              </ScrollView>
+            {getAchievements?.length > 0 ? (
               <View
                 style={{
                   width: "100%",
-                  alignSelf: "center",
-                  marginTop: 10,
-                  borderWidth: 0.6,
-                  borderColor: "lightgray",
+                  justifyContent: "center",
                 }}
-              />
-            </View>
+              >
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {Children.toArray(
+                    getAchievements?.slice(0, 10)?.map((item) => {
+                      return (
+                        <View
+                          style={{
+                            width: Scaler(50),
+                            height: Scaler(50),
+                            borderRadius: Scaler(25),
+                            marginVertical: Scaler(5),
+                            marginLeft: Scaler(10),
+                          }}
+                        >
+                          {typeof item.logoFront == "string" ? (
+                            <FastImage
+                              style={{
+                                width: Scaler(50),
+                                height: Scaler(50),
+                              }}
+                              source={{ uri: item.logoFront }}
+                              resizeMode={FastImage.resizeMode.cover}
+                            />
+                          ) : (
+                            <FastImage
+                              style={{
+                                width: Scaler(50),
+                                height: Scaler(50),
+                              }}
+                              source={item.logoFront}
+                              resizeMode={FastImage.resizeMode.cover}
+                            />
+                          )}
+                        </View>
+                      );
+                    })
+                  )}
+                </ScrollView>
+              </View>
+            ) : (
+              <View style={{ alignSelf: "center" }}>
+                <Text
+                  style={{
+                    fontSize: 17,
+                    ...theme.fonts.medium,
+                    color: "#7F8190",
+                  }}
+                >
+                  {Lang.noRecentAchievement}
+                </Text>
+              </View>
+            )}
+            <View
+              style={{
+                width: "100%",
+                alignSelf: "center",
+                marginTop: 10,
+                borderWidth: 0.6,
+                borderColor: "lightgray",
+              }}
+            />
           </View>
-        ) : null}
-      </View>
+        </View>
+      </>
     );
   };
 
@@ -769,16 +800,18 @@ export default function DashboardScreen({ navigation }) {
                 width: "82%",
               }}
             >
-              <Text
-                numberOfLines={1}
-                style={{
-                  fontSize: Scaler(22),
-                  fontFamily: "Poppins-SemiBold",
-                  color: "#000",
-                }}
-              >
-                {name}
-              </Text>
+              <View style={{ width: "100%" }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: Scaler(22),
+                    fontFamily: "Poppins-SemiBold",
+                    color: "#000",
+                  }}
+                >
+                  {name}
+                </Text>
+              </View>
               <TouchableOpacity
                 onPress={() => navigation.navigate("EditProfileScreen")}
                 style={{
@@ -789,10 +822,10 @@ export default function DashboardScreen({ navigation }) {
               >
                 <FastImage
                   style={{
-                    width: wp(8),
-                    height: hp(2.5),
-                    left: wp(7.5),
-                    top: hp(1),
+                    width: Scaler(20),
+                    height: Scaler(20),
+                    left: Scaler(10),
+                    marginTop: Scaler(5),
                   }}
                   source={Edit}
                   resizeMode={FastImage.resizeMode.contain}
@@ -800,28 +833,39 @@ export default function DashboardScreen({ navigation }) {
               </TouchableOpacity>
             </View>
             <View style={{ flexDirection: "row" }}>
-              <View
-                style={{
-                  backgroundColor: "green",
-                  marginTop: Platform.OS == "ios" ? hp(1) : hp(0),
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 5,
-                  width: "48%",
-                  paddingVertical: 2,
-                }}
-              >
-                <Text
+              {Ranking === "" || Ranking === undefined || Ranking === null ? (
+                <View
                   style={{
-                    fontSize: Scaler(10),
-                    color: "#FFFF",
-                    fontFamily: "Poppins-Medium",
-                    marginHorizontal: hp(0.1),
+                    marginTop: Platform.OS == "ios" ? hp(1) : hp(0),
+                    width: "48%",
+                    paddingVertical: 2,
+                  }}
+                ></View>
+              ) : (
+                <View
+                  style={{
+                    backgroundColor: "green",
+                    marginTop: Platform.OS == "ios" ? hp(1) : hp(0),
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 5,
+                    width: "48%",
+                    paddingVertical: 2,
                   }}
                 >
-                  {role + (department == "H.R." ? ",  " + department : "")}
-                </Text>
-              </View>
+                  <Text
+                    style={{
+                      fontSize: Scaler(10),
+                      color: "#FFFF",
+                      fontFamily: "Poppins-Medium",
+                      marginHorizontal: hp(0.1),
+                    }}
+                  >
+                    {/* {role + (department == "H.R." ? ",  " + department : "")} */}
+                    {Ranking}
+                  </Text>
+                </View>
+              )}
 
               <View
                 style={{
@@ -839,6 +883,7 @@ export default function DashboardScreen({ navigation }) {
                 }}
               >
                 <Text
+                  numberOfLines={1}
                   style={{
                     fontSize: Scaler(16),
                     color: "#4D39E9",
@@ -846,7 +891,7 @@ export default function DashboardScreen({ navigation }) {
                     marginHorizontal: hp(0.1),
                   }}
                 >
-                  3.32
+                  {EsPoints}
                 </Text>
                 <Text
                   style={{
@@ -940,11 +985,12 @@ export default function DashboardScreen({ navigation }) {
 
         <View style={{ marginTop: hp(3) }}>
           <Text
+          onPress={() => setTextShown(!textShown)}
             style={{
               fontSize: Scaler(14),
               alignSelf: "center",
               color: "#110D26",
-              width: wp(86),
+              width: wp(91),
               fontFamily: "Poppins-Regular",
             }}
             onTextLayout={onTextLayout}
@@ -1074,153 +1120,6 @@ export default function DashboardScreen({ navigation }) {
     );
   };
 
-  const EmptyListMessage = () => {
-    return (
-      <Body>
-        <View style={{ justifyContent: "center", height: hp(80) }}>
-          <View
-            style={{
-              backgroundColor: "#fff",
-              alignSelf: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowRadius: 6,
-              shadowOpacity: 0.1,
-              elevation: 5,
-              borderRadius: 10,
-              width: "90%",
-              height: hp(50),
-              top: hp(-13),
-            }}
-          >
-            <FastImage
-              source={requesBlanktIcon}
-              resizeMode={FastImage.resizeMode.contain}
-              style={{
-                width: wp(60),
-                height: hp(40),
-                alignSelf: "center",
-                top: hp(-3.3),
-              }}
-            />
-            <Text
-              style={{
-                textAlign: "center",
-                padding: 10,
-                width: wp(90),
-                alignSelf: "center",
-                fontSize: 17,
-                fontFamily: "Poppins-Medium",
-                color: "#7F8190",
-                top: hp(-12),
-              }}
-            >
-              {Lang.NO_REQUEST}
-            </Text>
-          </View>
-        </View>
-      </Body>
-    );
-  };
-
-  const EmptyListMessage2 = () => {
-    return (
-      <Body>
-        <View style={{ justifyContent: "center", height: hp(80) }}>
-          <View
-            style={{
-              backgroundColor: "#fff",
-              alignSelf: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowRadius: 6,
-              shadowOpacity: 0.1,
-              elevation: 5,
-              borderRadius: 10,
-              width: "90%",
-              height: hp(50),
-              top: hp(-13),
-            }}
-          >
-            <Image
-              source={requesBlanktIcon}
-              resizeMode={"contain"}
-              style={{
-                width: wp(60),
-                height: hp(40),
-                alignSelf: "center",
-                top: hp(-3.3),
-              }}
-            />
-            <Text
-              style={{
-                textAlign: "center",
-                padding: 10,
-                width: wp(90),
-                alignSelf: "center",
-                fontSize: 17,
-                fontFamily: "Poppins-Medium",
-                color: "#7F8190",
-                top: hp(-12),
-              }}
-            >
-              {Lang.NO_ACTIVITIES}
-            </Text>
-          </View>
-        </View>
-      </Body>
-    );
-  };
-
-  const EmptyListMessage3 = () => {
-    return (
-      <Body>
-        <View style={{ justifyContent: "center", height: hp(80) }}>
-          <View
-            style={{
-              backgroundColor: "#fff",
-              alignSelf: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowRadius: 6,
-              shadowOpacity: 0.1,
-              elevation: 5,
-              borderRadius: 10,
-              width: "90%",
-              height: hp(50),
-              top: hp(-13),
-            }}
-          >
-            <Image
-              source={requesBlanktIcon}
-              resizeMode={"contain"}
-              style={{
-                width: wp(60),
-                height: hp(40),
-                alignSelf: "center",
-                top: hp(-3.3),
-              }}
-            />
-            <Text
-              style={{
-                textAlign: "center",
-                padding: 10,
-                width: wp(90),
-                alignSelf: "center",
-                fontSize: 17,
-                fontFamily: "Poppins-Medium",
-                color: "#7F8190",
-                top: hp(-12),
-              }}
-            >
-              {Lang.NO_REQUESTS}
-            </Text>
-          </View>
-        </View>
-      </Body>
-    );
-  };
-
   return (
     <>
       <SafeAreaView
@@ -1246,29 +1145,53 @@ export default function DashboardScreen({ navigation }) {
               {activitiesButton == true ? (
                 <View>
                   <MyPostCard
-                  data={ActivitiesPostData}
-                  profileClick={(role, id) => profileClick(role, id)}
-                  onLike={(action, val, postId, index) =>
-                      likeOrCommentAction(action, val, postId, index, "MyActivities")
+                    data={ActivitiesPostData}
+                    profileClick={(item, role, id) =>
+                      profileClick(item, role, id)
                     }
-                  onDeletePost={(id) => _deletePost(id)}
-                  flag="MyActivities"
-                  listHeader={() => listHeaderRender()}
-                  EmptyList={() => EmptyListMessage()}
-                />
+                    onLike={(action, val, postId, index) =>
+                      likeOrCommentAction(
+                        action,
+                        val,
+                        postId,
+                        index,
+                        "MyActivities"
+                      )
+                    }
+                    onDeletePost={(id) => _deletePost(id)}
+                    flag="MyActivities"
+                    listHeader={() => listHeaderRender()}
+                    EmptyList={() => (
+                      <View style={{ marginTop: Scaler(20) }}>
+                        <EmptyCardView
+                          imageData={requesBlanktIcon}
+                          message={Lang.NO_ACTIVITIES}
+                        />
+                      </View>
+                    )}
+                  />
                 </View>
               ) : postButton == true ? (
                 <View>
                   <MyPostCard
                     data={postData}
-                    profileClick={(role, id) => profileClick(role, id)}
+                    profileClick={(item, role, id) =>
+                      profileClick(item, role, id)
+                    }
                     onLike={(action, val, postId, index) =>
                       likeOrCommentAction(action, val, postId, index, "MyPost")
                     }
                     onDeletePost={(id) => _deletePost(id)}
                     flag="MyPost"
                     listHeader={() => listHeaderRender()}
-                    EmptyList={() => EmptyListMessage()}
+                    EmptyList={() => (
+                      <View style={{ marginTop: Scaler(20) }}>
+                        <EmptyCardView
+                          imageData={requesBlanktIcon}
+                          message={Lang.NO_REQUEST}
+                        />
+                      </View>
+                    )}
                   />
                 </View>
               ) : (
@@ -1277,7 +1200,14 @@ export default function DashboardScreen({ navigation }) {
                   renderItem={renderFollowRequest}
                   keyExtractor={(item, index) => index.toString()}
                   ListHeaderComponent={listHeaderRender}
-                  ListEmptyComponent={EmptyListMessage3}
+                  ListEmptyComponent={() => (
+                    <View style={{ marginTop: Scaler(20) }}>
+                      <EmptyCardView
+                        imageData={requesBlanktIcon}
+                        message={Lang.NO_REQUESTS}
+                      />
+                    </View>
+                  )}
                   ListFooterComponent={() => {
                     return <View style={{ width: 50, height: 50 }} />;
                   }}

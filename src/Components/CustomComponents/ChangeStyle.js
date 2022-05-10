@@ -53,7 +53,7 @@ const changeStyle = StyleSheet.create({
     borderRadius: Scaler(10),
     zIndex: 1,
     backgroundColor: "#000",
-    justifyContent:'center'
+    justifyContent: "center",
   },
   contentStyle: {
     fontFamily: "Poppins-Regular",
@@ -62,7 +62,6 @@ const changeStyle = StyleSheet.create({
     alignItems: "center",
     fontSize: Scaler(11),
     marginHorizontal: 10,
-   
   },
   interesttextStyle: {
     lineHeight: Scaler(28),

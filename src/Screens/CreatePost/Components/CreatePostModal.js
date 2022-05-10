@@ -26,7 +26,7 @@ import Scaler from "../../../Utils/Scaler";
 import OutlinedInput from "../../../Components/SharedComponents/OutlinedInput";
 import { CustomButton } from "../../../Components/SharedComponents/Button";
 import Spacer from "../../../Components/SharedComponents/Space";
-import Dropdown from "../../../Components/CustomComponents/Dropdown";
+import Dropdown from "../../../Components/CustomComponents/DropDownCreatePost";
 import { useValidation } from "react-native-form-validator";
 import ValidationConstants from "../../../Constants/ValidationConstants";
 import Modal from "react-native-modal";
@@ -57,9 +57,15 @@ function CreatePostModal(props) {
   } = props;
 
   const { validate, isFieldInError, getErrorsInField } = useValidation({
-    state: { selectedCommunity },
+    state: { selectedCommunity, postUrl },
     ...ValidationConstants,
   });
+
+  useEffect(() => {
+    validate({
+      postUrl: { postUrl: postUrl, required: false },
+    });
+  }, [postUrl]);
 
   useEffect(() => {
     validate({
@@ -215,7 +221,6 @@ function CreatePostModal(props) {
             multiline={true}
             placeholder={Lang.POST_DESC}
             placeholderTextColor={"grey"}
-            multiline={true}
             textAlignVertical={"top"}
             value={postDescription}
             onChangeText={(val) => setPostDescription(val)}

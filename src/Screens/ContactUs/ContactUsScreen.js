@@ -28,7 +28,7 @@ export default function ContactUsScreen({ navigation }) {
       />
 
       <Image
-        source={rehvupEmail}
+        source={require("../../Assets/Images/phoneContact.png")}
         resizeMode={'contain'}
         style={{ alignSelf: 'center', width: wp(20), height: hp(10) }}
       />
@@ -58,7 +58,7 @@ export default function ContactUsScreen({ navigation }) {
       </View>
       <TouchableOpacity activeOpacity={0.8} onPress={() => Linking.openURL('mailto:info@rehvup.io')} >
         <Image
-          source={rehvupEmail}
+          source={require("../../Assets/Images/emailContact.png")}
           resizeMode={'contain'}
           style={{ alignSelf: 'center', width: wp(20), height: hp(15) }}
         />
@@ -74,7 +74,7 @@ export default function ContactUsScreen({ navigation }) {
         </Text>
       </TouchableOpacity>
       <Image
-        source={rehvupEmail}
+        source={require("../../Assets/Images/addressContact.png")}
         resizeMode={'contain'}
         style={{ alignSelf: 'center', width: wp(20), height: hp(15) }}
       />

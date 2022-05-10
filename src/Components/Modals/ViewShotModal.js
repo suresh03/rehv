@@ -8,7 +8,8 @@ import { deleteIcon, blockIcon, freezeAccIcon } from "../../Assets/icon";
 import Lang from "../../Language";
 
 const ViewShotModal = forwardRef((props, ref) => {
-  const { onDelete, onFreeze, onBlock, id, options, onHide, top,right } = props;
+  const { onDelete, onFreeze, onBlock, id, options, onHide, top, right } =
+    props;
   const theme = useTheme();
   return (
     <View
@@ -19,13 +20,13 @@ const ViewShotModal = forwardRef((props, ref) => {
         right: right,
         bottom: 0,
         top: top,
-        borderRadius:10
+        borderRadius: 10
       }}
     >
-      <Menu ref={ref}  style={{ borderRadius:10}}>
+      <Menu ref={ref} style={{ borderRadius: 10 }}>
         {options.includes("delete") ? (
           <MenuItem
-          style={{ borderRadius:10}}
+            style={{ borderRadius: 10, alignItems: "center", justifyContent: "center", paddingLeft: Scaler(10), paddingTop: Scaler(5) }}
             onPress={() => {
               onHide();
               onDelete(id);
@@ -38,14 +39,21 @@ const ViewShotModal = forwardRef((props, ref) => {
             <View
               style={{
                 flexDirection: "row",
-                width: Scaler(100),
-                height: Scaler(20),
-                justifyContent: "space-around",
-                alignItems: "center",
+                width: "100%",
+                height: "100%",
+                justifyContent: "center",
+                alignItems: "center"
               }}
             >
               <Image source={deleteIcon} />
-              <Text style={{ marginLeft: Scaler(15) }}>{Lang.DELETE}</Text>
+              <Text
+                style={{
+                  marginLeft: Scaler(5),
+                  color: theme.colors.disabledText,
+                }}
+              >
+                {Lang.DELETE}
+              </Text>
             </View>
           </MenuItem>
         ) : null}
@@ -72,8 +80,19 @@ const ViewShotModal = forwardRef((props, ref) => {
                 paddingHorizontal: Scaler(15),
               }}
             >
-              <Image source={blockIcon} resizeMode={"contain"} style={{height:Scaler(20),width:Scaler(20)}}/>
-              <Text style={{ marginLeft: Scaler(15) }}>{Lang.BLOCK}</Text>
+              <Image
+                source={blockIcon}
+                resizeMode={"contain"}
+                style={{ height: Scaler(20), width: Scaler(20) }}
+              />
+              <Text
+                style={{
+                  marginLeft: Scaler(15),
+                  color: theme.colors.disabledText,
+                }}
+              >
+                {Lang.BLOCK}
+              </Text>
             </View>
           </MenuItem>
         ) : null}
@@ -99,8 +118,19 @@ const ViewShotModal = forwardRef((props, ref) => {
                 paddingHorizontal: Scaler(15),
               }}
             >
-              <Image source={freezeAccIcon} resizeMode={"contain"} style={{height:Scaler(20),width:Scaler(20)}}/>
-              <Text style={{ marginLeft: Scaler(15) }}>{Lang.FREEZE}</Text>
+              <Image
+                source={freezeAccIcon}
+                resizeMode={"contain"}
+                style={{ height: Scaler(20), width: Scaler(20) }}
+              />
+              <Text
+                style={{
+                  marginLeft: Scaler(15),
+                  color: theme.colors.disabledText,
+                }}
+              >
+                {Lang.FREEZE}
+              </Text>
             </View>
           </MenuItem>
         ) : null}
@@ -118,13 +148,13 @@ ViewShotModal.propTypes = {
   onBlock: PropTypes.func,
   onHide: PropTypes.func,
   top: PropTypes.number,
-  right:PropTypes.number
+  right: PropTypes.number,
 };
 
 ViewShotModal.defaultProps = {
   options: [],
   top: 0,
-  right:Scaler(1),
+  right: Scaler(1),
   onDelete: () => {},
   onFreeze: () => {},
   onBlock: () => {},

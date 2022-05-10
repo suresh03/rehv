@@ -11,7 +11,9 @@ const initialState = {
   socketRef: null,
   socketLoading: false,
   newMessage: {},
-  chatList:[]
+  chatList: [],
+  refreshChatting: false,
+  refreshChatList:false
 };
 
 const socketAtom = atom({

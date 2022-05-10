@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from "react";
+import React, {useState} from "react";
 import {
   StyleSheet,
   View,
@@ -15,6 +15,7 @@ import { password_icon, passwordShow, passwordHide } from "../../Assets/icon";
 import Spacer from "./Space";
 import Scaler from "../../Utils/Scaler";
 const { width } = Dimensions.get("window");
+import { DayTheme } from "../../Constants/theme";
 
 const PasswordInput = (props) => {
   const {
@@ -29,10 +30,11 @@ const PasswordInput = (props) => {
     hidePassword,
     onShowPassword,
   } = props;
+  const [getBorderColor, setBorderColor] = useState("#a9a9a9")
 
   return (
     <>
-      <View style={[styles.container, inputViewStyle]}>
+      <View style={[styles.container, inputViewStyle, {borderColor: getBorderColor}]}>
         <Image
           resizeMode="contain"
           source={password_icon}
@@ -50,6 +52,8 @@ const PasswordInput = (props) => {
           style={[styles.textInputStyle, textInputStyle]}
           underlineColorAndroid="transparent"
           autoCapitalize="none"
+          onFocus={() => setBorderColor(DayTheme.colors.primary)}
+          onBlur={() => setBorderColor("#a9a9a9")}
           autoCorrect={false}
           secureTextEntry={hidePassword}
           returnKeyType={props.returnKeyType ?? "done"}

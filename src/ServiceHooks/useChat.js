@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
 import moment from "moment";
 import UltimateConfig from "react-native-ultimate-config";
 import { useAppValue } from "../Recoil/appAtom";
-import { useSetSocketState } from "../Recoil/socketAtom";
+import { useSetSocketState, useSocketValue } from "../Recoil/socketAtom";
+import { SocketContext } from "../Utils/SocketProvider";
 
 const SOCKET_URL = UltimateConfig.API_URL;
-
 const EVENTS = {
   SEND_MESSAGE: "sendMessage",
   RECEIVE_MESSAGE: "messageFromServer",
@@ -21,66 +21,79 @@ const EVENTS = {
 };
 
 const useChat = () => {
-  const socketRef = useRef();
+  // const socketRef = useRef();
   const { token, user } = useAppValue();
   const setSocketState = useSetSocketState();
+  const { socketRef, updateSocket } = useContext(SocketContext);
+  const { refreshChatting, refreshChatList } = useSocketValue();
 
   useEffect(() => {
-    setTimeout(() => {
-      if (socketRef?.current?.connected !== true) {
-        connectSocket();
-      } else {
-        console.log("socket already connected");
+    if (!refreshChatting) {
+      setSocketState((state) => ({
+        ...state,
+        refreshChatting: true,
+      }));
+      // getChatList();
+      refreshChat();
+    }
+    console.log("socket status => ", socketRef.id);
+  }, [socketRef.id]);
+
+  const getChatListFromServer = () =>
+    socketRef?.on(EVENTS.ChatListFromServer, (data) => {
+      console.log("getChatList => ", data);
+      setSocketState((state) => ({
+        ...state,
+        refreshChatList: true,
+      }));
+      if (data.chatList.length === 0) {
+        setSocketState((state) => ({
+          ...state,
+          chatList: [],
+          socketLoading: false,
+          refreshChatList:false,
+        }));
+        return [];
       }
-    }, 300);
+      let temp = data.chatList?.reduce((acc, item) => {
+        const {
+          message,
+          createdAt,
+          receiverData,
+          sendderData,
+          isRead,
+          messageId,
+          connectionId,
+        } = item;
 
-    //return () => disconnectSocket();
-  }, []);
-
-  useEffect(() => {
-    console.log("socket status => ", socketRef.current);
-  }, [socketRef?.current?.connected]);
+        let obj = {
+          message: message,
+          time: moment(createdAt).format("HH:MM a"),
+          isRead: receiverData?._id === user._id ? isRead : true,
+          messageId: messageId,
+          connectionId: connectionId,
+        };
+        if (receiverData?._id !== user._id) {
+          obj.user = receiverData;
+        } else {
+          obj.user = sendderData;
+        }
+        setSocketState((state) => ({ ...state, socketLoading: false }));
+        return acc.concat(obj);
+      }, []);
+      console.log(temp);
+      // setChatList(temp);
+      setSocketState((state) => ({ ...state, chatList: temp }));
+    });
 
   const getChatList = () => {
     try {
       setSocketState((state) => ({ ...state, socketLoading: true }));
-      if (socketRef?.current) {
-        socketRef?.current?.emit(EVENTS.CHATLIST, {
+      if (socketRef) {
+        socketRef?.emit(EVENTS.CHATLIST, {
           senderId: user?._id,
         });
-        socketRef?.current?.on(EVENTS.ChatListFromServer, (data) => {
-          console.log("getChatList => ", data);
-
-          let temp = data.chatList.reduce((acc, item) => {
-            const {
-              message,
-              createdAt,
-              receiverData,
-              sendderData,
-              isRead,
-              messageId,
-              connectionId,
-            } = item;
-
-            let obj = {
-              message: message,
-              time: moment(createdAt).format("HH:MM a"),
-              isRead: receiverData?._id === user._id ? isRead : true,
-              messageId: messageId,
-              connectionId: connectionId,
-            };
-            if (receiverData?._id !== user._id) {
-              obj.user = receiverData;
-            } else {
-              obj.user = sendderData;
-            }
-            setSocketState((state) => ({ ...state, socketLoading: false }));
-            return acc.concat(obj);
-          }, []);
-          console.log(temp);
-          // setChatList(temp);
-          setSocketState((state) => ({ ...state, chatList: temp }));
-        });
+        getChatListFromServer();
       }
     } catch (error) {
       console.log(error);
@@ -89,7 +102,7 @@ const useChat = () => {
   };
 
   const refreshChat = () => {
-    socketRef?.current?.on(EVENTS.RECEIVE_MESSAGE, (data) => {
+    socketRef?.on(EVENTS.RECEIVE_MESSAGE, (data) => {
       console.log("data => ", data, user._id);
       if (data?.getChatData !== undefined) {
         const { getChatData, chatList } = data;
@@ -142,42 +155,25 @@ const useChat = () => {
           setSocketState((state) => ({ ...state, socketLoading: false }));
           return acc.concat(obj);
         }, []);
-        setSocketState((state) => ({ ...state, newMessage: obj ,chatList: temp}));
+
+        setSocketState((state) => ({
+          ...state,
+          newMessage: obj,
+          chatList: temp,
+        }));
 
         // setNewMessage(obj);
       }
     });
   };
 
-  const connectSocket = async () => {
-    socketRef.current = await socketIOClient(SOCKET_URL, {
-      reconnection: true,
-      reconnectionDelay: 500,
-      reconnectionAttempts: Infinity,
-      jsonp: false,
-      transports: ["polling"],
-      autoConnect: true,
-      query: {
-        accessToken: token,
-      },
-    });
-    await socketRef.current.connect();
-    setSocketState((state) => ({
-      ...state,
-      connected: socketRef?.current?.connected,
-    }));
-
-    getChatList();
-    refreshChat();
-  };
-
   const disconnectSocket = () => {
-    socketRef.current.disconnect();
+    socketRef?.disconnect();
     setSocketState((state) => ({
       ...state,
-      connected: socketRef?.current?.connected,
+      connected: socketRef?.connected,
     }));
-    console.log("socket status => ", socketRef.current);
+    console.log("socket status => ", socketRef);
   };
 
   const sendMessage = (receiverId, message) => {
@@ -188,12 +184,12 @@ const useChat = () => {
       companyId: user.companyId,
       message: message,
     };
-    socketRef.current.emit(EVENTS.SEND_MESSAGE, payload);
+    socketRef?.emit(EVENTS.SEND_MESSAGE, payload);
   };
 
   const readCount = (connectionId, messageId) => {
     console.log("connectionId, messageId", connectionId, user?._id, messageId);
-    socketRef.current.emit(EVENTS.READ_MESSAGE, {
+    socketRef?.emit(EVENTS.READ_MESSAGE, {
       connectionId: connectionId,
       receiverId: user?._id,
       messageId: messageId,
@@ -221,7 +217,7 @@ const useChat = () => {
   };
 
   const deleteChats = (userId, chatId) => {
-    socketRef.current.emit("deleteChat", {
+    socketRef?.emit("deleteChat", {
       userId: userId,
       chatId: chatId,
     });
@@ -229,7 +225,6 @@ const useChat = () => {
   };
 
   return {
-    connectSocket,
     disconnectSocket,
     sendMessage,
     deleteChats,

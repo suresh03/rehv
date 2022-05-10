@@ -1,4 +1,4 @@
-import React, { Children, useRef, useState } from "react";
+import React, { Children, useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -46,7 +46,7 @@ import dynamicLinks from "@react-native-firebase/dynamic-links";
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import SkeletonPlaceholder from  'react-native-skeleton-placeholder';
-
+import useApiServices from "../../../Services/useApiServices";
 
 
 
@@ -71,7 +71,7 @@ function ProfilePost(props) {
   const playerRef = useRef();
   const [sound, setSound] = React.useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
+  const { ApiPostMethod, ApiGetMethod } = useApiServices();
   const onBuffer = () => {};
   const videoError = () => {};
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -84,6 +84,20 @@ function ProfilePost(props) {
   // Workaround to display thumbnail in android.
   const load = ({ duration }) => {
     videoComponent?.seek(0);
+  };
+
+  const [LangType, setLangType] = useState("")
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol)
+      })
+      .finally(() => console.log("success"));
   };
   // const onShare = async () => {
   //   await Share.open({
@@ -450,7 +464,9 @@ function ProfilePost(props) {
                       ...theme.fonts.regular,
                     }}
                   >
-                    {item?.communitiesData?.name}
+                    {item?.communitiesData?.name.length < 25
+                ? `${LangType === "en" ? item?.communitiesData?.name:item?.communitiesData?.frenchName}`
+                : `${LangType === "en" ? item?.communitiesData?.name.substring(0, 25):item?.communitiesData?.frenchName.substring(0, 25)}...`}
                   </Text>
                 </View>
               )}
@@ -527,14 +543,14 @@ function ProfilePost(props) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onPress={() =>
-                  navigation.navigate("MemberScreen", {
-                    data: {
-                      postId: item?._id,
-                      isLikes: true,
-                    },
-                  })
-                }
+                // onPress={() =>
+                //   navigation.navigate("MemberScreen", {
+                //     data: {
+                //       postId: item?._id,
+                //       isLikes: true,
+                //     },
+                //   })
+                // }
               >
                 <Text
                   style={[
@@ -598,14 +614,14 @@ function ProfilePost(props) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onPress={() =>
-                  navigation.navigate("MemberScreen", {
-                    data: {
-                      postId: item?._id,
-                      isLikes: false,
-                    },
-                  })
-                }
+                // onPress={() =>
+                //   navigation.navigate("MemberScreen", {
+                //     data: {
+                //       postId: item?._id,
+                //       isLikes: false,
+                //     },
+                //   })
+                // }
               >
                 <Text
                   style={[

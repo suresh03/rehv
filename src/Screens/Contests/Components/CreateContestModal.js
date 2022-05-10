@@ -17,10 +17,8 @@ import {
 } from "react-native-responsive-screen";
 import { blackcrossIcon, greyArrow } from "../../../Assets/icon";
 import Scaler from "../../../Utils/Scaler";
-import OutlinedInput from "../../../Components/SharedComponents/OutlinedInput";
 import { CustomButton } from "../../../Components/SharedComponents/Button";
 import Spacer from "../../../Components/SharedComponents/Space";
-import Dropdown from "../../../Components/CustomComponents/Dropdown";
 import { useValidation } from "react-native-form-validator";
 import ValidationConstants from "../../../Constants/ValidationConstants";
 import { Portal, Provider, Modal } from "react-native-paper";
@@ -138,21 +136,12 @@ function createContestModal(props) {
                     </TouchableOpacity>
                   </View>
                 ) : (
-                  <View
-                    style={{
-                      width: wp(90),
-                      height: Scaler(200),
-                      backgroundColor: "#EEEBFF",
-                      borderRadius: 10,
-                      justifyContent: "space-around",
-                    }}
-                  >
+                  <View style={{}}>
                     <View>
                       {Children.toArray(
                         images.map((i, index) => renderAsset(i, index))
                       )}
                     </View>
-                    <Spacer />
 
                     <TouchableOpacity
                       onPress={() => openPicker()}
@@ -161,7 +150,9 @@ function createContestModal(props) {
                         alignItems: "center",
                         justifyContent: "center",
                         flexDirection: "row",
-                        top: -20,
+                        zIndex: 2,
+                        position: "absolute",
+                        bottom: Scaler(10),
                       }}
                     >
                       <Image
@@ -177,7 +168,7 @@ function createContestModal(props) {
                       <Text
                         style={{
                           alignSelf: "center",
-                          color: "white",
+                          color: theme.colors.primary,
                           ...theme.fonts.regular,
                           fontSize: 14,
                           marginRight: Scaler(15),

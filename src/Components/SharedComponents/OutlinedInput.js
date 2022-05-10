@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from "react";
+import React, {useState} from "react";
 import {
   StyleSheet,
   View,
@@ -12,6 +12,7 @@ import { getFontSize } from "./ResponsiveSize";
 import PropTypes from "prop-types";
 import Spacer from "./Space";
 import Scaler from "../../Utils/Scaler";
+import { DayTheme } from "../../Constants/theme";
 
 const { width } = Dimensions.get("window");
 
@@ -30,10 +31,11 @@ const OutlinedInput = (props) => {
     maxLength,
     numberOfLines,
   } = props;
+   const [getBorderColor, setBorderColor] = useState("#a9a9a9")
 
   return (
     <View style={{ width: inputViewStyle.width }}>
-      <View style={[styles.container, inputViewStyle]}>
+      <View style={[styles.container, inputViewStyle, {borderColor: getBorderColor}]}>
         <Image
           source={img}
           style={[
@@ -52,6 +54,8 @@ const OutlinedInput = (props) => {
           style={{ ...styles.textInputStyle, ...textInputStyle }}
           underlineColorAndroid="transparent"
           autoCapitalize={autoCapitalize}
+          onFocus={() => setBorderColor(DayTheme.colors.primary)}
+          onBlur={() => setBorderColor("#a9a9a9")}
           autoCorrect={false}
           keyboardType={keyboardType}
           textAlign={props.textAlign}

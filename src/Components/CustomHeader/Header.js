@@ -92,7 +92,7 @@ export const HeaderBackAction = (props) => {
             <Text
               style={[
                 {
-                  fontSize: props.titleSize ? props.titleSize : Scaler(22.5),
+                  fontSize: props.titleSize ? props.titleSize : Scaler(21.5),
                   fontFamily: "Poppins-SemiBold",
                   color: "#000",
                 },

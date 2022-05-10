@@ -612,7 +612,7 @@ console.log('error?.message',error?.message)
             >
               <TextInput
                 style={{ padding: 10, left: 10, fontFamily: "Poppins-Regular" }}
-                placeholder="Enter Text"
+                placeholder={Lang.EnterText}
                 placeholderTextColor="#7F8190"
                 multiline={true}
                 onChangeText={(text) => setOther(text)}
@@ -632,7 +632,7 @@ console.log('error?.message',error?.message)
                 alignSelf: "center",
                 marginTop: 15,
                 position: "absolute",
-                bottom: 100,
+                bottom: Scaler(80),
               }}
             >
               {renderNextButton()}
@@ -648,7 +648,7 @@ console.log('error?.message',error?.message)
                 alignSelf: "center",
                 marginTop: 15,
                 position: "absolute",
-                bottom: 100,
+                bottom: Scaler(80),
               }}
             >
               {renderSubmitButton()}

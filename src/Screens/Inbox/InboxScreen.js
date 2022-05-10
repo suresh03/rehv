@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useContext } from "react";
 import {
   View,
   Text,
@@ -34,6 +34,7 @@ import Loader from "../../Utils/Loader";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSocketValue } from "../../Recoil/socketAtom";
 import FastImage from "react-native-fast-image";
+import { SocketContext } from "../../Utils/SocketProvider";
 
 export default function InboxScreen({ navigation }) {
   const [listData, setListData] = useState([]);
@@ -42,22 +43,24 @@ export default function InboxScreen({ navigation }) {
 
   const [searchHeader, setsearchHeader] = useState(false);
   const { getChatList } = useChat();
+  const { refreshChatList } = useSocketValue();
 
   const { ApiPostMethod } = useApiServices();
   const [searchText, setSearchText] = useState();
-  const { connected, socketRef, socketLoading, newMessage, chatList } =
-    useSocketValue();
+
+  const { connected, socketLoading, newMessage, chatList } = useSocketValue();
   // useEffect(() => {
-  //   // const unsubscribe = navigation.addListener("focus", () => {
-  //   getChatList();
-  //   // });
-  //   // return () => unsubscribe;
+  //   const unsubscribe = navigation.addListener("focus", () => {
+  //     getChatList();
+  //   });
+  //   return () => unsubscribe;
   // }, []);
+  const { socketRef, updateSocket } = useContext(SocketContext);
 
   useFocusEffect(
     useCallback(() => {
       getChatList();
-    }, [])
+    }, [socketRef?.id])
   );
 
   useEffect(() => {
@@ -181,7 +184,6 @@ export default function InboxScreen({ navigation }) {
                 width: "80%",
                 left: Scaler(10),
                 justifyContent: "space-between",
-                marginTop: Scaler(15),
               }}
             >
               <Text
@@ -247,7 +249,7 @@ export default function InboxScreen({ navigation }) {
         <View
           style={{
             width: width,
-            height: hp(8),
+            height: Scaler(65),
             backgroundColor: "#fff",
             alignItems: "center",
             justifyContent: "center",
@@ -257,36 +259,45 @@ export default function InboxScreen({ navigation }) {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              width: width - 50,
+              width: width / 1.1,
             }}
           >
-            <TouchableOpacity onPress={() => navigation.pop()} style={{}}>
-              <Image
-                style={{
-                  height: Scaler(25),
-                  width: Scaler(25),
-                  top: hp(0.5),
-                }}
-                source={blackback}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-            <Text
+            <View
               style={{
-                fontSize: Scaler(22.5),
-                fontFamily: "Poppins-SemiBold",
-                right: wp(10),
-                color: "#000",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                width: "70%",
               }}
             >
-              {/* {Lang.INBOX} */}
-              {Lang.INBOX.length < 10
-                ? `${Lang.INBOX}`
-                : `${Lang.INBOX.substring(0, 10)}...`}
-            </Text>
+              <TouchableOpacity onPress={() => navigation.pop()}>
+                <Image
+                  style={{
+                    height: Scaler(25),
+                    width: Scaler(25),
+                    top: Scaler(3.5),
+                  }}
+                  source={blackback}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+              <View style={{ left: Scaler(5) }}>
+                <Text
+                  style={{
+                    fontSize: Scaler(22.5),
+                    fontFamily: "Poppins-SemiBold",
+                    color: "#000",
+                  }}
+                >
+                  {/* {Lang.INBOX} */}
+                  {Lang.INBOX.length < 20
+                    ? `${Lang.INBOX}`
+                    : `${Lang.INBOX.substring(0, 20)}...`}
+                </Text>
+              </View>
+            </View>
             <TouchableOpacity
               onPress={() => setsearchHeader(!searchHeader)}
-              style={{ left: wp(12) }}
+              style={{}}
             >
               <Image
                 style={{
@@ -325,7 +336,8 @@ export default function InboxScreen({ navigation }) {
             flexDirection: "row",
             justifyContent: "space-around",
             width: width,
-            height: hp(8),
+            height: Scaler(65),
+            marginTop: Scaler(10),
           }}
         >
           <TouchableOpacity

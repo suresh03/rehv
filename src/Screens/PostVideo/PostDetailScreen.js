@@ -101,10 +101,12 @@ export default function PostDetailScreen({ navigation, route }) {
     // alert(e.nativeEvent.lines.length >=2);
   }, []);
 
+  console.log("screenHeight", screenHeight);
+
   useEffect(() => {
     console.log("creatorRole", creatorRole);
     const unsubscribe = navigation.addListener("focus", () => {
-      getPost(postId, eventType);
+      // getPost(postId, eventType);
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
@@ -128,12 +130,14 @@ export default function PostDetailScreen({ navigation, route }) {
       setPollDetail(res);
       setPollDetailLikes(res);
       setPollDetails(res.pollDetails[0]);
+      getPost(postId, eventType);
       // PollDetails.userData[0].department
     } else if (type.toLowerCase() === "survey") {
       const res = await getSurveyDetailsById(id);
       setSurveyDetail(res.surveyDetails[0]);
       setSurveyDetailLikes(res.surveyDetails);
       setQuestion(res.surveyDetails[0].questions.length);
+      getPost(postId, eventType);
     } else if (
       type.toLowerCase() === "contest" ||
       type.toLowerCase() === "participate"
@@ -150,6 +154,8 @@ export default function PostDetailScreen({ navigation, route }) {
         }
       });
       setPostDetail(temp);
+    } else if (type.toLowerCase() === "post") {
+      getPost(postId, eventType);
     }
   };
 
@@ -208,10 +214,6 @@ export default function PostDetailScreen({ navigation, route }) {
         SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
       })
       .finally(() => {});
-    // .finally(
-    //   () => getPostDetail(postId, eventType),
-    //   getPost(postId, eventType)
-    // );
   };
 
   const optionSelection = (type, selectedPostId) => {
@@ -414,6 +416,7 @@ export default function PostDetailScreen({ navigation, route }) {
       })
       .catch((err) => {
         err && console.log(err);
+        shareApiHit(item);
       });
   };
 
@@ -467,10 +470,15 @@ export default function PostDetailScreen({ navigation, route }) {
                       // alignItems: "center",
                       // width: "100%",
                       // height: "100%",
-                      bottom: 480,
-                      width: 60, 
+                      bottom:
+                        Platform.OS === "ios"
+                          ? screenHeight > 690
+                            ? 400
+                            : 365
+                          : 470,
+                      width: 60,
                       height: 60,
-                      left:175
+                      left: Platform.OS === "ios" ? 163 : 163,
                     }}
                   >
                     {/* <VideoPausedIcon playVideo={() => setIsPaused(false)} /> */}
@@ -479,7 +487,8 @@ export default function PostDetailScreen({ navigation, route }) {
                       style={{ width: "100%", height: "100%" }}
                     />
                   </TouchableOpacity>
-                ):<TouchableOpacity
+                ) : (
+                  <TouchableOpacity
                     onPress={() => setIsPaused(true)}
                     style={{
                       //position: "absolute",
@@ -487,13 +496,12 @@ export default function PostDetailScreen({ navigation, route }) {
                       // width: "100%",
                       // height: "100%",
                       bottom: 480,
-                      width: 60, 
+                      width: 60,
                       height: 60,
-                      left:175
+                      left: 175,
                     }}
-                  >
-                    
-                  </TouchableOpacity>}
+                  ></TouchableOpacity>
+                )}
                 <TouchableOpacity
                   onPress={() => setIsFullScreen(false)}
                   style={{
@@ -502,13 +510,13 @@ export default function PostDetailScreen({ navigation, route }) {
                     top: 65,
                     alignSelf: "flex-end",
                     right: 20,
-                    width: 28, 
-                    height: 26
+                    width: 28,
+                    height: 26,
                   }}
                 >
                   <Image
                     source={require("../../Assets/Images/Icon-20.png")}
-                    style={{ width: "100%", height: "100%"}}
+                    style={{ width: "100%", height: "100%" }}
                   />
                 </TouchableOpacity>
               </>
@@ -523,11 +531,12 @@ export default function PostDetailScreen({ navigation, route }) {
                     paused={isPaused}
                     resizeMode={"contain"}
                     style={{
-                      width: Dimensions.get('window').height,
-                      height: Dimensions.get('window').width * 2.1,
+                      width: Dimensions.get("window").height,
+                      height: Dimensions.get("window").width * 2.1,
                       // minWidth: Dimensions.get("window").height,
                       // minHeight: Dimensions.get("window").width * 2.1,
-                      right:200,
+                      bottom: Platform.OS === "ios" ? 60 : 0,
+                      right: Platform.OS === "ios" ? 145 : 178,
                       transform: [{ rotate: "90deg" }],
                     }}
                     repeat={true}
@@ -544,8 +553,8 @@ export default function PostDetailScreen({ navigation, route }) {
                       position: "absolute",
                       alignItems: "center",
                       bottom: 440,
-                      left:175,
-                      transform: [{ rotate: "90deg" }]
+                      left: 168,
+                      transform: [{ rotate: "90deg" }],
                     }}
                   >
                     <VideoPausedIcon playVideo={() => setIsPaused(false)} />
@@ -558,9 +567,9 @@ export default function PostDetailScreen({ navigation, route }) {
                     alignItems: "center",
                     top: 65,
                     alignSelf: "flex-end",
-                    left: 365,
-                    width: 28, 
-                    height: 26
+                    left: Platform.OS === "ios" ? 330 : 345,
+                    width: 28,
+                    height: 26,
                   }}
                 >
                   <Image
@@ -570,46 +579,6 @@ export default function PostDetailScreen({ navigation, route }) {
                 </TouchableOpacity>
               </>
             )}
-
-            {/* {isFullScreen ? (
-              <TouchableOpacity
-                onPress={() => setIsFullScreen(false)}
-                style={{
-                  position: "absolute",
-                  alignItems: "center",
-                  width: "100%",
-                  height: "100%",
-                  marginTop:100, 
-                  marginLeft:150
-                }}
-              >
-                <FullScreenIcon />
-              </TouchableOpacity>
-            ):<TouchableOpacity
-                onPress={() => setIsFullScreen(false)}
-                style={{
-                  position: "absolute",
-                  alignItems: "center",
-                  width: "100%",
-                  height: "100%",
-                  marginTop:100,
-                  left:-85, top:50
-                }}
-              >
-                <FullScreenIcon />
-              </TouchableOpacity>}
-            {isPaused && (
-              <View
-                style={{
-                  position: "absolute",
-                  alignItems: "center",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <VideoPausedIcon playVideo={() => setIsPaused(false)} />
-              </View>
-            )} */}
             <LinearGradient
               colors={["#000000", "transparent"]}
               style={{
@@ -658,8 +627,8 @@ export default function PostDetailScreen({ navigation, route }) {
           <FlatList
             data={
               ButtonTitle === "survey"
-                ? SurveyDetailLikes[0]?.pictureUrl
-                : PostDetail[0]?.pictureUrl
+                ? SurveyDetailLikes?.[0]?.pictureUrl
+                : PostDetail?.[0]?.pictureUrl
             }
             keyExtractor={(item, index) => index.toString()}
             renderItem={(item, index) => ItemView(item, index)}
@@ -704,9 +673,9 @@ export default function PostDetailScreen({ navigation, route }) {
               {ButtonTitle == "poll" ? (
                 <PollDetailTitle
                   creator={capitalizeEach(
-                    PollDetails?.userData[0]?.name +
+                    PollDetails?.userData?.[0]?.name +
                       " " +
-                      PollDetails?.userData[0]?.lastName
+                      PollDetails?.userData?.[0]?.lastName
                   )}
                   creatorRole={PollDetails?.postCreatedUserType}
                 />
@@ -775,7 +744,7 @@ export default function PostDetailScreen({ navigation, route }) {
                       color: "#fff",
                       fontSize: Scaler(14),
                       ...theme.fonts.medium,
-                      top: hp(2.5),
+                      top: hp(1),
                       opacity: 0.8,
                     }}
                   >
@@ -809,7 +778,7 @@ export default function PostDetailScreen({ navigation, route }) {
                     width: wp(95),
                   }}
                   onTextLayout={onTextLayout}
-                  numberOfLines={textShown ? undefined : 2}
+                  numberOfLines={textShown ? 18 : 2}
                 >
                   {surveyDetail?.description}
                 </Text>
@@ -894,7 +863,7 @@ export default function PostDetailScreen({ navigation, route }) {
                           ...theme.fonts.medium,
                         }}
                       >
-                        {Lang.TAKE} {ButtonTitle.toUpperCase()}
+                        {Lang.TAKE} {Lang.SURVEYS}
                       </Text>
                       <Text
                         style={{
@@ -956,7 +925,7 @@ export default function PostDetailScreen({ navigation, route }) {
                       <Text
                         style={{
                           color: "#fff",
-                          fontSize: Scaler(15),
+                          fontSize: Scaler(12),
                           ...theme.fonts.medium,
                           textAlign: "center",
                           opacity: 0.9,
@@ -967,7 +936,7 @@ export default function PostDetailScreen({ navigation, route }) {
                       <Text
                         style={{
                           color: "#fff",
-                          fontSize: Scaler(14),
+                          fontSize: Scaler(21),
                           textAlign: "center",
                           ...theme.fonts.medium,
                         }}
@@ -985,11 +954,11 @@ export default function PostDetailScreen({ navigation, route }) {
                       borderRadius: 15,
                     }}
                   >
-                    <View style={{ left: 10, top: 10 }}>
+                    <View style={{ left: 10, top: 4 }}>
                       <Text
                         style={{
                           color: "#fff",
-                          fontSize: Scaler(15),
+                          fontSize: Scaler(21),
                           ...theme.fonts.medium,
                         }}
                       >
@@ -999,7 +968,7 @@ export default function PostDetailScreen({ navigation, route }) {
                       <Text
                         style={{
                           color: "#fff",
-                          fontSize: Scaler(13),
+                          fontSize: Scaler(12),
                           ...theme.fonts.medium,
                           opacity: 0.9,
                         }}
@@ -1041,7 +1010,7 @@ export default function PostDetailScreen({ navigation, route }) {
               isCommented={
                 ButtonTitle === "survey"
                   ? surveyDetail?.isCommented
-                  : PostDetailLikes[0]?.isCommented
+                  : PostDetailLikes?.[0]?.isCommented
               }
               totalLikes={
                 ButtonTitle === "survey"

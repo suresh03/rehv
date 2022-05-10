@@ -1,4 +1,4 @@
-import React, { Children, useRef, useState } from "react";
+import React, { Children, useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   Alert,
   TextInput,
   RefreshControl,
-  Linking
+  Linking,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -41,57 +41,64 @@ import { DayTheme } from "../../../Constants/theme";
 import { capitalize, isImage } from "../../../Utils/Helpers";
 import VideoPausedIcon from "../../Community/Components/VideoPausedIcon";
 const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
 import Lang from "../../../Language";
-const FULL_WIDTH = Dimensions.get("window").width;
 import { useAppValue } from "../../../Recoil/appAtom";
 import ViewShotModal from "../../../Components/Modals/ViewShotModal";
 import dynamicLinks from "@react-native-firebase/dynamic-links";
 import Icon from "react-native-vector-icons/Ionicons";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import VideoBufferIndicator from "../../../Utils/VideoBufferIndicator";
 
 function TrendingPostcard(props) {
   // const { data, profileClick, onLike, onComment, selectedCommunityId } = props;
   const { user } = useAppValue();
-  const { _id, companyId, department } = user;
+  const { companyId, department } = user;
   const {
     data,
     profileClick,
     onLike,
-    onComment,
     onDeletePost,
-    selectedCommunityId,
     listHeader,
     EmptyList,
-    refReshData
+    refReshData,
   } = props;
   const theme = useTheme();
   const navigation = useNavigation();
   const _menu = [];
-  const [CompName, setCompName] = useState("");
   const [sound, setSound] = React.useState(false);
-  const [refreshing, setRefreshing] = useState(false)
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const playerRef = useRef();
-  const onBuffer = () => {};
-  const videoError = () => {};
+  const [refreshing, setRefreshing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const { ApiPostMethod, ApiGetMethod } = useApiServices();
-  const [currentIndex2, setCurrentIndex2] = useState(0);
-  const scrollViewRef = useRef();
+  const { ApiGetMethod } = useApiServices();
+  const [opacity, setOpacity] = useState(0);
+
   const [isPaused, setIsPaused] = useState(true);
   //const [IndexCheck, setIndexCheck] = useState(props.currentIndex);
   let videoComponent = useRef();
-  const [getDescStatus, setDescStatus] = useState(false);
+  const [currentDescriptionIndex, setCurrentDescriptionIndex] = useState(null);
+  const [showFullDescription, setShowFullDescription] = useState(false);
   console.log("currentIndex", props.currentIndex);
   // Workaround to display thumbnail in android.
-  const load = ({ duration }) => {
+  const load = () => {
     videoComponent?.seek(0);
   };
   setTimeout(() => {
     setIsLoading(false);
   }, 1000);
+
+  const [LangType, setLangType] = useState("");
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol);
+      })
+      .finally(() => console.log("success"));
+  };
 
   // const onShare = async () => {
   //   await Share.open({
@@ -154,32 +161,33 @@ function TrendingPostcard(props) {
     }
   };
 
-  const shareApiHit = async(item)=>{
-    console.log("helloitem", item)
+  const shareApiHit = async (item) => {
+    console.log("helloitem", item);
     ApiGetMethod(`coach/sharePost?id=${item._id}`)
-    .then((res) => {
-      console.log("data", res);
-    })
-    .catch((error) => {
-      console.assert(error);
-    })
-    .finally(() => setLoading(false));
-  }
+      .then((res) => {
+        console.log("data", res);
+      })
+      .catch((error) => {
+        console.assert(error);
+      })
+      .finally(() => setLoading(false));
+  };
 
   const onShare = async (item) => {
     const getLink = await generateLink(item);
-    const resData ={
+    const resData = {
       message: "Check out my Post",
       url: getLink,
-    }
+    };
     Share.open(resData)
-    .then((res) => {
-      console.log("resData",res);
-      shareApiHit(item)
-    })
-    .catch((err) => {
-      err && console.log(err);
-    });
+      .then((res) => {
+        console.log("resData", res);
+        shareApiHit(item);
+      })
+      .catch((err) => {
+        err && console.log(err);
+        shareApiHit(item);
+      });
   };
 
   const renderIndicators = (contents) => {
@@ -233,6 +241,22 @@ function TrendingPostcard(props) {
     setVisibleItemIndex(indexData);
   };
 
+  const onLoadStart = () => {
+    setOpacity(1);
+    console.log("onLoadStart");
+  };
+
+  const onLoad = () => {
+    setOpacity(0);
+    videoComponent?.seek(0);
+    console.log("onLoad");
+  };
+
+  const onBuffer = ({ isBuffering }) => {
+    setOpacity(isBuffering ? 1 : 0);
+    console.log("onBuffer");
+  };
+
   const ItemView = (item, index, indexData, itemData) => {
     // console.log("items,", item, "itemData", itemData);
     return (
@@ -264,7 +288,6 @@ function TrendingPostcard(props) {
             {indexData != visibleItemIndex && (
               <VideoPausedIcon playVideo={() => pausePlayVideo2(indexData)} />
             )}
-            {/* <TouchableWithoutFeedback onPress={() => pausePlayVideo(indexData)}> */}
             <TouchableWithoutFeedback
               onPress={() =>
                 navigation.navigate("PostDetailScreen", {
@@ -291,13 +314,21 @@ function TrendingPostcard(props) {
                 // paused={isPaused}
                 style={styles.video}
                 repeat={true}
-                onLoad={load}
                 resizeMode={"contain"}
                 volume={sound ? 1.0 : 0.0}
+                onLoad={onLoad}
+                onBuffer={onBuffer}
+                onLoadStart={onLoadStart}
               />
             </TouchableWithoutFeedback>
+
+            <VideoBufferIndicator
+              opacity={opacity}
+              color={theme.colors.primary}
+            />
+
             <TouchableOpacity
-              style={{ position: "absolute", right: 10, bottom: 240 }}
+              style={{ position: "absolute", right: 10, top: 130 }}
               onPress={() => setSound(!sound)}
             >
               <Icon
@@ -362,361 +393,6 @@ function TrendingPostcard(props) {
       </View>
     );
   };
-  // const renderCard = (item, index ) => {
-  //   console.log("itemsdcsd", item);
-  //   return (
-  //     <View style={styles.outerBoundary}>
-  //       <View
-  //         style={{
-  //           height: Scaler(40),
-  //           width: "90%",
-  //           flexDirection: "row",
-  //           alignItems: "center",
-  //           justifyContent: "space-between",
-  //           alignSelf: "center",
-  //           //paddingHorizontal: Scaler(18),
-  //         }}
-  //       >
-  //         <TouchableOpacity
-  //           onPress={() =>
-  //             profileClick(item?.postCreatedUserType, item?.createdBy)
-  //           }
-  //           style={[
-  //             {
-  //               width: "50%",
-  //               alignItems: "center",
-  //               height: "100%",
-  //               flexDirection: "row",
-  //               alignItems: "flex-end",
-  //               justifyContent: "space-between",
-  //             },
-  //           ]}
-  //         >
-  //           {item?.profilePic == undefined ||
-  //           item?.profilePic == null ||
-  //           item?.profilePic?.trim() == "" ? (
-  //             <Image
-  //               style={{
-  //                 height: Scaler(40),
-  //                 width: Scaler(40),
-  //                 borderRadius: Scaler(20),
-  //               }}
-  //               source={profilePic}
-  //               resizeMode={"contain"}
-  //             />
-  //           ) : (
-  //             <Image
-  //               source={{
-  //                 uri: item.profilePic.trim(),
-  //               }}
-  //               style={{
-  //                 height: Scaler(40),
-  //                 width: Scaler(40),
-  //                 borderRadius: Scaler(20),
-  //                 resizeMode: "cover",
-  //               }}
-  //             />
-  //           )}
-  //           <View
-  //             style={{
-  //               marginLeft: Scaler(10),
-  //               height: "100%",
-  //               width: "80%",
-  //               alignSelf: "center",
-  //               alignItems: "flex-start",
-  //               justifyContent: "space-between",
-  //             }}
-  //           >
-  //             <Text style={{ color: "#000" }}>
-  //               {item.userData[0].name + " " + item.userData[0].lastName}
-  //             </Text>
-  //             <Text>
-  //               {item?.postCreatedUserType}{" "}
-  //               {item.userData[0].department == "H.R."
-  //                 ? ",  " + item.userData[0].department
-  //                 : ""}
-  //             </Text>
-  //           </View>
-  //         </TouchableOpacity>
-  //         <View
-  //           style={{
-  //             flexDirection: "row",
-  //             alignItems: "flex-end",
-  //             justifyContent: "space-between",
-  //           }}
-  //         >
-  //           <View
-  //             style={{
-  //               height: "82%",
-  //               alignItems: "flex-end",
-  //               justifyContent: "space-between",
-  //             }}
-  //           >
-  //             <Text
-  //               style={{
-  //                 fontSize: 10,
-  //                 ...theme.fonts.regular,
-  //                 color: theme.colors.disabledText,
-  //               }}
-  //             >
-  //               {moment(item?.createdAt).format("ll")}
-  //             </Text>
-  //             <View
-  //               style={{
-  //                 backgroundColor: "#EEEBFF",
-  //                 padding: Scaler(4),
-  //                 borderRadius: Scaler(5),
-  //               }}
-  //             >
-  //               <Text
-  //                 style={{
-  //                   fontSize: 10,
-  //                   color: theme.colors.primary,
-  //                   ...theme.fonts.regular,
-  //                 }}
-  //               >
-  //                 {item?.communitiesData?.name}
-  //               </Text>
-  //             </View>
-  //           </View>
-  //         </View>
-  //       </View>
-  //       <Spacer size={Scaler(10)} />
-  //       <ScrollView
-  //         contentContainerStyle={styles.mediaContainer}
-  //         horizontal
-  //         showsHorizontalScrollIndicator={false}
-  //         scrollEnabled={item?.pictureUrl?.join(",").split(",").length > 1}
-  //         style={{ flexGrow: 1 }}
-  //         onScroll={onScroll}
-  //         scrollEventThrottle={16}
-  //       >
-  //         {Children.toArray(
-  //           item?.pictureUrl
-  //             ?.join(",")
-  //             .split(",")
-  //             ?.map((pic) => {
-  //               return (
-  //                 <Pressable
-  //                   onPress={() =>
-  //                     isImage(pic)
-  //                       ? navigation.navigate("PostDetailScreen", {
-  //                           postId: item._id,
-  //                           eventType: item.eventType,
-  //                           creator:
-  //                             item.userData[0].name +
-  //                             " " +
-  //                             item.userData[0].lastName,
-  //                           creatorRole: item?.role,
-  //                           pictureUrl: item?.pictureUrl,
-  //                           isLikes: item?.isLikes,
-  //                           totalLikes: item.totalLikes,
-  //                           totalComments: item.totalComments,
-  //                           questions: item.questions,
-  //                         })
-  //                       : null
-  //                   }
-  //                   style={styles.mediaContainer}
-  //                 >
-  //                   {isImage(pic) ? (
-  //                     <Image
-  //                       source={{ uri: pic?.trim() }}
-  //                       style={styles.media}
-  //                     />
-  //                   ) : (
-  //                     <VideoContent videoSource={{ uri: pic?.trim() }} />
-  //                   )}
-  //                   {/*
-  //                     <InViewport onChange={(e)=>handlePlaying(e)}>
-  //                     <VideoPlayer key={index.toString()} index={index} currentIndex={currentIndex} />
-  //                     <Video
-  //                           source={{
-  //                             uri: pic?.trim(),
-  //                           }} // Can be a URL or a local file.
-  //                           ref={playerRef} // Store reference
-  //                           onBuffer={onBuffer} // Callback when remote video is buffering
-  //                           onError={videoError} // Callback when video cannot be loaded
-  //                           style={styles.backgroundVideo}
-  //                           paused={isPaused}
-  //                           controls={Platform.OS == "ios"}
-  //                           resizeMode="cover"
-  //                         />
-  //                    */}
-  //                   {item?.eventType.toLowerCase() == "post" ||
-  //                   item?.eventType.toLowerCase() == "" ? null : (
-  //                     <View style={styles.rollViewStyle}>
-  //                       <Text style={[CommonStyle.rollTextStyle]}>
-  //                         {item?.eventType}
-  //                       </Text>
-  //                     </View>
-  //                   )}
-  //                 </Pressable>
-  //               );
-  //             })
-  //         )}
-  //       </ScrollView>
-  //       <View style={styles.indicatorContainer}>
-  //         {item?.pictureUrl.length > 1
-  //           ? renderIndicators(item?.pictureUrl?.join(",").split(","))
-  //           : null}
-  //       </View>
-  //       {/* {renderContent(item)} */}
-  //       <Spacer size={Scaler(10)} />
-  //       <View style={styles.footer}>
-  //         <View
-  //           style={{
-  //             flexDirection: "row",
-  //             alignItems: "center",
-  //             justifyContent: "space-between",
-  //             width: Scaler(140),
-  //           }}
-  //         >
-  //           <View
-  //             style={{
-  //               flexDirection: "row",
-  //               alignItems: "center",
-  //               justifyContent: "center",
-  //             }}
-  //           >
-  //             <TouchableOpacity
-  //               onPress={() => onLike("like", item?.isLikes, item._id, index)}
-  //             >
-  //               <Image
-  //                 style={{
-  //                   width: Scaler(40),
-  //                   height: Scaler(40),
-  //                   borderRadius: Scaler(20),
-  //                 }}
-  //                 source={item?.isLikes ? likeIcon : likeBlackIcon}
-  //                 resizeMode={"contain"}
-  //               />
-  //             </TouchableOpacity>
-  //             <Spacer horizontal size={Scaler(5)} />
-  //             <TouchableOpacity
-  //               style={{
-  //                 width: Scaler(25),
-  //                 height: Scaler(30),
-  //                 alignItems: "center",
-  //                 justifyContent: "center",
-  //               }}
-  //               onPress={() =>
-  //                 navigation.navigate("MemberScreen", {
-  //                   data: {
-  //                     postId: item?._id,
-  //                     isLikes: true,
-  //                   },
-  //                 })
-  //               }
-  //             >
-  //               <Text
-  //                 style={[
-  //                   CommonStyle.likeTextStyle,
-  //                   {
-  //                     color: item?.isLikes
-  //                       ? theme.colors.primary
-  //                       : theme.colors.disabledText,
-  //                   },
-  //                 ]}
-  //               >
-  //                 {item.totalLikes}
-  //               </Text>
-  //             </TouchableOpacity>
-  //           </View>
-
-  //           <View
-  //             style={{
-  //               flexDirection: "row",
-  //               alignItems: "center",
-  //               justifyContent: "center",
-  //               marginLeft: Scaler(15),
-  //             }}
-  //           >
-  //             <TouchableOpacity
-  //               onPress={() =>
-  //                 navigation.navigate("CommentScreen", {
-  //                   data: {
-  //                     isLikes: item?.isLikes,
-  //                     isCommented: item?.isCommented,
-  //                     postId: item._id,
-  //                     totalLikes: item.totalLikes,
-  //                     totalComments: item.totalComments,
-  //                     description: item?.description,
-  //                     pictureUrl: item?.pictureUrl,
-  //                     name: item.userName + " " + item.userLast,
-  //                     postCreatedUserType: item.postCreatedUserType,
-  //                     selectedCommunityId: selectedCommunityId,
-  //                   },
-  //                 })
-  //               }
-  //             >
-  //               <Image
-  //                 style={{
-  //                   width: Scaler(40),
-  //                   height: Scaler(40),
-  //                   borderRadius: Scaler(20),
-  //                 }}
-  //                 source={item?.isCommented ? commentBlue : commentIcon}
-  //                 resizeMode={"contain"}
-  //               />
-  //             </TouchableOpacity>
-  //             <Spacer horizontal size={Scaler(5)} />
-  //             <TouchableOpacity
-  //               style={{
-  //                 width: Scaler(25),
-  //                 height: Scaler(30),
-  //                 alignItems: "center",
-  //                 justifyContent: "center",
-  //               }}
-  //               onPress={() =>
-  //                 navigation.navigate("MemberScreen", {
-  //                   data: {
-  //                     postId: item?._id,
-  //                     isLikes: false,
-  //                   },
-  //                 })
-  //               }
-  //             >
-  //               <Text
-  //                 style={[
-  //                   CommonStyle.commentTextStyle,
-  //                   {
-  //                     color: item?.isCommented
-  //                       ? theme.colors.primary
-  //                       : theme.colors.disabledText,
-  //                   },
-  //                 ]}
-  //               >
-  //                 {item.totalComments}
-  //               </Text>
-  //             </TouchableOpacity>
-  //           </View>
-  //         </View>
-  //         <TouchableOpacity onPress={() => onShare()}>
-  //           <Image
-  //             style={{ width: wp(13), height: hp(5.2) }}
-  //             source={postShareIcon}
-  //             resizeMode={"contain"}
-  //           />
-  //         </TouchableOpacity>
-  //       </View>
-  //       <Spacer />
-  //       <View style={{ paddingHorizontal: Scaler(15) }}>
-  //         <Text style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}>
-  //           {item.description}
-  //         </Text>
-  //         <Spacer size={Scaler(15)} />
-  //       </View>
-  //       <Divider
-  //         style={{
-  //           width: wp(100) - Scaler(30),
-  //           height: Scaler(1),
-  //           alignSelf: "center",
-  //         }}
-  //       />
-  //     </View>
-  //   );
-  // };
-
   const ItemView2 = ({ item, index }) => {
     console.log("items => ", item);
     return (
@@ -733,7 +409,7 @@ function TrendingPostcard(props) {
         >
           <TouchableOpacity
             onPress={() =>
-              profileClick(item?.postCreatedUserType, item?.createdBy)
+              profileClick(item, item?.postCreatedUserType, item?.createdBy)
             }
             style={[
               {
@@ -847,7 +523,18 @@ function TrendingPostcard(props) {
                       ...theme.fonts.regular,
                     }}
                   >
-                    {item?.communitiesData?.name}
+                    {/* {item?.communitiesData?.name} */}
+                    {item?.communitiesData?.name.length < 25
+                      ? `${
+                          LangType === "en"
+                            ? item?.communitiesData?.name
+                            : item?.communitiesData?.frenchName
+                        }`
+                      : `${
+                          LangType === "en"
+                            ? item?.communitiesData?.name.substring(0, 25)
+                            : item?.communitiesData?.frenchName.substring(0, 25)
+                        }...`}
                   </Text>
                 </View>
               )}
@@ -991,14 +678,14 @@ function TrendingPostcard(props) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onPress={() =>
-                  navigation.navigate("MemberScreen", {
-                    data: {
-                      postId: item?._id,
-                      isLikes: false,
-                    },
-                  })
-                }
+                // onPress={() =>
+                //   navigation.navigate("MemberScreen", {
+                //     data: {
+                //       postId: item?._id,
+                //       isLikes: false,
+                //     },
+                //   })
+                // }
               >
                 <Text
                   style={[
@@ -1024,22 +711,38 @@ function TrendingPostcard(props) {
           </TouchableOpacity>
         </View>
         <Spacer />
-        <TouchableOpacity onPress={() => setDescStatus((data) => !data)} style={{ paddingHorizontal: Scaler(15) }}>
-          {/* <Text
-            style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
-            numberOfLines={2}
-          >
-            {item.description}
-          </Text> */}
-          {getDescStatus === false ? (
+        <TouchableOpacity
+          onPress={() => {
+            setCurrentDescriptionIndex(index);
+            setShowFullDescription(
+              index === currentDescriptionIndex && showFullDescription
+                ? false
+                : true
+            );
+          }}
+          style={{ paddingHorizontal: Scaler(15) }}
+        >
+          {showFullDescription == true &&
+          currentDescriptionIndex != null &&
+          currentDescriptionIndex == index ? (
             <Text
-              numberOfLines={2}
-              style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
+              style={{
+                ...theme.fonts.regular,
+                fontSize: Scaler(13),
+                color: theme.colors.disabledText,
+              }}
             >
               {item?.description}
             </Text>
           ) : (
-            <Text style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}>
+            <Text
+              numberOfLines={2}
+              style={{
+                ...theme.fonts.regular,
+                fontSize: Scaler(13),
+                color: theme.colors.disabledText,
+              }}
+            >
               {item?.description}
             </Text>
           )}
@@ -1080,6 +783,7 @@ function TrendingPostcard(props) {
             width: wp(100) - Scaler(30),
             height: Scaler(1),
             alignSelf: "center",
+            marginTop: Scaler(16),
           }}
         />
       </View>
@@ -1087,9 +791,9 @@ function TrendingPostcard(props) {
   };
 
   const _onRefresh = () => {
-    console.log('_onRefresh')
-    refReshData()
-};
+    console.log("_onRefresh");
+    refReshData();
+  };
 
   //return <View>{Children.toArray(data.map((item, index) => renderCard(item, index)))}</View>;
   return (
@@ -1178,11 +882,8 @@ function TrendingPostcard(props) {
           showsVerticalScrollIndicator={false}
           style={{ marginBottom: Scaler(125) }}
           refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={_onRefresh}
-          />
-        }
+            <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
+          }
         />
       )}
     </View>
@@ -1196,7 +897,7 @@ TrendingPostcard.propTypes = {
   onComment: PropTypes.func,
   listHeader: PropTypes.any,
   EmptyList: PropTypes.any,
-  refReshData: PropTypes.func
+  refReshData: PropTypes.func,
 };
 
 TrendingPostcard.defaultProps = {
@@ -1206,14 +907,14 @@ TrendingPostcard.defaultProps = {
   onComment: () => {},
   listHeader: () => {},
   EmptyList: () => {},
-  refReshData: () => {}
+  refReshData: () => {},
 };
 
 const styles = StyleSheet.create({
   outerBoundary: {
     minHeight: Scaler(400),
     width: wp(100),
-    marginTop: Scaler(10),
+    marginTop: Scaler(6),
   },
   header: {
     height: Scaler(50),
@@ -1283,6 +984,13 @@ const styles = StyleSheet.create({
     width: windowWidth,
     height: Scaler(450),
     marginVertical: 8,
+  },
+  video: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
   },
 });
 

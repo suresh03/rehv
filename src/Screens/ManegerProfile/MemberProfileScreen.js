@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -39,7 +38,7 @@ export default function MemberProfileScreen({ navigation, route }) {
   const hideDialog = () => setVisible(false);
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
-
+  console.log("  route?.params", route?.params);
   const followFunction = async (id) => {
     setBtnLoading(true);
     console.log(id);
@@ -114,11 +113,11 @@ export default function MemberProfileScreen({ navigation, route }) {
   };
 
   useEffect(() => {
+    getUserData();
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
-    getUserData();
+    }, 3000);
   }, []);
 
   const _blockUser = async (id) => {
@@ -148,6 +147,8 @@ export default function MemberProfileScreen({ navigation, route }) {
       console.log(error);
     }
   };
+
+  console.log("userDatauserDatauserData", userData);
 
   return (
     <SafeAreaView style={CommonStyle.container}>
@@ -281,7 +282,10 @@ export default function MemberProfileScreen({ navigation, route }) {
                     fontFamily: "Poppins-Medium",
                   }}
                 >
-                  {moment(userData?.dateOfBirth).format("ll")}
+                  {route?.params?.item?.userData[0]?.employeeStartFrom.replace(
+                    ":",
+                    " - "
+                  )}
                 </Text>
               </View>
             )}

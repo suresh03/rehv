@@ -171,6 +171,23 @@ export const HeaderCustom = (props) => {
   );
 };
 
+export const HeaderCustomLearn = (props) => {
+  return (
+    <TouchableOpacity
+      onPress={() => props.onBackPress()}
+      style={[{ padding: 15 }, props.headerViewStyle]}
+    >
+      <View>
+        <Image
+          style={[props.backButtonStyle]}
+          source={backblack}
+          resizeMode="contain"
+        />
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     width: width,

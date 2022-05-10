@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, Platform, TouchableOpacity, Image,TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  Platform,
+  TouchableOpacity,
+  Image,
+  TouchableWithoutFeedback,
+} from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -58,10 +65,9 @@ function EnterBirthday(props) {
                   <TouchableOpacity
                     onPress={() => datePop()}
                     style={{
-                      width: wp(40),
                       flexDirection: "row",
                       alignItems: "center",
-                      justifyContent: "space-between",
+                      justifyContent: "space-between"
                     }}
                   >
                     <Image
@@ -77,6 +83,7 @@ function EnterBirthday(props) {
                         fontFamily: "Poppins-Regular",
                         color: confirmDate == "" ? "grey" : "#000",
                         fontSize: Scaler(14),
+                        marginLeft: Scaler(10),
                       }}
                     >
                       {confirmDate == ""
@@ -112,7 +119,7 @@ function EnterBirthday(props) {
             modal
             open={dateToggle}
             date={confirmDate}
-            maximumDate={maximumBirthDate}
+            //maximumDate={maximumBirthDate}
             onConfirm={(d) => {
               setDateToggle(false);
               setDate(d);

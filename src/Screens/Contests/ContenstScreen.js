@@ -7,13 +7,12 @@ import {
   Image,
   Pressable,
   FlatList,
-  ImageBackground,
   KeyboardAvoidingView,
   Alert,
   Platform,
   StatusBar,
   Dimensions,
-  TouchableWithoutFeedback,
+  StyleSheet,
 } from "react-native";
 import CommonStyle from "../../Components/CustomComponents/CommonStyle";
 import { HeaderBackAction } from "../../Components/CustomHeader/ContestHeader";
@@ -31,6 +30,8 @@ import {
   playIcon,
   profilePic,
   likeWhite,
+  likeBlackIcon,
+  likeIcon,
 } from "../../Assets/icon";
 import ImagePicker from "react-native-image-crop-picker";
 import { Portal, Provider, Modal } from "react-native-paper";
@@ -83,8 +84,8 @@ export default function ContestScreen({ navigation, route }) {
         setTopArray(res.data.contestList);
       })
       .catch((error) => {
-        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message??'');
-console.log('error?.message',error?.message)
+        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
+        console.log("error?.message", error?.message);
       })
       .finally(() => console.log(false));
   };
@@ -97,8 +98,8 @@ console.log('error?.message',error?.message)
         setRecentArray(res.data.contestList);
       })
       .catch((error) => {
-        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message??'');
-console.log('error?.message',error?.message)
+        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
+        console.log("error?.message", error?.message);
       })
       .finally(() => console.log(false));
   };
@@ -159,8 +160,8 @@ console.log('error?.message',error?.message)
                 uri: item?.pictureUrl[0],
               }}
               style={{
-                width: Platform.OS === "ios" ? Scaler(140):Scaler(140),
-                height: Platform.OS === "ios" ? Scaler(120):Scaler(120),
+                width: Platform.OS === "ios" ? Scaler(140) : Scaler(140),
+                height: Platform.OS === "ios" ? Scaler(120) : Scaler(120),
                 alignSelf: "center",
                 borderRadius: Scaler(10),
               }}
@@ -174,11 +175,11 @@ console.log('error?.message',error?.message)
                   //backgroundColor: "#EEEBFF",
                   borderRadius: 10,
                   justifyContent: "center",
-                  top:3,
+                  top: 3,
                   backgroundColor: "#000",
                   alignItems: "center",
                   //zIndex: 1,
-                  alignSelf:'center',
+                  alignSelf: "center",
                 }}
               >
                 <Video
@@ -188,8 +189,8 @@ console.log('error?.message',error?.message)
                   ref={playerRef}
                   style={{
                     width: wp(35),
-                    height: Platform.OS === "ios" ? hp(14):hp(12),
-                    alignSelf:'center',
+                    height: Platform.OS === "ios" ? hp(14) : hp(12),
+                    alignSelf: "center",
                   }}
                   repeat={false}
                   onLoad={load}
@@ -230,7 +231,8 @@ console.log('error?.message',error?.message)
             }}
           >
             <Image
-              source={likeWhite}
+              //source={likeWhite}
+              source={item?.isLikes ? likeIcon : likeBlackIcon}
               style={{ width: wp(15), height: hp(3), top: hp(2) }}
               resizeMode={"contain"}
             />
@@ -239,7 +241,8 @@ console.log('error?.message',error?.message)
                 width: wp(10),
                 height: hp(3),
                 top: hp(2.2),
-                color: "#ffff",
+                //color: "#ffff",
+                color: item?.isLikes ? theme.colors.primary : "#fff",
                 fontFamily: "Poppins-Medium",
                 right: wp(2.5),
               }}
@@ -309,8 +312,8 @@ console.log('error?.message',error?.message)
         </View>
         <Text
           style={{
-            top: Platform.OS === "ios" ? Scaler(-12):Scaler(-17),
-            left: Platform.OS === "ios" ? wp(13):wp(13.3),
+            top: Platform.OS === "ios" ? Scaler(-12) : Scaler(-17),
+            left: Platform.OS === "ios" ? wp(13) : wp(13.3),
             color: "#7F8190",
             fontSize: getFontSize(12),
             fontFamily: "Poppins-Medium",
@@ -374,11 +377,11 @@ console.log('error?.message',error?.message)
                   //backgroundColor: "#EEEBFF",
                   borderRadius: 10,
                   justifyContent: "center",
-                  top:3,
+                  top: 3,
                   backgroundColor: "#000",
                   alignItems: "center",
                   //zIndex: 1,
-                  alignSelf:'center',
+                  alignSelf: "center",
                 }}
               >
                 <Video
@@ -530,36 +533,35 @@ console.log('error?.message',error?.message)
   };
   const renderVideo = (video) => {
     return (
-      <View style={{}}>
-        <View
-          style={{
-            borderRadius: Scaler(11),
-            backgroundColor: "#000",
-            alignItems: "center",
-            zIndex: 1,
-            top: -3,
-            alignSelf:'center',
-            justifyContent:'center'
+      <View
+        style={{
+          backgroundColor: "#000",
+          alignItems: "center",
+          alignSelf: "center",
+          justifyContent: "center",
+          width: wp(90),
+          height: Scaler(200),
+          borderRadius: Scaler(10),
+        }}
+      >
+        <Video
+          source={{
+            uri: video?.uri?.trim(),
           }}
-        >
-          <Video
-            source={{
-              uri: video?.uri?.trim(),
-            }}
-            repeat={false}
-            onLoad={load}
-            ref={(ref) => (videoComponent = ref)}
-            style={{
-              width: windowWidth/1.1,
-              height: Scaler(140),
-              alignSelf:'center',
-              alignItems:'center',
-              justifyContent:'center',
-              left:Scaler(115)
-            }}
-            paused={true}
-          />
-          {/* <TouchableWithoutFeedback>
+          repeat={false}
+          onLoad={load}
+          ref={(ref) => (videoComponent = ref)}
+          style={{
+            width: wp(90),
+            height: Scaler(200),
+            alignSelf: "center",
+            borderRadius: Scaler(10),
+            ...StyleSheet.absoluteFill,
+          }}
+          paused={true}
+          resizeMode={"cover"}
+        />
+        {/* <TouchableWithoutFeedback>
               <Video
                 ref={(ref) => (videoComponent = ref)}
                 source={{ uri: item }}
@@ -571,44 +573,33 @@ console.log('error?.message',error?.message)
                 resizeMode={"cover"}
               />
             </TouchableWithoutFeedback> */}
-          <Image
-            source={playIcon}
-            style={{
-              width: wp(10),
-              height: hp(10),
-              alignSelf: "center",
-              top: 20,
-              position: "absolute",
-            }}
-            resizeMode={"contain"}
-          />
-        </View>
+        <Image
+          source={playIcon}
+          style={{
+            width: Scaler(50),
+            height: Scaler(50),
+            resizeMode: "contain",
+            alignSelf: "center",
+            position: "absolute",
+          }}
+          resizeMode={"contain"}
+        />
       </View>
     );
   };
 
   const renderImage = (image) => {
     return (
-      <View style={{ alignSelf: "center" }}>
-        <ImageBackground
-          style={{
-            width: wp(85),
-            height: Scaler(180),
-            backgroundColor: "#EEEBFF",
-            borderRadius: 10,
-            justifyContent: "center",
-            top: 13,
-          }}
-          imageStyle={{
-            width: wp(85),
-            height: Scaler(180),
-            backgroundColor: "#EEEBFF",
-            borderRadius: 10,
-            justifyContent: "center",
-          }}
-          source={image}
-        ></ImageBackground>
-      </View>
+      <Image
+        style={{
+          width: wp(90),
+          height: Scaler(200),
+          backgroundColor: "#EEEBFF",
+          borderRadius: 10,
+          justifyContent: "center",
+        }}
+        source={image}
+      />
     );
   };
 
@@ -696,7 +687,7 @@ console.log('error?.message',error?.message)
     setCameraOpen(false);
     PicturePicker.captureFromCamera().then((res) => {
       console.log("onCamera => ", res);
-      
+
       let x = [...images, ...res];
       setImages(x);
       setCamera(false);
@@ -748,13 +739,13 @@ console.log('error?.message',error?.message)
         } else {
           SnackbarHandler.errorToast(
             Lang.MESSAGE,
-            "You are already participated in this contest"
+            "You have already participated in this contest"
           );
         }
       })
       .catch((error) => {
-        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message??'');
-console.log('error?.message',error?.message)
+        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
+        console.log("error?.message", error?.message);
         Lang.MESSAGE, error;
       })
       .finally(() => setLoading(false));
@@ -786,7 +777,7 @@ console.log('error?.message',error?.message)
       return urls;
     } else {
       SnackbarHandler.errorToast(Lang.MESSAGE, res.message);
-console.log('res.message =>',res.message);
+      console.log("res.message =>", res.message);
       return false;
     }
   };
@@ -807,7 +798,7 @@ console.log('res.message =>',res.message);
       return temp;
     } else {
       SnackbarHandler.errorToast(Lang.MESSAGE, res.message);
-console.log('res.message =>',res.message);
+      console.log("res.message =>", res.message);
       return false;
     }
   };

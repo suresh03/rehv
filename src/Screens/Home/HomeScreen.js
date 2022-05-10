@@ -123,7 +123,7 @@ export default function HomeScreen({ navigation }) {
     );
     if (companyName != UserPostCompanyName) {
       Alert.alert("The post is from different company");
-    } else {
+    }else {
       if (!!link?.url) {
         setTimeout(() => {
           navigation.navigate("PostDetailScreen", {
@@ -187,7 +187,7 @@ export default function HomeScreen({ navigation }) {
     if (role.toLowerCase() == "excoach") {
       navigation.navigate("ExCoachProfileScreen", { item, _id });
     } else {
-      navigation.navigate("MemberProfileScreen", { _id });
+      navigation.navigate("MemberProfileScreen", {  item, _id });
     }
   };
 

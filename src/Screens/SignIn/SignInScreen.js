@@ -12,10 +12,7 @@ import ChangeStyle from "../../Components/CustomComponents/ChangeStyle";
 import CommonStyle from "../../Components/CustomComponents/CommonStyle";
 import Body from "../../Components/SharedComponents/Body";
 import Padding from "../../Components/SharedComponents/Padding";
-import {
-  getFontSize,
-  responsiveSize,
-} from "../../Components/SharedComponents/ResponsiveSize";
+
 import Spacer from "../../Components/SharedComponents/Space";
 import { TextField } from "../../Components/SharedComponents/TextField";
 import { logo, freezeIcon } from "../../Assets/icon";
@@ -41,8 +38,8 @@ export default function SignInScreen({ navigation, route }) {
   return (
     <SafeAreaView style={CommonStyle.container}>
       <Body>
-        <Image style={CommonStyle.logoStyle} source={logo} />
-        <Padding horizontal size={responsiveSize(25)}>
+        <Image style={CommonStyle.logoStyle} resizeMode="contain" source={logo} />
+        <Padding horizontal size={Scaler(25)}>
           <TextField
             textStyle={[
               CommonStyle.tittleStyle,
@@ -99,7 +96,7 @@ export default function SignInScreen({ navigation, route }) {
           <Text
             style={{
               fontFamily: "Poppins-Medium",
-              fontSize: getFontSize(22),
+              fontSize: Scaler(22),
               width: wp(90),
               paddingTop: 20,
               color: "#110D26",
@@ -112,7 +109,7 @@ export default function SignInScreen({ navigation, route }) {
           <Text
             style={{
               fontFamily: "Poppins-Medium",
-              fontSize: getFontSize(16),
+              fontSize: Scaler(16),
               width: wp(90),
               paddingTop: 20,
               color: "#7F8190",
@@ -137,7 +134,7 @@ export default function SignInScreen({ navigation, route }) {
             style={{
               alignSelf: "center",
               color: "#fff",
-              fontSize: getFontSize(20),
+              fontSize: Scaler(20),
               fontFamily: "Poppins-Medium",
               top: Platform.OS === "ios" ? hp(2) : 15,
             }}

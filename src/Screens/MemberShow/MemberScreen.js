@@ -17,8 +17,15 @@ export default function MemberScreen({ navigation, route }) {
     const getLikeOrCommentList = async () => {
       try {
         const res = await likeOrCommentList(postId, isLikes);
-        console.log(" likeOrCommentList =?>  ", res.list[0].userData);
-        setUserList(res.list);
+        // console.log(" likeOrCommentList =?>  ", res.list);
+
+        let temp = res.list.reduce((acc, crr) => {
+          let { userData, isFollower, isFollowing, requestPending } = crr;
+          return acc.concat([
+            { ...userData[0], isFollower, isFollowing, requestPending },
+          ]);
+        }, []);
+        setUserList(temp);
       } catch {
         (error) => {
           console.log("error comment ", error);
@@ -29,9 +36,8 @@ export default function MemberScreen({ navigation, route }) {
     getLikeOrCommentList();
   }, []);
 
-  console.log(userList);
   const renderItem = ({ item, index }) => {
-    return <UserCard data={item.userData[0]} index={index} />;
+    return <UserCard data={item} index={index} />;
   };
 
   return (

@@ -400,7 +400,7 @@ class OtpInput extends Component {
           onPress={() => this.props.VerifyCode(code)}
           status={Lang.VERIFY}
           style={{
-            bottom:Scaler(78)
+            bottom:Scaler(30)
           }}
         />
         ):<CustomButton

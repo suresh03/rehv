@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Children } from "react";
 import {
   View,
   Text,
@@ -16,17 +16,11 @@ import {
   ImageBackground,
 } from "react-native";
 import { updatePersonalCommunity } from "../../Redux/actions";
-import {
-  getFontSize,
-  responsiveSize,
-} from "../../Components/SharedComponents/ResponsiveSize";
-import { backblack, whiteback, onButton, offButton } from "../../Assets/icon";
+import { backblack, onButton, offButton } from "../../Assets/icon";
 import Scaler from "../../Utils/Scaler";
-import BottomSheet from "react-native-simple-bottom-sheet";
 import Lang from "../../Language";
 import useApiServices from "../../Services/useApiServices";
-import { useSelector, useDispatch } from "react-redux";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { useDispatch } from "react-redux";
 
 export default function InsightCompany({ navigation }) {
   const [getOptions, setOptions] = useState([]);
@@ -36,40 +30,10 @@ export default function InsightCompany({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [bottomSheet, setBottomSheet] = useState(false);
   const [exBottomSheet, setExBottomSheet] = useState(false);
+  const [PersonaOfCompany, setPersonaOfCompany] = useState([]);
   const dispatch = useDispatch();
   const { ApiGetMethod, ApiPostMethod } = useApiServices();
-  const btmArray = [
-    {
-      title: "Maestro",
-      value: 88,
-      image: require("../../Assets/Images/btnimage/one.png"),
-      fontColor: "#000",
-    },
-    {
-      title: "Gifted",
-      value: 140,
-      image: require("../../Assets/Images/btnimage/two.png"),
-      fontColor: "#fff",
-    },
-    {
-      title: "Expert",
-      value: 212,
-      image: require("../../Assets/Images/btnimage/three.png"),
-      fontColor: "#000",
-    },
-    {
-      title: "Experienced",
-      value: 122,
-      image: require("../../Assets/Images/btnimage/four.png"),
-      fontColor: "#fff",
-    },
-    {
-      title: "Talented",
-      value: 144,
-      image: require("../../Assets/Images/btnimage/five.png"),
-      fontColor: "#fff",
-    },
-  ];
+
   const personList = [
     {
       name: "Myles",
@@ -123,17 +87,33 @@ export default function InsightCompany({ navigation }) {
     },
   ];
 
+  const [LangType, setLangType] = useState("");
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol);
+      })
+      .finally(() => console.log("success"));
+  };
+
   useEffect(() => {
     global.isPersonal = false;
     getCommunityData();
+    personaOfCompany();
   }, [getCommunity]);
 
   const getCommunityData = () => {
     setLoading(true);
     ApiGetMethod(
-      `post/communityListByCompany?type=${getCommunity === "Worker" ? "Employee" : "Manager"
+      `post/communityListByCompany?type=${
+        getCommunity === "Worker" ? "Employee" : "Manager"
       }`
-    ).then(async(res) => {
+    ).then(async (res) => {
       console.log(
         "get post/communityListByCompany list => ",
         JSON.stringify(res)
@@ -165,30 +145,53 @@ export default function InsightCompany({ navigation }) {
           icon: "bar-chart",
         },
       ]);
-      let empcmnty =  data.communityList.filter((x) => x.type === "Employee");
-      let mgrcmnty =  data.communityList.filter((x) => x.type === "Manager");
+      let empcmnty = data.communityList.filter((x) => x.type === "Employee");
+      let mgrcmnty = data.communityList.filter((x) => x.type === "Manager");
       empcmnty.push({
-        title: "Aggragate Stats1",
+        title: "Aggregate Stats1",
         langType: "en",
-        picture: require("../../Assets/Images/marketingIcon.png"),
-        isAggragate: true,
-        name: "Aggragate Stats",
-        frenchName: "Aggragate Stats",
-        type: "Employee"
-      })
+        picture: require("../../Assets/Images/aggregate.png"),
+        isAggregate: true,
+        name: "Aggregate Stats",
+        frenchName: "Aggregate Stats",
+        type: "Employee",
+      });
       mgrcmnty.push({
-        title: "Aggragate Stats2",
+        title: "Aggregate Stats2",
         langType: "en",
-        picture: require("../../Assets/Images/marketingIcon.png"),
-        isAggragate: true,
-        name: "Aggragate Stats",
-        frenchName: "Aggragate Stats",
-        type: "Manager"
-      })
+        picture: require("../../Assets/Images/aggregate.png"),
+        isAggregate: true,
+        name: "Aggregate Stats",
+        frenchName: "Aggregate Stats",
+        type: "Manager",
+      });
       setCommunitites(empcmnty);
       setMCommunities(mgrcmnty);
       setLoading(false);
     });
+  };
+
+  const personaOfCompany = () => {
+    ApiGetMethod(`post/personaOfCompany`)
+      .then((res) => {
+        let keyOrder = [
+          "Maestro",
+          "Gifted",
+          "Expert",
+          "Experienced",
+          "Talented",
+        ];
+        let sortedData = keyOrder.reduce((acc, curr) => {
+          let obj = res.data.find((item) => item._id === curr);
+          return acc.concat(obj);
+        }, []);
+        console.log("sortedData ", sortedData);
+        setPersonaOfCompany(sortedData);
+      })
+      .catch((error) => {
+        console.assert(error);
+      })
+      .finally(() => setLoading(false));
   };
 
   const renderBigButton = (title) => {
@@ -209,7 +212,7 @@ export default function InsightCompany({ navigation }) {
       >
         {title ? (
           <View style={styles.optionLeft}>
-            {title === "Persona" ? (
+            {title === Lang.Persona ? (
               <Image
                 source={require("../../Assets/Images/persona.png")}
                 style={styles.optionImage}
@@ -224,7 +227,7 @@ export default function InsightCompany({ navigation }) {
             )}
             <Text
               style={{
-                fontSize: getFontSize(12),
+                fontSize: Scaler(12),
                 alignSelf: "center",
                 color: "#000",
                 fontFamily: "Poppins-Regular",
@@ -268,7 +271,7 @@ export default function InsightCompany({ navigation }) {
           </TouchableOpacity>
           <Text
             style={{
-              fontSize: getFontSize(20),
+              fontSize: Scaler(20),
               fontFamily: "Poppins-SemiBold",
               color: "#000",
               textAlign: "center",
@@ -279,7 +282,7 @@ export default function InsightCompany({ navigation }) {
         </View>
         <Text
           style={{
-            fontSize: getFontSize(24),
+            fontSize: Scaler(24),
             fontFamily: "Poppins-SemiBold",
             color: "#000",
             textAlign: "center",
@@ -305,19 +308,19 @@ export default function InsightCompany({ navigation }) {
           >
             <Text
               style={{
-                fontSize: getFontSize(20),
+                fontSize: Scaler(20),
                 fontFamily: "Poppins-SemiBold",
                 color: "#000",
                 textAlign: "center",
                 position: "absolute",
               }}
             >
-              Persona
+              {Lang.Persona}
             </Text>
             <Text
               onPress={() => setBottomSheet(false)}
               style={{
-                fontSize: getFontSize(20),
+                fontSize: Scaler(20),
                 position: "absolute",
                 right: 10,
                 fontFamily: "Poppins-SemiBold",
@@ -330,7 +333,7 @@ export default function InsightCompany({ navigation }) {
           </View>
           <Text
             style={{
-              fontSize: getFontSize(24),
+              fontSize: Scaler(24),
               fontFamily: "Poppins-SemiBold",
               color: "#000",
               textAlign: "center",
@@ -338,46 +341,91 @@ export default function InsightCompany({ navigation }) {
           >
             {global.loginCompany}
           </Text>
-          <Text
+          <View
             style={{
-              fontSize: getFontSize(16),
-              fontFamily: "Poppins-Medium",
-              color: "#7F8190",
-              textAlign: "center",
+              width: "90%",
+              alignItems: "center",
+              alignSelf: "center",
+              marginVertical: Scaler(10),
             }}
           >
-            {global.companyDescription}
-          </Text>
+            <Text
+              style={{
+                fontSize: Scaler(16),
+                fontFamily: "Poppins-Medium",
+                color: "#7F8190",
+                textAlign: "center",
+              }}
+            >
+              {Lang.rankingNote}
+            </Text>
+          </View>
           <View style={{ paddingVertical: 5, flex: 1 }}>
-            {btmArray.map((item) => {
-              return (
-                <ImageBackground
-                  source={item.image}
-                  style={[styles.bsheetButton]}
-                >
-                  <Text
-                    style={{
-                      fontSize: getFontSize(17),
-                      fontFamily: "Poppins-Medium",
-                      color: item.fontColor,
-                      textAlign: "center",
-                    }}
+            {Children.toArray(
+              PersonaOfCompany.map((item) => {
+                return (
+                  <ImageBackground
+                    source={
+                      item.ranking == "Experienced"
+                        ? require("../../Assets/Images/btnimage/four.png")
+                        : item.ranking == "Maestro"
+                        ? require("../../Assets/Images/btnimage/one.png")
+                        : item.ranking == "Gifted"
+                        ? require("../../Assets/Images/btnimage/two.png")
+                        : item.ranking == "Talented"
+                        ? require("../../Assets/Images/btnimage/five.png")
+                        : item.ranking == "Expert"
+                        ? require("../../Assets/Images/btnimage/three.png")
+                        : null
+                    }
+                    style={[styles.bsheetButton]}
                   >
-                    {item.title}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: getFontSize(22),
-                      fontFamily: "Poppins-Bold",
-                      color: item.fontColor,
-                      textAlign: "center",
-                    }}
-                  >
-                    {item.value}
-                  </Text>
-                </ImageBackground>
-              );
-            })}
+                    <Text
+                      style={{
+                        fontSize: Scaler(17),
+                        fontFamily: "Poppins-Medium",
+                        color:
+                          item.ranking == "Experienced"
+                            ? "#fff"
+                            : item.ranking == "Maestro"
+                            ? "#000"
+                            : item.ranking == "Gifted"
+                            ? "#fff"
+                            : item.ranking == "Talented"
+                            ? "#fff"
+                            : item.ranking == "Expert"
+                            ? "#fff"
+                            : null,
+                        textAlign: "center",
+                      }}
+                    >
+                      {item.ranking}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: Scaler(22),
+                        fontFamily: "Poppins-Bold",
+                        color:
+                          item.ranking == "Experienced"
+                            ? "#fff"
+                            : item.ranking == "Maestro"
+                            ? "#000"
+                            : item.ranking == "Gifted"
+                            ? "#fff"
+                            : item.ranking == "Talented"
+                            ? "#fff"
+                            : item.ranking == "Expert"
+                            ? "#fff"
+                            : null,
+                        textAlign: "center",
+                      }}
+                    >
+                      {item.total}
+                    </Text>
+                  </ImageBackground>
+                );
+              })
+            )}
           </View>
         </View>
       </View>
@@ -406,7 +454,7 @@ export default function InsightCompany({ navigation }) {
             </TouchableOpacity>
             <Text
               style={{
-                fontSize: getFontSize(20),
+                fontSize: Scaler(20),
                 fontFamily: "Poppins-SemiBold",
                 color: "#000",
                 textAlign: "center",
@@ -417,7 +465,7 @@ export default function InsightCompany({ navigation }) {
           </View>
           <Text
             style={{
-              fontSize: getFontSize(24),
+              fontSize: Scaler(24),
               fontFamily: "Poppins-SemiBold",
               color: "#000",
               textAlign: "center",
@@ -427,7 +475,7 @@ export default function InsightCompany({ navigation }) {
           </Text>
           <Text
             style={{
-              fontSize: getFontSize(16),
+              fontSize: Scaler(16),
               width: "80%",
               marginVertical: 10,
               fontFamily: "Poppins-Medium",
@@ -474,7 +522,7 @@ export default function InsightCompany({ navigation }) {
                   <View style={{ width: "50%", alignItems: "flex-start" }}>
                     <Text
                       style={{
-                        fontSize: getFontSize(16),
+                        fontSize: Scaler(16),
                         fontFamily: "Poppins-SemiBold",
                         color: "#000",
                         textAlign: "center",
@@ -495,7 +543,7 @@ export default function InsightCompany({ navigation }) {
                   >
                     <Text
                       style={{
-                        fontSize: getFontSize(12),
+                        fontSize: Scaler(12),
                         fontFamily: "Poppins-SemiBold",
                         color: "#4D39E9",
                         textAlign: "center",
@@ -516,11 +564,11 @@ export default function InsightCompany({ navigation }) {
   const renderFooterComponent = () => {
     return (
       <View style={{ flex: 1 }}>
-        {renderBigButton("Persona")}
+        {renderBigButton(Lang.Persona)}
         <View style={styles.communityHeadingContainer}>
           <Text
             style={{
-              fontSize: getFontSize(18),
+              fontSize: Scaler(18),
               fontFamily: "Poppins-SemiBold",
               color: "#000",
               textAlign: "center",
@@ -536,7 +584,7 @@ export default function InsightCompany({ navigation }) {
             >
               <Text
                 style={{
-                  fontSize: getFontSize(14),
+                  fontSize: Scaler(14),
                   fontFamily:
                     getCommunity === "Worker"
                       ? "Poppins-Bold"
@@ -568,7 +616,7 @@ export default function InsightCompany({ navigation }) {
             >
               <Text
                 style={{
-                  fontSize: getFontSize(14),
+                  fontSize: Scaler(14),
                   fontFamily:
                     getCommunity === "Worker"
                       ? "Poppins-Regular"
@@ -590,15 +638,26 @@ export default function InsightCompany({ navigation }) {
                 return (
                   <TouchableOpacity
                     onPress={() => {
-                      dispatch(updatePersonalCommunity(item.isAggragate ? item.type : item));
-                      navigation.navigate("CommunityDetails");
+                      dispatch(
+                        updatePersonalCommunity(
+                          item.isAggregate ? item.type : item
+                        )
+                      );
+                      navigation.navigate("CommunityDetails", {
+                        flag: "company",
+                        name:
+                          item.name === "Aggregate Stats" ? "Aggregate" : "",
+                      });
                     }}
                     activeOpacity={0.8}
                     style={[
                       styles.comContainer,
                       {
-                        borderColor:
-                        item.isAggragate ? "#0089BD" : getCommunity === "Worker" ? "#4C38E8": "#C8D997",
+                        borderColor: item.isAggregate
+                          ? "#0089BD"
+                          : getCommunity === "Worker"
+                          ? "#4C38E8"
+                          : "#C8D997",
                       },
                     ]}
                   >
@@ -609,19 +668,26 @@ export default function InsightCompany({ navigation }) {
                         overflow: "hidden",
                         borderRadius: 100,
                         borderWidth: 2,
-                        borderColor:
-                        item.isAggragate ? "#0089BD" : getCommunity === "Worker" ? "#EEEBFF" : "#C8D997",
+                        borderColor: item.isAggregate
+                          ? "#0089BD"
+                          : getCommunity === "Worker"
+                          ? "#EEEBFF"
+                          : "#C8D997",
                       }}
                     >
                       <Image
-                        source={item.isAggragate ? item.picture : { uri: item.picture }}
+                        source={
+                          item.isAggregate
+                            ? item.picture
+                            : { uri: item.picture }
+                        }
                         style={styles.comImage}
                         resizeMode="contain"
                       />
                     </View>
                     <Text
                       style={{
-                        fontSize: getFontSize(14),
+                        fontSize: Scaler(14),
                         alignSelf: "center",
                         color: "#000",
                         fontWeight: "bold",
@@ -629,7 +695,7 @@ export default function InsightCompany({ navigation }) {
                         fontFamily: "Poppins-SemiBold",
                       }}
                     >
-                      {item.langType === "en" ? item.name : item.frenchName}
+                      {LangType === "en" ? item.name : item.frenchName}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -646,7 +712,7 @@ export default function InsightCompany({ navigation }) {
                   >
                     <Text
                       style={{
-                        fontSize: getFontSize(14),
+                        fontSize: Scaler(14),
                         alignSelf: "center",
                         color: "#000",
                         textAlign: "center",
@@ -668,15 +734,26 @@ export default function InsightCompany({ navigation }) {
                 return (
                   <TouchableOpacity
                     onPress={() => {
-                      dispatch(updatePersonalCommunity(item.isAggragate ? item.type : item));
-                      navigation.navigate("CommunityDetails");
+                      dispatch(
+                        updatePersonalCommunity(
+                          item.isAggregate ? item.type : item
+                        )
+                      );
+                      navigation.navigate("CommunityDetails", {
+                        flag: "company",
+                        name:
+                          item.name === "Aggregate Stats" ? "Aggregate" : "",
+                      });
                     }}
                     activeOpacity={0.8}
                     style={[
                       styles.comContainer,
                       {
-                        borderColor:
-                        item.isAggragate ? "#0089BD" : getCommunity === "Worker" ? "#4C38E8" : "#C8D997",
+                        borderColor: item.isAggregate
+                          ? "#0089BD"
+                          : getCommunity === "Worker"
+                          ? "#4C38E8"
+                          : "#C8D997",
                       },
                     ]}
                   >
@@ -687,19 +764,26 @@ export default function InsightCompany({ navigation }) {
                         overflow: "hidden",
                         borderRadius: 100,
                         borderWidth: 2,
-                        borderColor:
-                        item.isAggragate ? "#0089BD" : getCommunity === "Worker" ? "#EEEBFF" : "#C8D997",
+                        borderColor: item.isAggregate
+                          ? "#0089BD"
+                          : getCommunity === "Worker"
+                          ? "#EEEBFF"
+                          : "#C8D997",
                       }}
                     >
                       <Image
-                        source={item.isAggragate ? item.picture : { uri: item.picture }}
+                        source={
+                          item.isAggregate
+                            ? item.picture
+                            : { uri: item.picture }
+                        }
                         style={styles.comImage}
                         resizeMode="contain"
                       />
                     </View>
                     <Text
                       style={{
-                        fontSize: getFontSize(14),
+                        fontSize: Scaler(14),
                         alignSelf: "center",
                         color: "#000",
                         fontWeight: "bold",
@@ -707,7 +791,7 @@ export default function InsightCompany({ navigation }) {
                         fontFamily: "Poppins-SemiBold",
                       }}
                     >
-                      {item.langType === "en" ? item.name : item.frenchName}
+                      {LangType === "en" ? item.name : item.frenchName}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -724,7 +808,7 @@ export default function InsightCompany({ navigation }) {
                   >
                     <Text
                       style={{
-                        fontSize: getFontSize(14),
+                        fontSize: Scaler(14),
                         alignSelf: "center",
                         color: "#000",
                         textAlign: "center",
@@ -798,7 +882,7 @@ export default function InsightCompany({ navigation }) {
                         />
                         <Text
                           style={{
-                            fontSize: getFontSize(12),
+                            fontSize: Scaler(12),
                             alignSelf: "center",
                             color: "#000",
                             fontFamily: "Poppins-Regular",
@@ -810,7 +894,7 @@ export default function InsightCompany({ navigation }) {
                       <View style={styles.optionRight}>
                         <Text
                           style={{
-                            fontSize: getFontSize(20),
+                            fontSize: Scaler(20),
                             alignSelf: "center",
                             color: "#000",
                             fontFamily: "Poppins-Regular",
@@ -947,6 +1031,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     marginBottom: 10,
+    borderRadius: 50,
   },
   bsheetButton: {
     width: "90%",

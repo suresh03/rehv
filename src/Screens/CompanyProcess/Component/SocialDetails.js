@@ -1,12 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 /* eslint-disable react-native/no-inline-styles */
 import { Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { responsiveSize } from "../../../Components/SharedComponents/ResponsiveSize";
-import Padding from "../../../Components/SharedComponents/Padding";
-import { TextField } from "../../../Components/SharedComponents/TextField";
 import Spacer from "../../../Components/SharedComponents/Space";
-import CommonStyle from "../../../Components/CustomComponents/CommonStyle";
 import PropTypes from "prop-types";
 import { linkdingIcon, twitterIcon } from "../../../Assets/icon";
 import OutlinedInput from "../../../Components/SharedComponents/OutlinedInput";

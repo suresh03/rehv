@@ -9,8 +9,6 @@ import {
   useSetRecoilState,
 } from "recoil";
 
-const LOADER_DELAY = 1000;
-
 const initialState = {
   loggedIn: false,
   user: undefined,

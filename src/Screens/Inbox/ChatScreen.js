@@ -80,7 +80,7 @@ export default function ChatScreen() {
   }, [item?.userId, user?._id]);
 
   useLayoutEffect(() => {
-    console.log(newMessage);
+    console.log("newMessage=> ", newMessage);
     if (Object.keys(newMessage)?.length > 0 && chatsMessages.length > 0) {
       let temp = [...chatsMessages];
       temp.unshift(newMessage);

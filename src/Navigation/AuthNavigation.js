@@ -50,15 +50,26 @@ function AuthStackNavigator() {
 
   const getSocket = () => {
     let x = socketIOClient.connect(SOCKET_URL, {
-      query: { token },
+      reconnection: true,
+      reconnectionDelay: 500,
+      reconnectionAttempts: Infinity,
+      jsonp: false,
+      transports: ["polling"],
+      autoConnect: true,
+      query: { accessToken: token },
     });
     return x;
-    //return socketIOClient.connect(SOCKET_URL);
+  };
+
+  const updateSocket = () => {
+    // getSocket();
   };
 
   return (
     <TimeTrackerProvider>
-      <SocketContext.Provider value={getSocket()}>
+      <SocketContext.Provider
+        value={{ socketRef: getSocket(), updateSocket: updateSocket() }}
+      >
         <AuthStack.Navigator>
           <AuthStack.Screen
             name="BottomTabs"

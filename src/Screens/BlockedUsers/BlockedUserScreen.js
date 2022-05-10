@@ -18,18 +18,12 @@ import {
 } from "react-native-responsive-screen";
 import { Divider } from "react-native-paper";
 import { HeaderBackAction } from "../../Components/CustomHeader/Header";
-import {
-  getFontSize,
-  responsiveSize,
-} from "../../Components/SharedComponents/ResponsiveSize";
 import useApiServices from "../../Services/useApiServices";
 import Scaler from "../../Utils/Scaler";
 import SnackbarHandler from "../../Utils/SnackbarHandler";
 import Lang from "../../Language";
 import EmptyCardView from "../../Components/CustomComponents/EmptyCardView";
-import {
-  requesBlanktIcon
-} from "../../Assets/icon";
+import { requesBlanktIcon } from "../../Assets/icon";
 
 export default function BlockedUserScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -50,12 +44,12 @@ export default function BlockedUserScreen({ navigation }) {
           setData(res.data);
         } else {
           SnackbarHandler.errorToast(Lang.MESSAGE, res.message);
-console.log('res.message =>',res.message);
+          console.log("res.message =>", res.message);
         }
       })
       .catch((error) => {
-        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message??'');
-console.log('error?.message',error?.message)
+        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
+        console.log("error?.message", error?.message);
       })
       .finally(() => setLoading(false));
   };
@@ -71,12 +65,12 @@ console.log('error?.message',error?.message)
           console.log("resss", res);
         } else {
           SnackbarHandler.errorToast(Lang.MESSAGE, res.message);
-console.log('res.message =>',res.message);
+          console.log("res.message =>", res.message);
         }
       })
       .catch((error) => {
-        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message??'');
-console.log('error?.message',error?.message)
+        SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
+        console.log("error?.message", error?.message);
       })
       .finally(() => GetBlockUserList());
   };
@@ -95,8 +89,8 @@ console.log('error?.message',error?.message)
         <View style={{ height: hp(5) }}>
           <View style={{ flexDirection: "row" }}>
             {item.profilePic == undefined ||
-              item.profilePic == null ||
-              item.profilePic?.trim() == "" ? (
+            item.profilePic == null ||
+            item.profilePic?.trim() == "" ? (
               <Image
                 style={{
                   width: Scaler(50),
@@ -121,7 +115,7 @@ console.log('error?.message',error?.message)
               style={{
                 width: wp(70),
                 left: wp(1.9),
-                fontSize: getFontSize(16),
+                fontSize: Scaler(16),
                 fontFamily: "Poppins-SemiBold",
                 color: "#110D26",
                 marginTop: Scaler(5),
@@ -135,7 +129,7 @@ console.log('error?.message',error?.message)
               left: wp(16),
               top: hp(-3.0),
               color: "#7F8190",
-              fontSize: getFontSize(12),
+              fontSize: Scaler(12),
               fontFamily: "Poppins-Medium",
             }}
           >
@@ -150,7 +144,7 @@ console.log('error?.message',error?.message)
               width: wp(30),
               height: hp(5),
               alignSelf: "flex-end",
-              right: responsiveSize(20),
+              right: Scaler(20),
               borderRadius: 10,
             }}
           >
@@ -158,9 +152,9 @@ console.log('error?.message',error?.message)
               style={{
                 color: "#110D26",
                 fontFamily: "Poppins-Medium",
-                fontSize: getFontSize(15),
+                fontSize: Scaler(15),
                 top: hp(1),
-                paddingHorizontal: responsiveSize(10),
+                paddingHorizontal: Scaler(10),
                 height: hp(3),
                 textAlign: "center",
               }}
@@ -175,7 +169,6 @@ console.log('error?.message',error?.message)
       </View>
     );
   };
-
 
   console.log("data", data);
   return (
@@ -192,12 +185,20 @@ console.log('error?.message',error?.message)
         renderItem={ItemView}
         ListEmptyComponent={() => {
           return (
-            <View style={{ width: "100%", height: Dimensions.get("screen").height / 1.3, alignItems: 'center', justifyContent: 'center' }}>
+            <View
+              style={{
+                width: "100%",
+                height: Dimensions.get("screen").height / 1.3,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <EmptyCardView
-              imageData={requesBlanktIcon}
-              message={Lang.NO_BLOCKEDUSER} />
+                imageData={requesBlanktIcon}
+                message={Lang.NO_BLOCKEDUSER}
+              />
             </View>
-          )
+          );
         }}
         keyExtractor={(item, index) => index.toString()}
       />

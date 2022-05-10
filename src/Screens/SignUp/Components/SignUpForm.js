@@ -286,7 +286,7 @@ export default function SignUpForm() {
         <Text
           style={{
             ...DayTheme.fonts.regular,
-            color: "gray",
+            color: "#000",
             fontSize: Scaler(13),
           }}
         >
@@ -299,6 +299,7 @@ export default function SignUpForm() {
             }}
             style={styles.clickHereStyle}
           >
+            {" "}
             {Lang.CLICK_HERE}
           </Text>
         </Text>
@@ -333,7 +334,10 @@ export default function SignUpForm() {
 
       <Spacer size={Scaler(10)} />
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <TouchableOpacity onPress={() => setFlagImage(!flagImage)}>
+        <TouchableOpacity
+          style={{ top: Lang.SIGN_UP === "Sign Up" ? -2 : -10 }}
+          onPress={() => setFlagImage(!flagImage)}
+        >
           <Image
             source={flagImage ? TickSquare : TickSquaregrey}
             style={{ height: Scaler(30), width: Scaler(30) }}
@@ -343,19 +347,26 @@ export default function SignUpForm() {
         <View style={{ marginLeft: Scaler(8) }}>
           <Text style={CommonStyle.continueStyle}>{Lang.Terms}</Text>
           <Text>
+            <TouchableOpacity
+            style={{alignItems:'center', justifyContent:'center'}}
+            activeOpacity={0.9}
+              onPress={() => navigation.navigate("TermsCondition")}>
             <Text
-              onPress={() => navigation.navigate("TermsCondition")}
               style={[CommonStyle.textColorStyle]}
             >
               {Lang.TermsLink1}
             </Text>
+            </TouchableOpacity>
             <Text style={[CommonStyle.continueStyle]}>{Lang.TermsLink2}</Text>
+            <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate("PrivacyPolicy")}>
             <Text
-              onPress={() => navigation.navigate("PrivacyPolicy")}
               style={[CommonStyle.textColorStyle]}
             >
               {Lang.PrivacyLink}
             </Text>
+            </TouchableOpacity>
           </Text>
         </View>
       </View>

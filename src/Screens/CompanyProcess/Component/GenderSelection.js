@@ -6,61 +6,57 @@ import {
   View,
   Image,
   StyleSheet,
-  Text
+  Text,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import {
-  responsiveSize,
-  getFontSize,
-} from "../../../Components/SharedComponents/ResponsiveSize";
-import Padding from "../../../Components/SharedComponents/Padding";
+
 import { TextField } from "../../../Components/SharedComponents/TextField";
 import Spacer from "../../../Components/SharedComponents/Space";
 import CommonStyle from "../../../Components/CustomComponents/CommonStyle";
-import {
-  tickIcon,
-  femaleFocus,
-  femaleUnfocus,
-  maleFocus,
-  maleUnfocus,
-  otherFocus,
-  otherUnfocus,
-} from "../../../Assets/icon";
+import { tickIcon } from "../../../Assets/icon";
 import PropTypes from "prop-types";
 import Scaler from "../../../Utils/Scaler";
 import Lang from "../../../Language";
 
 function GenderSelection(props) {
-  const { selectGender, genderDiverse, maleToggle, WouldRather, femaleToggle } = props;
+  const { selectGender, genderDiverse, maleToggle, WouldRather, femaleToggle } =
+    props;
 
   return (
-    <View style={{height:Platform.OS === "ios" ? hp(65):hp(64)}}>
-    <View>
-      <TextField
-        textStyle={[
-          CommonStyle.tittleStyle,
-          { top: Platform.OS == "ios" ? hp(0.5) : hp(1) },
-        ]}
-        status={Lang.SELECT_GENDER}
-      />
-    
-      <Spacer size={30} />
-      <View style={{flexDirection:'row', justifyContent:'space-between', width:wp(75), alignSelf:'center'}}>
+    <View style={{ height: Platform.OS === "ios" ? hp(65) : hp(64) }}>
       <View>
-        {femaleToggle == true ? (
-          <Image source={tickIcon} style={styles.tick} />
-        ) : null}
-        <TouchableOpacity
-          onPress={() => selectGender("female")}
+        <TextField
+          textStyle={[
+            CommonStyle.tittleStyle,
+            { top: Platform.OS == "ios" ? hp(0.5) : hp(1) },
+          ]}
+          status={Lang.SELECT_GENDER}
+        />
+
+        <Spacer size={30} />
+        <View
           style={{
-            ...styles.touch,
-            borderColor: femaleToggle == false ? "lightgrey" : "#4D39E9",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: wp(75),
+            alignSelf: "center",
           }}
         >
-          {/* <Image
+          <View>
+            {femaleToggle == true ? (
+              <Image source={tickIcon} style={styles.tick} />
+            ) : null}
+            <TouchableOpacity
+              onPress={() => selectGender("female")}
+              style={{
+                ...styles.touch,
+                borderColor: femaleToggle == false ? "lightgrey" : "#4D39E9",
+              }}
+            >
+              {/* <Image
             source={femaleToggle == true ? femaleFocus : femaleUnfocus}
             resizeMode={"contain"}
             style={{
@@ -70,7 +66,7 @@ function GenderSelection(props) {
               top: -5,
             }}
           /> */}
-          {/* <TextField
+              {/* <TextField
             textStyle={{
               fontSize: Scaler(13),
               color: "#000",
@@ -79,40 +75,47 @@ function GenderSelection(props) {
             }}
             status={Lang.FEMALE}
           /> */}
-          <Text style={[{ fontSize: getFontSize(10), fontSize: Scaler(13),
-              color: "#000",
-              fontFamily: "Poppins-Medium",
-              alignSelf: "center",
-              textAlign:'center',
-              padding:15 }]}>
-            {Lang.FEMALE}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <Spacer size={20} />
-      <View>
-        {maleToggle == true ? (
-          <Image
-            source={tickIcon}
-            style={{
-              position: "absolute",
-              width: wp(13),
-              height: hp(9),
-              top: hp(-2),
-              alignSelf: "center",
-              right:-wp(4),
-              zIndex: 1,
-            }}
-          />
-        ) : null}
-        <TouchableOpacity
-          onPress={() => selectGender("male")}
-          style={{
-            ...styles.touch,
-            borderColor: maleToggle == false ? "lightgrey" : "#4D39E9",
-          }}
-        >
-          {/* <Image
+              <Text
+                style={[
+                  {
+                    fontSize: Scaler(10),
+                    fontSize: Scaler(13),
+                    color: "#000",
+                    fontFamily: "Poppins-Medium",
+                    alignSelf: "center",
+                    textAlign: "center",
+                    padding: 15,
+                  },
+                ]}
+              >
+                {Lang.FEMALE}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Spacer size={20} />
+          <View>
+            {maleToggle == true ? (
+              <Image
+                source={tickIcon}
+                style={{
+                  position: "absolute",
+                  width: wp(13),
+                  height: hp(9),
+                  top: hp(-2),
+                  alignSelf: "center",
+                  right: -wp(4),
+                  zIndex: 1,
+                }}
+              />
+            ) : null}
+            <TouchableOpacity
+              onPress={() => selectGender("male")}
+              style={{
+                ...styles.touch,
+                borderColor: maleToggle == false ? "lightgrey" : "#4D39E9",
+              }}
+            >
+              {/* <Image
             source={maleToggle == true ? maleFocus : maleUnfocus}
             resizeMode={"contain"}
             style={{
@@ -122,7 +125,7 @@ function GenderSelection(props) {
               top: -5,
             }}
           /> */}
-          {/* <TextField
+              {/* <TextField
             textStyle={{
               fontSize:Scaler(13),
               color: "#000",
@@ -132,31 +135,45 @@ function GenderSelection(props) {
             }}
             status={Lang.MALE}
           /> */}
-          <Text style={[{ fontSize: getFontSize(10), fontSize: Scaler(13),
-              color: "#000",
-              fontFamily: "Poppins-Medium",
-              alignSelf: "center",
-              textAlign:'center',
-              padding:15 }]}>
-            {Lang.MALE}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      </View>
-      <Spacer size={20} />
-      <View style={{flexDirection:'row', justifyContent:'space-between', width:wp(75), alignSelf:'center'}}>
-      <View>
-        {genderDiverse == true ? (
-          <Image source={tickIcon} style={styles.tick} />
-        ) : null}
-        <TouchableOpacity
-          onPress={() => selectGender("Gender Diverse")}
+              <Text
+                style={[
+                  {
+                    fontSize: Scaler(10),
+                    fontSize: Scaler(13),
+                    color: "#000",
+                    fontFamily: "Poppins-Medium",
+                    alignSelf: "center",
+                    textAlign: "center",
+                    padding: 15,
+                  },
+                ]}
+              >
+                {Lang.MALE}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Spacer size={20} />
+        <View
           style={{
-            ...styles.touch,
-            borderColor: genderDiverse == false ? "lightgrey" : "#4D39E9",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: wp(75),
+            alignSelf: "center",
           }}
         >
-          {/* <Image
+          <View>
+            {genderDiverse == true ? (
+              <Image source={tickIcon} style={styles.tick} />
+            ) : null}
+            <TouchableOpacity
+              onPress={() => selectGender("Gender Diverse")}
+              style={{
+                ...styles.touch,
+                borderColor: genderDiverse == false ? "lightgrey" : "#4D39E9",
+              }}
+            >
+              {/* <Image
             source={genderDiverse == true ? otherFocus : otherUnfocus}
             resizeMode={"contain"}
             style={{
@@ -166,7 +183,7 @@ function GenderSelection(props) {
               top: -5,
             }}
           /> */}
-          {/* <TextField
+              {/* <TextField
             textStyle={{
               fontSize: Scaler(13),
               color: "#000",
@@ -175,28 +192,35 @@ function GenderSelection(props) {
             }}
             status={Lang.GENDER_DIVERSE}
           /> */}
-          <Text style={[{ fontSize: getFontSize(10), fontSize: Scaler(13),
-              color: "#000",
-              fontFamily: "Poppins-Medium",
-              alignSelf: "center",
-              textAlign:'center',
-              padding:15 }]}>
-            {Lang.GENDER_DIVERSE}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View>
-        {WouldRather == true ? (
-          <Image source={tickIcon} style={styles.tick} />
-        ) : null}
-        <TouchableOpacity
-          onPress={() => selectGender("Would Rather Not Say")}
-          style={{
-            ...styles.touch,
-            borderColor: WouldRather == false ? "lightgrey" : "#4D39E9",
-          }}
-        >
-          {/* <Image
+              <Text
+                style={[
+                  {
+                    fontSize: Scaler(10),
+                    fontSize: Scaler(13),
+                    color: "#000",
+                    fontFamily: "Poppins-Medium",
+                    alignSelf: "center",
+                    textAlign: "center",
+                    padding: 15,
+                  },
+                ]}
+              >
+                {Lang.GENDER_DIVERSE}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            {WouldRather == true ? (
+              <Image source={tickIcon} style={styles.tick} />
+            ) : null}
+            <TouchableOpacity
+              onPress={() => selectGender("Would Rather Not Say")}
+              style={{
+                ...styles.touch,
+                borderColor: WouldRather == false ? "lightgrey" : "#4D39E9",
+              }}
+            >
+              {/* <Image
             source={genderDiverse == true ? otherFocus : otherUnfocus}
             resizeMode={"contain"}
             style={{
@@ -206,7 +230,7 @@ function GenderSelection(props) {
               top: -5,
             }}
           /> */}
-          {/* <TextField
+              {/* <TextField
             textStyle={{
               fontSize: Scaler(13),
               color: "#000",
@@ -217,18 +241,25 @@ function GenderSelection(props) {
             }}
             status={Lang.WouldRather}
           /> */}
-          <Text style={[{ fontSize: getFontSize(10), fontSize: Scaler(13),
-              color: "#000",
-              fontFamily: "Poppins-Medium",
-              alignSelf: "center",
-              textAlign:'center',
-              padding:15 }]}>
-            {Lang.WouldRather}
-          </Text>
-        </TouchableOpacity>
+              <Text
+                style={[
+                  {
+                    fontSize: Scaler(10),
+                    fontSize: Scaler(13),
+                    color: "#000",
+                    fontFamily: "Poppins-Medium",
+                    alignSelf: "center",
+                    textAlign: "center",
+                    padding: 15,
+                  },
+                ]}
+              >
+                {Lang.WouldRather}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-      </View>
-    </View>
     </View>
   );
 }
@@ -247,12 +278,12 @@ const styles = StyleSheet.create({
     height: hp(9),
     top: hp(-2),
     alignSelf: "center",
-    right:-wp(4),
+    right: -wp(4),
     zIndex: 1,
   },
   touch: {
-    width: responsiveSize(125),
-    height: responsiveSize(125),
+    width: Scaler(125),
+    height: Scaler(125),
     borderRadius: 15,
     overflow: "hidden",
     borderWidth: 0.8,

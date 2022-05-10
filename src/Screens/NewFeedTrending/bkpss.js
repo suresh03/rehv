@@ -9,14 +9,10 @@ import {
   Image,
   Pressable,
   Platform,
-  Alert,
 } from "react-native";
 import CommonStyle from "../../Components/CustomComponents/CommonStyle";
 import { HeaderBackAction } from "../../Components/CustomHeader/Header";
-import {
-  getFontSize,
-  responsiveSize,
-} from "../../Components/SharedComponents/ResponsiveSize";
+
 import { TextField } from "../../Components/SharedComponents/TextField";
 import {
   widthPercentageToDP as wp,
@@ -58,7 +54,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
     setTittle(tittlename);
     setButtonTittle(buttonname);
     getData();
-    getSelectedCommunitys()
+    getSelectedCommunitys();
   }, []);
 
   const getSelectedCommunitys = () => {
@@ -153,11 +149,11 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
       .finally(() => getHomePostList());
   };
 
-  const profileClick = (role, _id) => {
+  const profileClick = (item,role, _id) => {
     if (role.toLowerCase() == "excoach") {
-      navigation.navigate("ExCoachProfileScreen", { _id });
+      navigation.navigate("ExCoachProfileScreen", {item, _id });
     } else {
-      navigation.navigate("MemberProfileScreen", { _id });
+      navigation.navigate("MemberProfileScreen", {item, _id });
     }
   };
 
@@ -218,7 +214,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                   color: "#110D26",
                   alignSelf: "center",
                   textAlign: "center",
-                  fontSize: getFontSize(20),
+                  fontSize: Scaler(20),
                   fontFamily: "Poppins-SemiBold",
                 }}
               >
@@ -234,7 +230,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                   width: wp(50),
                   height: hp(6.5),
                   alignSelf: "center",
-                  borderRadius: responsiveSize(15),
+                  borderRadius: Scaler(15),
                 }}
               >
                 <Text
@@ -243,7 +239,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                     alignSelf: "center",
                     textAlign: "center",
                     top: hp(1.3),
-                    fontSize: getFontSize(20),
+                    fontSize: Scaler(20),
                     fontFamily: "Poppins-Medium",
                   }}
                 >
@@ -256,7 +252,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                   width: wp(50),
                   height: hp(6.5),
                   alignSelf: "center",
-                  borderRadius: responsiveSize(15),
+                  borderRadius: Scaler(15),
                   borderWidth: 1,
                   borderColor: "#E9E5E4",
                 }}
@@ -267,7 +263,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                     alignSelf: "center",
                     textAlign: "center",
                     top: hp(1.3),
-                    fontSize: getFontSize(20),
+                    fontSize: Scaler(20),
                     fontFamily: "Poppins-Medium",
                   }}
                 >
@@ -317,7 +313,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
               return (
                 <View key={Index}>
                   <View style={{}}>
-                    <View style={{ marginHorizontal: responsiveSize(10) }}>
+                    <View style={{ marginHorizontal: Scaler(10) }}>
                       <View
                         style={{ flexDirection: "row", alignSelf: "flex-end" }}
                       >
@@ -388,7 +384,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                   style={{
                     color: manegemnetButton ? "#FFFFFF" : "#000000",
                     fontFamily: "Poppins-Medium",
-                    fontSize: getFontSize(15),
+                    fontSize: Scaler(15),
                   }}
                 >
                   New Feed
@@ -411,7 +407,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                   style={{
                     color: !manegemnetButton ? "#FFFFFF" : "#000000",
                     fontFamily: "Poppins-Medium",
-                    fontSize: getFontSize(15),
+                    fontSize: Scaler(15),
                   }}
                 >
                   Trending
@@ -424,7 +420,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
               {postData?.length > 0 ? (
                 <CommunityTrendingPost
                   data={postData}
-                  profileClick={(role, id) => profileClick(role, id)}
+                  profileClick={(item,role, id) => profileClick(item,role, id)}
                   onLike={(action, val, postId) =>
                     likeOrCommentAction(action, val, postId)
                   }
@@ -478,7 +474,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
               {postData?.length > 0 ? (
                 <CommunityTrendingPost
                   data={postData}
-                  profileClick={(role, id) => profileClick(role, id)}
+                  profileClick={(item,role, id) => profileClick(item,role, id)}
                   onLike={(action, val, postId) =>
                     likeOrCommentAction(action, val, postId)
                   }
@@ -540,14 +536,14 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                 padding: 20,
                 height: hp(35),
                 width: wp(100),
-                borderTopRightRadius: responsiveSize(20),
-                borderTopLeftRadius: responsiveSize(20),
+                borderTopRightRadius: Scaler(20),
+                borderTopLeftRadius: Scaler(20),
               }}
             >
               <View style={{ flex: 1 }}>
                 <Text
                   style={{
-                    fontSize: getFontSize(20),
+                    fontSize: Scaler(20),
                     width: wp(80),
                     paddingTop: 20,
                     textAlign: "center",
@@ -578,7 +574,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                       fontFamily: "Poppins-Medium",
                       alignSelf: "center",
                       color: "#000",
-                      fontSize: getFontSize(20),
+                      fontSize: Scaler(20),
                       top: Platform.OS == "ios" ? 20 : 15,
                     }}
                   >
@@ -612,7 +608,7 @@ export default function NewFeedTrendingScreen({ navigation, route }) {
                       fontFamily: "Poppins-Medium",
                       alignSelf: "center",
                       color: "#fff",
-                      fontSize: getFontSize(20),
+                      fontSize: Scaler(20),
                       top: Platform.OS === "ios" ? 20 : 15,
                     }}
                   >

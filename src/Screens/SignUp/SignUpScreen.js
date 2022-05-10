@@ -5,7 +5,6 @@ import ChangeStyle from "../../Components/CustomComponents/ChangeStyle";
 import CommonStyle from "../../Components/CustomComponents/CommonStyle";
 import Body from "../../Components/SharedComponents/Body";
 import Padding from "../../Components/SharedComponents/Padding";
-import { responsiveSize } from "../../Components/SharedComponents/ResponsiveSize";
 import Spacer from "../../Components/SharedComponents/Space";
 import { TextField } from "../../Components/SharedComponents/TextField";
 import SignUp from "./Components/SignUpForm";
@@ -22,9 +21,9 @@ export default function SignUpScreen({ navigation }) {
         keyboardDismissMode="interactive"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <Image style={CommonStyle.logoStyle} source={logo} />
+        <Image style={CommonStyle.logoStyle} resizeMode="contain" source={logo} />
 
-        <Padding horizontal size={responsiveSize(25)}>
+        <Padding horizontal size={Scaler(25)}>
           <TextField
             textStyle={[
               CommonStyle.tittleStyle,

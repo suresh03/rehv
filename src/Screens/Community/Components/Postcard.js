@@ -1,4 +1,4 @@
-import React, { Children, useRef, useMemo, useState } from "react";
+import React, { Children, useRef, useMemo, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,12 +12,13 @@ import {
   Alert,
   Linking,
   RefreshControl,
+  Platform,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { Divider, useTheme } from "react-native-paper";
+import { ActivityIndicator, Divider, useTheme } from "react-native-paper";
 import moment from "moment";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
@@ -38,8 +39,6 @@ import { capitalizeEach, isImage } from "../../../Utils/Helpers";
 import Video from "react-native-video";
 import VideoPausedIcon from "./VideoPausedIcon";
 const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
-
 const FULL_WIDTH = Dimensions.get("window").width;
 import { useAppValue } from "../../../Recoil/appAtom";
 import ViewShotModal from "../../../Components/Modals/ViewShotModal";
@@ -48,6 +47,7 @@ import dynamicLinks from "@react-native-firebase/dynamic-links";
 import Icon from "react-native-vector-icons/Ionicons";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import useApiServices from "../../../Services/useApiServices";
+import VideoBufferIndicator from "../../../Utils/VideoBufferIndicator";
 
 function Postcard(props) {
   let _menu = [];
@@ -55,7 +55,6 @@ function Postcard(props) {
     data,
     profileClick,
     onLike,
-    selectedCommunityId,
     listHeader,
     onDeletePost,
     EmptyListMessage,
@@ -63,41 +62,55 @@ function Postcard(props) {
   } = props;
   const theme = useTheme();
   const navigation = useNavigation();
-  const playerRef = useRef();
+
   const [sound, setSound] = React.useState(false);
-  const { ApiPostMethod, ApiGetMethod } = useApiServices();
+  const { ApiGetMethod } = useApiServices();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollViewRef = useRef();
   const [isPaused, setIsPaused] = useState(true);
-  const [currentIndex2, setCurrentIndex2] = useState(0);
-  const [currentPostId, setCurrentPostId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [CompName, setCompName] = useState("");
   const [visibleItemIndex, setVisibleItemIndex] = useState();
-  const [getDescStatus, setDescStatus] = useState(false);
+  const [currentDescriptionIndex, setCurrentDescriptionIndex] = useState(null);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [opacity, setOpacity] = useState(0);
+
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 100 });
   const onViewRef = React.useRef(({ viewableItems, changed }) => {
-    console.log("Viewable", viewableItems, "changed", changed[0].index);
+    //console.log("Viewable", viewableItems, "changed", changed[0].index);
     if (changed[0].index !== null) {
       setVisibleItemIndex(changed[0].index);
     }
-    console.log("visibleItemIndex", visibleItemIndex);
+   // console.log("visibleItemIndex", visibleItemIndex);
   }, []);
+
+  const [LangType, setLangType] = useState("");
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol);
+      })
+      .finally(() => console.log("success"));
+  };
 
   // console.log("Postcard data => ", data);
   let videoComponent = useRef();
   const load = ({ duration }) => {
     videoComponent.seek(0);
   };
+
   setTimeout(() => {
     setIsLoading(false);
   }, 1000);
 
   const { user } = useAppValue();
   const { _id, companyId, department } = user;
-  console.log("user => ", user);
+  //console.log("user => ", user);
+
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -253,6 +266,7 @@ function Postcard(props) {
       })
       .catch((err) => {
         err && console.log(err);
+        shareApiHit(item);
       });
   };
 
@@ -302,6 +316,22 @@ function Postcard(props) {
   const pausePlayVideo2 = (indexData) => {
     setVisibleItemIndex(indexData);
   };
+  const onLoadStart = () => {
+    setOpacity(1);
+    console.log("onLoadStart");
+  };
+
+  const onLoad = () => {
+    setOpacity(0);
+    videoComponent?.seek(0);
+    console.log("onLoad");
+  };
+
+  const onBuffer = ({ isBuffering }) => {
+    setOpacity(isBuffering ? 1 : 0);
+    console.log("onBuffer");
+  };
+
   const ItemView2 = (item, index, indexData, itemData) => {
     return (
       <Pressable
@@ -357,11 +387,19 @@ function Postcard(props) {
                 // paused={isPaused}
                 style={styles.video}
                 repeat={true}
-                onLoad={load}
+                onLoad={onLoad}
+                onBuffer={onBuffer}
+                onLoadStart={onLoadStart}
                 resizeMode={"contain"}
                 volume={sound ? 1.0 : 0.0}
               />
             </TouchableWithoutFeedback>
+
+            <VideoBufferIndicator
+              opacity={opacity}
+              color={theme.colors.primary}
+            />
+
             <TouchableOpacity
               style={{ position: "absolute", right: 20, bottom: 300 }}
               onPress={() => setSound(!sound)}
@@ -431,7 +469,7 @@ function Postcard(props) {
   // const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 10 });
 
   const ItemView = ({ item, index }) => {
-    console.log("itemitemitem => ", item);
+   // console.log("itemitemitem => ", item);
     return (
       <View style={styles.outerBoundary}>
         <Spacer />
@@ -448,7 +486,7 @@ function Postcard(props) {
         >
           <TouchableOpacity
             onPress={() =>
-              profileClick(item?.postCreatedUserType, item?.createdBy)
+              profileClick(item, item?.postCreatedUserType, item?.createdBy)
             }
             style={[
               {
@@ -581,7 +619,10 @@ function Postcard(props) {
               department === "H.R." ? (
               <TouchableOpacity
                 onPress={() => _menu[item._id]?.show()}
-                style={{ marginLeft: Scaler(10) }}
+                style={{
+                  marginLeft: Scaler(10),
+                  top: Platform.OS === "android" ? -12 : 0,
+                }}
               >
                 <Image
                   source={threedots}
@@ -702,14 +743,14 @@ function Postcard(props) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onPress={() =>
-                  navigation.navigate("MemberScreen", {
-                    data: {
-                      postId: item?._id,
-                      isLikes: false,
-                    },
-                  })
-                }
+                // onPress={() =>
+                //   navigation.navigate("MemberScreen", {
+                //     data: {
+                //       postId: item?._id,
+                //       isLikes: false,
+                //     },
+                //   })
+                // }
               >
                 <Text
                   style={[
@@ -736,21 +777,41 @@ function Postcard(props) {
         </View>
         <Spacer />
 
-        <TouchableOpacity onPress={() => setDescStatus((data) => !data)} style={{ paddingHorizontal: Scaler(15) }}>
-          {getDescStatus === false ? (
+        <TouchableOpacity
+          onPress={() => {
+            setCurrentDescriptionIndex(index);
+            setShowFullDescription(
+              index === currentDescriptionIndex && showFullDescription
+                ? false
+                : true
+            );
+          }}
+          style={{ paddingHorizontal: Scaler(15) }}
+        >
+          {showFullDescription == true &&
+          currentDescriptionIndex != null &&
+          currentDescriptionIndex == index ? (
             <Text
-            numberOfLines={2}
-            style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
-          >
-            {item?.description}
-          </Text>
-              ) : (
-                <Text
-            style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
-          >
-            {item?.description}
-          </Text>
-              )}
+              style={{
+                ...theme.fonts.regular,
+                fontSize: Scaler(13),
+                color: theme.colors.disabledText,
+              }}
+            >
+              {item?.description}
+            </Text>
+          ) : (
+            <Text
+              numberOfLines={2}
+              style={{
+                ...theme.fonts.regular,
+                fontSize: Scaler(13),
+                color: theme.colors.disabledText,
+              }}
+            >
+              {item?.description}
+            </Text>
+          )}
         </TouchableOpacity>
         {item?.postUrl === "" ||
         item?.postUrl == null ||

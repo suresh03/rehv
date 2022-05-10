@@ -303,7 +303,7 @@ export default class EditProfileScreen extends Component {
     console.log("desigantionAdditem===>", nameKey);
     this.setState({
       cityfiled: nameKey,
-      cityToggle: false, 
+      cityToggle: false,
     });
   };
 
@@ -792,7 +792,7 @@ export default class EditProfileScreen extends Component {
                       modal
                       open={this.state.datetoggle}
                       date={this.state.date}
-                      maximumDate={maximumBirthDate}
+                      //  maximumDate={maximumBirthDate}
                       onConfirm={(date) => {
                         this.dateset(date);
                       }}
@@ -908,7 +908,9 @@ export default class EditProfileScreen extends Component {
                     img={CalendarSqure}
                     customStyle={{}}
                     value={this.state.startmonth}
-                    handleChange={(text) => this.setState({ startmonth: text.replace(/[^0-9]/g, '') })}
+                    handleChange={(text) =>
+                      this.setState({ startmonth: text.replace(/[^0-9]/g, "") })
+                    }
                   />
                   <StartYear
                     inputViewStyle={{
@@ -919,7 +921,9 @@ export default class EditProfileScreen extends Component {
                     img={CalendarSqure}
                     //value={this.state.startyear}
                     value={this.state.startyear}
-                    handleChange={(text) => this.setState({ startyear: text.replace(/[^0-9]/g, '') })}
+                    handleChange={(text) =>
+                      this.setState({ startyear: text.replace(/[^0-9]/g, "") })
+                    }
                   />
                 </View>
               </View>
@@ -1026,7 +1030,9 @@ export default class EditProfileScreen extends Component {
                 img={linkdingIcon}
                 value={this.state.linkdingValue}
                 handleChange={(text) => this.setState({ linkdingValue: text })}
-                textInputStyle={{ height: Platform.OS === "android" ? hp(7):hp(5) }}
+                textInputStyle={{
+                  height: Platform.OS === "android" ? hp(7) : hp(5),
+                }}
               />
               <OutlinedInput
                 inputViewStyle={{ alignSelf: "center" }}
@@ -1035,7 +1041,9 @@ export default class EditProfileScreen extends Component {
                 img={twitterIcon}
                 value={this.state.twitterValue}
                 handleChange={(text) => this.setState({ twitterValue: text })}
-                textInputStyle={{ height: Platform.OS === "android" ? hp(7):hp(5) }}
+                textInputStyle={{
+                  height: Platform.OS === "android" ? hp(7) : hp(5),
+                }}
               />
               <Spacer size={20} />
               <CustomButton

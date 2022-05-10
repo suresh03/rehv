@@ -1,17 +1,8 @@
-import React, {useEffect, useState} from "react";
-import {
-  Dimensions,
-  ScrollView,
-  StatusBar,
-  SafeAreaView,
-  View,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Dimensions, ScrollView, SafeAreaView, View } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import CommonStyle from "../../Components/CustomComponents/CommonStyle";
-import {
-  getFontSize,
-  responsiveSize,
-} from "../../Components/SharedComponents/ResponsiveSize";
+
 import Spacer from "../../Components/SharedComponents/Space";
 import { TextField } from "../../Components/SharedComponents/TextField";
 import { TermsAndPrivacyHeader } from "../../Components/CustomHeader/TermsAndPrivacyHeader";
@@ -20,23 +11,21 @@ import Scaler from "../../Utils/Scaler";
 import Lang from "../../Language";
 const { width } = Dimensions.get("window");
 import RenderHtml from "react-native-render-html";
+
 export default function PrivacyPolicy({ navigation }) {
   const theme = useTheme();
-  const [dataShow, setDataShow] = useState(false)
+  const [dataShow, setDataShow] = useState(false);
   useEffect(() => {
-    if(Lang.PRIVACY_NOTICE === "Avis de confidentialité"){
-      
-      setDataShow(true)
-    }else{
-      setDataShow(false)
+    if (Lang.PRIVACY_NOTICE === "Avis de confidentialité") {
+      setDataShow(true);
+    } else {
+      setDataShow(false);
     }
-  }, [])
+  }, []);
 
   return (
     <>
-      <SafeAreaView
-        style={{ flex: 0, backgroundColor: "white" }}
-      />
+      <SafeAreaView style={{ flex: 0, backgroundColor: "white" }} />
       <SafeAreaView style={CommonStyle.container}>
         <TermsAndPrivacyHeader back_nav={() => navigation.pop()} />
         {/* <Spacer size={Scaler(60)} /> */}
@@ -46,11 +35,11 @@ export default function PrivacyPolicy({ navigation }) {
         >
           <TextField
             textStyle={{
-              left: responsiveSize(15),
-              fontSize: getFontSize(27),
+              left: Scaler(15),
+              fontSize: Scaler(27),
               width: wp(60),
               color: "#000",
-              marginTop: responsiveSize(15),
+              marginTop: Scaler(15),
               fontFamily: "Poppins-Medium",
             }}
             status={Lang.PRIVACY_NOTICE}
@@ -60,9 +49,9 @@ export default function PrivacyPolicy({ navigation }) {
           <View style={{ width: width - 30, alignSelf: "center" }}>
             {dataShow ? (
               <RenderHtml
-              contentWidth={"100%"}
-              source={{
-                html: `<!DOCTYPE html>
+                contentWidth={"100%"}
+                source={{
+                  html: `<!DOCTYPE html>
 <html>
     <body>
 <div class="edit-profile">
@@ -191,7 +180,7 @@ export default function PrivacyPolicy({ navigation }) {
 
 <p style='margin:0in;font-size:16px;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;' >Coordonnées</span></p>
 <p style='margin:0in;font-size:16px;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;' >&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;' >Veuillez soumettre toute question par e-mail à : info@rehvup.io</span></p>
+<p style='margin:0in;font-size:16px;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;' >Veuillez soumettre toute question par e-mail à : <a href="mailto:info@rehvup.io"><span style='font-family:"Arial",sans-serif;'>info@rehvup.io</span></a></span></span></p>
 <p style='margin:0in;font-size:16px;margin-bottom:12.0pt;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif ;couleur:#141414;'>&nbsp;</span></p>
 <p style='margin:0in;font-size:16px;margin-bottom:12.0pt;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif ;color:#141414;'>Veuillez noter que nous devrons peut-être confirmer votre identité, demander des détails supplémentaires et travailler avec d'autres services de RehvUp Technologies Inc. pour vous répondre ou examiner vos préoccupations ou votre plainte.</span></ p>
 <p style='margin:0in;font-size:16px;background:white;'><span style='font-family:"Arial",sans-serif;color:#141414;'>Modifications de notre politique de confidentialité </span></p>
@@ -317,7 +306,7 @@ export default function PrivacyPolicy({ navigation }) {
 <p style='margin:0in;font-size:16px;font-family:"Calibri",sans-serif;margin-bottom:12.0pt;background:white;'><span style="font-size:18px ;color:#141414;">Nous utilisons des mesures de protection physiques, technologiques, organisationnelles et contractuelles raisonnables, appropriées &agrave; la sensibilité des informations, pour protéger les informations personnelles en notre possession ou sous notre contrôle, contre l'accès, la divulgation ou l'utilisation non autorisée.</span></p>
 <p style='margin:0in;font-size:16px;font-family:"Calibri",sans-serif;background:white;'><span style="font-size:18px;color:#141414;" >Coordonnées de la personne-ressource</span></p>
 <p style='margin:0in;font-size:16px;font-family:"Calibri",sans-serif;background:white;'><span style='font-size:18px;font-family:"Arial ",sans-serif;couleur :#141414;'>&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;font-family:"Calibri",sans-serif;background:white;'><span style="font-size:18px;color:#141414;" >Veuillez soumettre toute question par courriel &agrave; l'adresse suivante : info@rehvup.io</span></p>
+<p style='margin:0in;font-size:16px;font-family:"Calibri",sans-serif;background:white;'><span style="font-size:18px;color:#141414;" >Veuillez soumettre toute question par courriel &agrave; l'adresse suivante : <a href="mailto:info@rehvup.io"><span style='font-family:"Arial",sans-serif;'>info@rehvup.io</span></a></span></span></p>
 <p style='margin:0in;font-size:16px;font-family:"Calibri",sans-serif;margin-bottom:12.0pt;background:white;'><span style='font-size:18px ;font-family:"Arial",sans-serif;color:#141414;'>&nbsp;</span></p>
 <p style='margin:0in;font-size:16px;font-family:"Calibri",sans-serif;margin-bottom:12.0pt;background:white;'><span style="font-size:18px ;color:#141414;">Veuillez noter que nous devrons peut-être confirmer votre identité, demander des détails supplémentaires et travailler avec d'autres RehvUp</span><span style="color:black ;">&nbsp;</span><span style="font-size:18px;color:#141414;">&nbsp;Technologies Inc.</span><span style="font-size:18px;color:#141414;">pour vous répondre ou pour examiner vos préoccupations ou votre plainte.</span></p>
 <p style='margin:0in;font-size:16px;font-family:"Calibri",sans-serif;background:white;'><span style="color:#141414;">Modifications apportées &agrave ; notre politique de confidentialité</span></p>
@@ -328,12 +317,13 @@ export default function PrivacyPolicy({ navigation }) {
 </div>
 </body>
 </html>`,
-              }}
-            />
-            ):<RenderHtml
-              contentWidth={"100%"}
-              source={{
-                html: `<!DOCTYPE html>
+                }}
+              />
+            ) : (
+              <RenderHtml
+                contentWidth={"100%"}
+                source={{
+                  html: `<!DOCTYPE html>
 <html>
     <body>
 <div class="edit-profile">
@@ -453,7 +443,7 @@ export default function PrivacyPolicy({ navigation }) {
 <p style='margin:0in;font-size:16px;margin-bottom:12.0pt;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;'>We use reasonable physical, technological, organizational and contractual safeguards, appropriate to the sensitivity of the information, to protect personal information in our possession or under our control, from unauthorized access, disclosure or use.</span></p>
 <p style='margin:0in;font-size:16px;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;'>Contact information</span></p>
 <p style='margin:0in;font-size:16px;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;'>&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;'>Please submit any queries via email to: info@rehvup.io</span></p>
+<p style='margin:0in;font-size:16px;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;'>Please submit any queries via email to: <a href="mailto:info@rehvup.io"><span style='font-family:"Arial",sans-serif;'>info@rehvup.io</span></a></span></span></p>
 <p style='margin:0in;font-size:16px;margin-bottom:12.0pt;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;'>&nbsp;</span></p>
 <p style='margin:0in;font-size:16px;margin-bottom:12.0pt;background:white;'><span style='font-size:16px;font-family:"Arial",sans-serif;color:#141414;'>Please note that we may need to confirm your identity, request additional details and work with other RehvUp Technologies Inc. departments to respond to you or to look into your concerns or complaint.</span></p>
 <p style='margin:0in;font-size:16px;background:white;'><span style='font-family:"Arial",sans-serif;color:#141414;'>Changes to our privacy policy</span></p>
@@ -464,8 +454,9 @@ export default function PrivacyPolicy({ navigation }) {
 </div>
 </body>
 </html>`,
-              }}
-            />}
+                }}
+              />
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>

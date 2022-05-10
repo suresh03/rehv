@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   ScrollView,
   DeviceEventEmitter,
+  ActivityIndicator,
 } from "react-native";
 import CommonStyle from "../../Components/CustomComponents/CommonStyle";
 import AsyncStorage from "@react-native-community/async-storage";
@@ -39,13 +40,18 @@ import { getFontSize } from "../../Components/SharedComponents/ResponsiveSize";
 import { Divider } from "react-native-paper";
 import { CustomButton } from "../../Components/SharedComponents/Button";
 import { useResetAppState } from "../../Recoil/appAtom";
-import { storeToLocal, removeFromLocal } from "../../Utils/LocalStorage";
+import {
+  storeToLocal,
+  removeFromLocal,
+  getFromLocal,
+} from "../../Utils/LocalStorage";
 import Spacer from "../../Components/SharedComponents/Space";
 import Scaler from "../../Utils/Scaler";
 import Lang from "../../Language";
 import TouchID from "react-native-touch-id";
 import useApiServices from "../../Services/useApiServices";
 import { useAppValue, useSetAppState } from "../../Recoil/appAtom";
+import { useResetSocketState } from "../../Recoil/socketAtom";
 
 export default function SettingScreen({ navigation, route }) {
   const setAppState = useSetAppState();
@@ -65,6 +71,7 @@ export default function SettingScreen({ navigation, route }) {
   const { ApiPostMethod, ApiGetMethod } = useApiServices();
   const [englishLangId, setEnglishLangId] = useState("");
   const [frenchLangId, setFrenchLangId] = useState("");
+  const [Role, setRole] = useState("");
 
   const getLanguage = async () => {
     try {
@@ -83,7 +90,59 @@ export default function SettingScreen({ navigation, route }) {
   };
   useEffect(() => {
     getLanguage();
+    getMyProfile();
   }, []);
+
+  // useEffect(() => {
+  //   getFromLocal("isNotification").then((isNotification) => {
+  //     console.log("isNotification", isNotification)
+  //     setteamToggle(isNotification);
+  //     setUserToggle(isNotification);
+  //   });
+  // }, []);
+
+  const getMyProfile = async () => {
+    setLoading(true);
+    try {
+      const resp = await ApiGetMethod(`user/getUserDetails`);
+      console.log("respss", resp);
+      setRole(resp.data[0].role);
+      setteamToggle(resp.data[0].isTeamNotification);
+      setUserToggle(resp.data[0].isNotification);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const notificationSetting = async (item) => {
+    if (item === "team") {
+      try {
+        const resp = await ApiPostMethod("user/changeNotificationSetting", {
+          type: "team",
+          isNotification: teamToggle == true ? false : true,
+        });
+        setteamToggle(!teamToggle);
+        storeToLocal("isNotification", JSON.stringify(teamToggle));
+        console.log("followFunction =>", resp);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log("userToggle", userToggle);
+      try {
+        const resp = await ApiPostMethod("user/changeNotificationSetting", {
+          type: "user",
+          isNotification: userToggle == true ? false : true,
+        });
+        setUserToggle(!userToggle);
+        storeToLocal("isNotification", JSON.stringify(userToggle));
+        console.log("followFunction =>", resp);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   const SelectLanguageFunction = async (data) => {
     await AsyncStorage.setItem("LANGUAGE", data);
@@ -153,7 +212,7 @@ export default function SettingScreen({ navigation, route }) {
   };
 
   const resetAppState = useResetAppState();
-
+  const resetSocketState = useResetSocketState();
   const _logoutFromServer = async () => {
     ApiPostMethod("user/logout");
   };
@@ -164,6 +223,7 @@ export default function SettingScreen({ navigation, route }) {
       await storeToLocal("user", JSON.stringify({}));
       await storeToLocal("token", "");
       await removeFromLocal("token");
+      resetSocketState();
       setTimeout(() => {
         navigation.navigate("SignInScreen");
       }, 100);
@@ -186,134 +246,11 @@ export default function SettingScreen({ navigation, route }) {
         headerViewStyle={{ backgroundColor: "#fff" }}
       />
       <StatusBar barStyle="default" />
-      <ScrollView>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginHorizontal: 20,
-            width: wp(90),
-            top: 10,
-          }}
-        >
-          <Image
-            style={CommonStyle.settingiconStyle}
-            source={bellIcon}
-            resizeMode={"contain"}
-          />
-          <Text
-            style={{
-              width: wp(53),
-              fontSize: Scaler(18),
-              fontFamily: "Poppins-SemiBold",
-              color: "#000",
-              left: Platform.OS === "ios" ? -Scaler(16) : -Scaler(18),
-            }}
-          >
-            {Lang.NOTIFICATION}
-          </Text>
-          <TouchableOpacity onPress={() => notificationToggle()}>
-            <Image
-              source={isSwitchOn ? dropDwonUp : dwonArrowIcon}
-              resizeMode={"contain"}
-              style={{ height: hp(1.5) }}
-            />
-          </TouchableOpacity>
-        </View>
-        {isToggleOn == false ? null : (
-          <View style={{ alignSelf: "center" }}>
-            <View
-              style={{
-                marginVertical: hp(1),
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginHorizontal: 20,
-                width: wp(90),
-                top: 10,
-              }}
-            >
-              <Text
-                style={{
-                  width: wp(53),
-                  fontSize: getFontSize(18),
-                  fontFamily: "Poppins-Medium",
-                  color: "#000",
-                  left: wp(23),
-                }}
-              >
-                {Lang.USER}
-              </Text>
-              <TouchableOpacity
-                style={{}}
-                onPress={() => setUserToggle(!userToggle)}
-              >
-                <Image source={userToggle ? offIcon : onIcon} />
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginHorizontal: 20,
-                width: wp(90),
-                top: 10,
-              }}
-            >
-              <Text
-                style={{
-                  width: wp(53),
-                  fontSize: getFontSize(18),
-                  fontFamily: "Poppins-Medium",
-                  color: "#000",
-                  left: wp(23),
-                }}
-              >
-                {Lang.TEAM}
-              </Text>
-              <TouchableOpacity
-                style={{}}
-                onPress={() => setteamToggle(!teamToggle)}
-              >
-                <Image source={teamToggle ? offIcon : onIcon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
-        <Divider
-          style={{
-            width: wp(90),
-            alignSelf: "center",
-            marginVertical: hp(1.5),
-            top: hp(1.5),
-          }}
-        />
-        <TouchableOpacity
-          onPress={() => navigation.navigate("ChangePasswordScreen")}
-          style={CommonStyle.settingTouchStyle}
-        >
-          <Image
-            style={CommonStyle.settingiconStyle}
-            source={keyIcon}
-            resizeMode={"contain"}
-          />
-          <Text style={CommonStyle.settingTextStyle}>
-            {Lang.CHANGE_PASSWORD}
-          </Text>
-        </TouchableOpacity>
-        <Divider
-          style={{
-            width: wp(90),
-            alignSelf: "center",
-            marginVertical: hp(1.5),
-            top: hp(1.5),
-          }}
-        />
-        {biometricType != "" ? (
-          <View>
+      {loading ? (
+        <ActivityIndicator color="#000" size="large" />
+      ) : (
+        <>
+          <ScrollView>
             <View
               style={{
                 flexDirection: "row",
@@ -325,8 +262,8 @@ export default function SettingScreen({ navigation, route }) {
               }}
             >
               <Image
-                style={[CommonStyle.settingiconStyle]}
-                source={finger}
+                style={CommonStyle.settingiconStyle}
+                source={bellIcon}
                 resizeMode={"contain"}
               />
               <Text
@@ -338,19 +275,81 @@ export default function SettingScreen({ navigation, route }) {
                   left: Platform.OS === "ios" ? -Scaler(16) : -Scaler(18),
                 }}
               >
-                {Lang.BIOMETRICS}
+                {Lang.NOTIFICATION}
               </Text>
-              <TouchableOpacity onPress={() => biometricToggle()}>
+              <TouchableOpacity onPress={() => notificationToggle()}>
                 <Image
-                  source={isBioSwitchOn ? dropDwonUp : dwonArrowIcon}
+                  source={isSwitchOn ? dropDwonUp : dwonArrowIcon}
                   resizeMode={"contain"}
                   style={{ height: hp(1.5) }}
                 />
               </TouchableOpacity>
             </View>
-            {isBioToggleOn == false ? null : (
+            {isToggleOn == false ? null : (
               <View style={{ alignSelf: "center" }}>
-                {biometricType === "FaceID" ? (
+                {Role != "EMPLOYEE" ? (
+                  <>
+                    <View
+                      style={{
+                        marginVertical: hp(1),
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginHorizontal: 20,
+                        width: wp(90),
+                        top: 10,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          width: wp(53),
+                          fontSize: getFontSize(18),
+                          fontFamily: "Poppins-Medium",
+                          color: "#000",
+                          left: wp(23),
+                        }}
+                      >
+                        {Lang.USER}
+                      </Text>
+                      <TouchableOpacity
+                        style={{}}
+                        onPress={() => notificationSetting("user")}
+                        // onPress={() => setUserToggle(!userToggle)}
+                      >
+                        <Image source={userToggle ? onIcon : offIcon} />
+                      </TouchableOpacity>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginHorizontal: 20,
+                        width: wp(90),
+                        top: 10,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          width: wp(53),
+                          fontSize: getFontSize(18),
+                          fontFamily: "Poppins-Medium",
+                          color: "#000",
+                          left: wp(23),
+                        }}
+                      >
+                        {Lang.TEAM}
+                      </Text>
+                      <TouchableOpacity
+                        style={{}}
+                        // onPress={() => setteamToggle(!teamToggle)}
+                        onPress={() => notificationSetting("team")}
+                      >
+                        <Image source={teamToggle ? onIcon : offIcon} />
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                ) : (
                   <View
                     style={{
                       marginVertical: hp(1),
@@ -371,61 +370,20 @@ export default function SettingScreen({ navigation, route }) {
                         left: wp(23),
                       }}
                     >
-                      {Lang.FACE}
+                      {Lang.USER}
                     </Text>
                     <TouchableOpacity
                       style={{}}
-                      onPress={() => {
-                        biometricLocalHandler(
-                          faceBioToggle === true ? "remove" : "add"
-                        );
-                        setFaceBioToggle(!faceBioToggle);
-                      }}
+                      onPress={() => notificationSetting("user")}
+                      // onPress={() => setUserToggle(!userToggle)}
                     >
-                      <Image
-                        source={faceBioToggle === false ? offIcon : onIcon}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginHorizontal: 20,
-                      width: wp(90),
-                      top: 10,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        width: wp(53),
-                        fontSize: getFontSize(18),
-                        fontFamily: "Poppins-Medium",
-                        color: "#000",
-                        left: wp(23),
-                      }}
-                    >
-                      {Lang.FINGERPRNT}
-                    </Text>
-                    <TouchableOpacity
-                      style={{}}
-                      onPress={() => {
-                        setFingerBioToggle(!fingerBioToggle);
-                        biometricLocalHandler(
-                          fingerBioToggle === true ? "remove" : "add"
-                        );
-                      }}
-                    >
-                      <Image
-                        source={fingerBioToggle === false ? offIcon : onIcon}
-                      />
+                      <Image source={userToggle ? onIcon : offIcon} />
                     </TouchableOpacity>
                   </View>
                 )}
               </View>
             )}
+
             <Divider
               style={{
                 width: wp(90),
@@ -434,174 +392,17 @@ export default function SettingScreen({ navigation, route }) {
                 top: hp(1.5),
               }}
             />
-          </View>
-        ) : null}
-
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginHorizontal: 20,
-            width: wp(90),
-            top: 10,
-          }}
-        >
-          <Image
-            style={CommonStyle.settingiconStyle}
-            source={changeLanIcon}
-            resizeMode={"contain"}
-          />
-          <Text
-            style={{
-              right: wp(1.2),
-              width: wp(50),
-              fontSize: getFontSize(18),
-              fontFamily: "Poppins-SemiBold",
-              color: "#000",
-              left: wp(1),
-            }}
-          >
-            {Lang.CHANGE_LANG}
-          </Text>
-          <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
-              onPress={() => {
-                Lang.setLanguage("en");
-                setLanguageData("en");
-                SelectLanguageFunction("en");
-              }}
-              style={{
-                backgroundColor:
-                  getLanguageData === "en" ? "#4D39E9" : "#0000000D",
-                width: wp(10),
-                height: hp(5),
-                borderRadius: 10,
-                right: wp(2),
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "Poppins-Medium",
-                  color: getLanguageData === "en" ? "#fff" : "#7F8190",
-                  textAlign: "center",
-                  top: Platform.OS == "ios" ? hp(1) : hp(1),
-                }}
-              >
-                ENG
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                Lang.setLanguage("fr");
-                setLanguageData("fr");
-                SelectLanguageFunction("fr");
-              }}
-              style={{
-                backgroundColor:
-                  getLanguageData === "en" ? "#0000000D" : "#4D39E9",
-                width: wp(10),
-                height: hp(5),
-                borderRadius: 10,
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "Poppins-Medium",
-                  color: getLanguageData === "en" ? "#7F8190" : "#fff",
-                  textAlign: "center",
-                  top: Platform.OS == "ios" ? hp(1) : hp(1),
-                }}
-              >
-                FRA
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-        <Divider
-          style={{
-            width: wp(90),
-            alignSelf: "center",
-            marginVertical: hp(1.5),
-            top: hp(1.5),
-          }}
-        />
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate("TermsServiceScreen")}
-          style={CommonStyle.settingTouchStyle}
-        >
-          <Image
-            style={CommonStyle.settingiconStyle}
-            source={termsIcon}
-            resizeMode={"contain"}
-          />
-          <Text style={CommonStyle.settingTextStyle}>{Lang.TERMS}</Text>
-        </TouchableOpacity>
-        <Divider
-          style={{
-            width: wp(90),
-            alignSelf: "center",
-            marginVertical: hp(1.5),
-            top: hp(1.5),
-          }}
-        />
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate("PrivacyScreen")}
-          style={CommonStyle.settingTouchStyle}
-        >
-          <Image
-            style={CommonStyle.settingiconStyle}
-            source={privacyIcon}
-            resizeMode={"contain"}
-          />
-          <Text style={CommonStyle.settingTextStyle}>{Lang.PRIVACY}</Text>
-        </TouchableOpacity>
-        <Divider
-          style={{
-            width: wp(90),
-            alignSelf: "center",
-            marginVertical: hp(1.5),
-            top: hp(1.5),
-          }}
-        />
-        <TouchableOpacity
-          onPress={() => navigation.navigate("BlockedUserScreen")}
-          style={CommonStyle.settingTouchStyle}
-        >
-          <Image
-            style={CommonStyle.settingiconStyle}
-            source={blockedIcon}
-            resizeMode={"contain"}
-          />
-          <Text style={CommonStyle.settingTextStyle}>
-            {Lang.BLOCKED_USERS}{" "}
-          </Text>
-        </TouchableOpacity>
-        <Divider
-          style={{
-            width: wp(90),
-            alignSelf: "center",
-            marginVertical: hp(1.5),
-            top: hp(1.5),
-          }}
-        />
-
-        {department == "H.R." ? (
-          <>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("FreezedUser")}
+              onPress={() => navigation.navigate("ChangePasswordScreen")}
               style={CommonStyle.settingTouchStyle}
             >
               <Image
                 style={CommonStyle.settingiconStyle}
-                source={freezeEncircledIcon}
+                source={keyIcon}
                 resizeMode={"contain"}
               />
               <Text style={CommonStyle.settingTextStyle}>
-                {Lang.FREEZED_USER}
+                {Lang.CHANGE_PASSWORD}
               </Text>
             </TouchableOpacity>
             <Divider
@@ -612,41 +413,348 @@ export default function SettingScreen({ navigation, route }) {
                 top: hp(1.5),
               }}
             />
-          </>
-        ) : null}
+            {biometricType != "" ? (
+              <View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginHorizontal: 20,
+                    width: wp(90),
+                    top: 10,
+                  }}
+                >
+                  <Image
+                    style={[CommonStyle.settingiconStyle]}
+                    source={finger}
+                    resizeMode={"contain"}
+                  />
+                  <Text
+                    style={{
+                      width: wp(53),
+                      fontSize: Scaler(18),
+                      fontFamily: "Poppins-SemiBold",
+                      color: "#000",
+                      left: Platform.OS === "ios" ? -Scaler(16) : -Scaler(18),
+                    }}
+                  >
+                    {Lang.BIOMETRICS}
+                  </Text>
+                  <TouchableOpacity onPress={() => biometricToggle()}>
+                    <Image
+                      source={isBioSwitchOn ? dropDwonUp : dwonArrowIcon}
+                      resizeMode={"contain"}
+                      style={{ height: hp(1.5) }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {isBioToggleOn == false ? null : (
+                  <View style={{ alignSelf: "center" }}>
+                    {biometricType === "FaceID" ? (
+                      <View
+                        style={{
+                          marginVertical: hp(1),
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginHorizontal: 20,
+                          width: wp(90),
+                          top: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            width: wp(53),
+                            fontSize: getFontSize(18),
+                            fontFamily: "Poppins-Medium",
+                            color: "#000",
+                            left: wp(23),
+                          }}
+                        >
+                          {Lang.FACE}
+                        </Text>
+                        <TouchableOpacity
+                          style={{}}
+                          onPress={() => {
+                            biometricLocalHandler(
+                              faceBioToggle === true ? "remove" : "add"
+                            );
+                            setFaceBioToggle(!faceBioToggle);
+                          }}
+                        >
+                          <Image
+                            source={faceBioToggle === false ? offIcon : onIcon}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginHorizontal: 20,
+                          width: wp(90),
+                          top: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            width: wp(53),
+                            fontSize: getFontSize(18),
+                            fontFamily: "Poppins-Medium",
+                            color: "#000",
+                            left: wp(23),
+                          }}
+                        >
+                          {Lang.FINGERPRNT}
+                        </Text>
+                        <TouchableOpacity
+                          style={{}}
+                          onPress={() => {
+                            setFingerBioToggle(!fingerBioToggle);
+                            biometricLocalHandler(
+                              fingerBioToggle === true ? "remove" : "add"
+                            );
+                          }}
+                        >
+                          <Image
+                            source={
+                              fingerBioToggle === false ? offIcon : onIcon
+                            }
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                )}
+                <Divider
+                  style={{
+                    width: wp(90),
+                    alignSelf: "center",
+                    marginVertical: hp(1.5),
+                    top: hp(1.5),
+                  }}
+                />
+              </View>
+            ) : null}
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate("ContactUsScreen")}
-          style={CommonStyle.settingTouchStyle}
-        >
-          <Image
-            style={CommonStyle.settingiconStyle}
-            source={contactIcon}
-            resizeMode={"contain"}
-          />
-          <Text style={CommonStyle.settingTextStyle}>{Lang.CONTACT_US}</Text>
-        </TouchableOpacity>
-        <Divider
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginHorizontal: 20,
+                width: wp(90),
+                top: 10,
+              }}
+            >
+              <Image
+                style={CommonStyle.settingiconStyle}
+                source={changeLanIcon}
+                resizeMode={"contain"}
+              />
+              <Text
+                style={{
+                  right: wp(1.2),
+                  width: wp(50),
+                  fontSize: getFontSize(18),
+                  fontFamily: "Poppins-SemiBold",
+                  color: "#000",
+                  left: wp(1),
+                }}
+              >
+                {Lang.CHANGE_LANG}
+              </Text>
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    Lang.setLanguage("en");
+                    setLanguageData("en");
+                    SelectLanguageFunction("en");
+                  }}
+                  style={{
+                    backgroundColor:
+                      getLanguageData === "en" ? "#4D39E9" : "#0000000D",
+                    width: wp(10),
+                    height: hp(5),
+                    borderRadius: 10,
+                    right: wp(2),
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Poppins-Medium",
+                      color: getLanguageData === "en" ? "#fff" : "#7F8190",
+                      textAlign: "center",
+                      top: Platform.OS == "ios" ? hp(1) : hp(1),
+                    }}
+                  >
+                    ENG
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    Lang.setLanguage("fr");
+                    setLanguageData("fr");
+                    SelectLanguageFunction("fr");
+                  }}
+                  style={{
+                    backgroundColor:
+                      getLanguageData === "en" ? "#0000000D" : "#4D39E9",
+                    width: wp(10),
+                    height: hp(5),
+                    borderRadius: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Poppins-Medium",
+                      color: getLanguageData === "en" ? "#7F8190" : "#fff",
+                      textAlign: "center",
+                      top: Platform.OS == "ios" ? hp(1) : hp(1),
+                    }}
+                  >
+                    FRA
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+            <Divider
+              style={{
+                width: wp(90),
+                alignSelf: "center",
+                marginVertical: hp(1.5),
+                top: hp(1.5),
+              }}
+            />
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("TermsServiceScreen")}
+              style={CommonStyle.settingTouchStyle}
+            >
+              <Image
+                style={CommonStyle.settingiconStyle}
+                source={termsIcon}
+                resizeMode={"contain"}
+              />
+              <Text style={CommonStyle.settingTextStyle}>{Lang.TERMS}</Text>
+            </TouchableOpacity>
+            <Divider
+              style={{
+                width: wp(90),
+                alignSelf: "center",
+                marginVertical: hp(1.5),
+                top: hp(1.5),
+              }}
+            />
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("PrivacyScreen")}
+              style={CommonStyle.settingTouchStyle}
+            >
+              <Image
+                style={CommonStyle.settingiconStyle}
+                source={privacyIcon}
+                resizeMode={"contain"}
+              />
+              <Text style={CommonStyle.settingTextStyle}>{Lang.PRIVACY}</Text>
+            </TouchableOpacity>
+            <Divider
+              style={{
+                width: wp(90),
+                alignSelf: "center",
+                marginVertical: hp(1.5),
+                top: hp(1.5),
+              }}
+            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("BlockedUserScreen")}
+              style={CommonStyle.settingTouchStyle}
+            >
+              <Image
+                style={CommonStyle.settingiconStyle}
+                source={blockedIcon}
+                resizeMode={"contain"}
+              />
+              <Text style={CommonStyle.settingTextStyle}>
+                {Lang.BLOCKED_USERS}{" "}
+              </Text>
+            </TouchableOpacity>
+            <Divider
+              style={{
+                width: wp(90),
+                alignSelf: "center",
+                marginVertical: hp(1.5),
+                top: hp(1.5),
+              }}
+            />
+
+            {department == "H.R." ? (
+              <>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("FreezedUser")}
+                  style={CommonStyle.settingTouchStyle}
+                >
+                  <Image
+                    style={CommonStyle.settingiconStyle}
+                    source={freezeEncircledIcon}
+                    resizeMode={"contain"}
+                  />
+                  <Text style={CommonStyle.settingTextStyle}>
+                    {Lang.FREEZED_USER}
+                  </Text>
+                </TouchableOpacity>
+                <Divider
+                  style={{
+                    width: wp(90),
+                    alignSelf: "center",
+                    marginVertical: hp(1.5),
+                    top: hp(1.5),
+                  }}
+                />
+              </>
+            ) : null}
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ContactUsScreen")}
+              style={CommonStyle.settingTouchStyle}
+            >
+              <Image
+                style={CommonStyle.settingiconStyle}
+                source={contactIcon}
+                resizeMode={"contain"}
+              />
+              <Text style={CommonStyle.settingTextStyle}>
+                {Lang.CONTACT_US}
+              </Text>
+            </TouchableOpacity>
+            {/* <Divider
           style={{
             width: wp(90),
             alignSelf: "center",
             marginVertical: hp(1.5),
             top: hp(1.5),
           }}
-        />
-        <Spacer size={Scaler(100)} />
-      </ScrollView>
-      <CustomButton
-        loading={loading}
-        disabled={false}
-        onPress={() => {
-          setLoading(true);
-          _logout();
-        }}
-        style={{ position: "absolute", bottom: Scaler(20) }}
-        buttonIcon={loading ? greyArrow : arrowbackgroundBlue}
-        status={Lang.LOGOUT}
-      />
+        /> */}
+            <Spacer size={Scaler(100)} />
+          </ScrollView>
+
+          <CustomButton
+            loading={loading}
+            disabled={false}
+            onPress={() => {
+              setLoading(true);
+              _logout();
+            }}
+            style={{ position: "absolute", bottom: Scaler(20) }}
+            buttonIcon={loading ? greyArrow : arrowbackgroundBlue}
+            status={Lang.LOGOUT}
+          />
+        </>
+      )}
     </SafeAreaView>
   );
 }

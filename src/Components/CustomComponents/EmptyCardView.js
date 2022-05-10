@@ -4,9 +4,12 @@ import { View, Image, Text } from "react-native-animatable";
 import { followBlankIcon } from "../../Assets/icon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import Scaler from "../../Utils/Scaler";
+import FastImage from "react-native-fast-image";
+import { useTheme } from "react-native-paper";
 
 function EmptyCardView(props) {
   const { message, imageData } = props;
+  const theme =useTheme();
   return (
     <View style={{ justifyContent: "center", flex: 0.92 }}>
       <View
@@ -20,15 +23,15 @@ function EmptyCardView(props) {
           elevation: 5,
           borderRadius: 10,
           width: "90%",
-          height: Scaler(420),
+          height: Scaler(360),
         }}
       >
-        <Image
+        <FastImage
           source={imageData ? imageData : followBlankIcon}
-          resizeMode={"contain"}
+          resizeMode={FastImage.resizeMode.contain}
           style={{
-            width: Scaler(230),
-            height: Scaler(325),
+            width: Scaler(220),
+            height:Scaler(250),
             alignSelf: "center",
           }}
         />
@@ -37,10 +40,9 @@ function EmptyCardView(props) {
             textAlign: "center",
             padding: 10,
             width: wp(90),
-            alignSelf: "center",
             fontSize: 17,
             fontFamily: "Poppins-Medium",
-            color: "#7F8190",
+            color: theme.colors.disabledText,
           }}
         >
           {message}

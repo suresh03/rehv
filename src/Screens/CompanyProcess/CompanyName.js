@@ -934,7 +934,7 @@ function CompanyName({ navigation, route }) {
               }
               style={{
                 position: "absolute",
-                bottom: Platform.OS === "ios" ? Scaler(45) : Scaler(60),
+                bottom: Platform.OS === "ios" ? Scaler(45) : Scaler(45),
               }}
               onPress={() => setStep(6)}
               status={Lang.NEXT}

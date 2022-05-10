@@ -57,11 +57,25 @@ export default function CommunityScreen({ navigation }) {
   const [selectedCommunityId, setSelectedCommunityId] = useState("");
   const [selectedCommunityDetails, setSelectedCommunityDetails] = useState([]);
 
-  const profileClick = (role, _id) => {
+  const [LangType, setLangType] = useState("");
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol);
+      })
+      .finally(() => console.log("success"));
+  };
+
+  const profileClick = (item, role, _id) => {
     if (role.toLowerCase() == "excoach") {
-      navigation.navigate("ExCoachProfileScreen", { _id });
+      navigation.navigate("ExCoachProfileScreen", { item, _id });
     } else {
-      navigation.navigate("MemberProfileScreen", { _id });
+      navigation.navigate("MemberProfileScreen", { item, _id });
     }
   };
 
@@ -224,7 +238,9 @@ export default function CommunityScreen({ navigation }) {
             return (
               <TouchableOpacity
                 key={index}
-                onPress={() => handleItemClick(item._id, index)}
+                onPress={() => {
+                  handleItemClick(item._id, index);
+                }}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -233,7 +249,7 @@ export default function CommunityScreen({ navigation }) {
                     item.selected == false ? "lightgrey" : theme.colors.primary,
                   marginHorizontal: Scaler(10),
                   marginTop: Scaler(20),
-                  borderWidth: Scaler(0.8),
+                  borderWidth: Scaler(1.2),
                   borderRadius: Scaler(10),
                   paddingRight: Scaler(10),
                   height: Scaler(54),
@@ -263,9 +279,10 @@ export default function CommunityScreen({ navigation }) {
                     ...theme.fonts.medium,
                     alignItems: "center",
                     justifyContent: "center",
+                    color: theme.colors.disabledText,
                   }}
                 >
-                  {item.name}
+                  {LangType === "en" ? item.name : item.frenchName}
                 </Text>
               </TouchableOpacity>
             );
@@ -286,13 +303,14 @@ export default function CommunityScreen({ navigation }) {
               ...theme.fonts.semiBold,
               alignItems: "center",
               justifyContent: "center",
+              color: theme.colors.disabledText,
             }}
           >
             {(membersList[0]?.userData.length ?? "") + " " + Lang.MEMBERS}
           </Text>
 
           <TouchableOpacity
-             style={{
+            style={{
               paddingHorizontal: 10,
               height: 30,
               alignItems: "center",
@@ -408,7 +426,7 @@ export default function CommunityScreen({ navigation }) {
                 alignSelf: "center",
                 fontSize: 17,
                 fontFamily: "Poppins-Medium",
-                color: "#7F8190",
+                color: theme.colors.disabledText,
               }}
             >
               {Lang.NO_COMMUNITY_POST}
@@ -442,71 +460,10 @@ export default function CommunityScreen({ navigation }) {
           leftImage={pencile}
         />
         <StatusBar barStyle="light-content" />
-        {/* {loading ? (
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        ) : ( */}
 
-        {/* {membersList?.length > 0 || postData?.length > 0 ? (
-          <Postcard
-            data={postData}
-            profileClick={(role, id) => profileClick(role, id)}
-            onLike={(action, val, postId, index) =>
-              likeOrCommentAction(action, val, postId, index)
-            }
-            selectedCommunityId={selectedCommunityId}
-            listHeader={() => listHeaderRender()}
-            onDeletePost={(id) => _deletePost(id)}
-            EmptyListMessage={()=> EmptyListMessage()}
-          />
-        ) : (
-          <View style={{ justifyContent: "center", height: hp(65) }}>
-            <View
-              style={{
-                backgroundColor: "#fff",
-                alignSelf: "center",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowRadius: 6,
-                shadowOpacity: 0.1,
-                elevation: 5,
-                borderRadius: 10,
-                width: "90%",
-                height: hp(55),
-              }}
-            >
-              <Image
-                source={communityBlankIcon}
-                resizeMode={"contain"}
-                style={{
-                  width: wp(60),
-                  height: hp(40),
-                  alignSelf: "center",
-                }}
-              />
-              <Text
-                style={{
-                  textAlign: "center",
-                  padding: 10,
-                  width: wp(90),
-                  alignSelf: "center",
-                  fontSize: 17,
-                  fontFamily: "Poppins-Medium",
-                  color: "#7F8190",
-                }}
-              >
-                {Lang.NO_COMMUNITY_POST}
-              </Text>
-            </View>
-          </View>
-        )} */}
-        {/* {loading ? (
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-          </View>
-        ) : ( */}
         <Postcard
           data={postData}
-          profileClick={(role, id) => profileClick(role, id)}
+          profileClick={(item, role, id) => profileClick(item, role, id)}
           onLike={(action, val, postId, index) =>
             likeOrCommentAction(action, val, postId, index)
           }
@@ -514,9 +471,9 @@ export default function CommunityScreen({ navigation }) {
           listHeader={() => listHeaderRender()}
           onDeletePost={(id) => _deletePost(id)}
           EmptyListMessage={() => EmptyListMessage()}
-          refReshData={getCommunityById}
+          refReshData={() => getCommunityById()}
         />
-        {/* )} */}
+
         <PostCreationSuccessModal
           visible={modalVisible}
           hideModal={hideModal}

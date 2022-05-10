@@ -98,7 +98,7 @@ console.log('res.message =>',res.message);
             CommonStyle.tittleStyle,
             {
               top: Platform.OS == "ios" ? 0 : heightPercentageToDP(1),
-              fontSize: Scaler(21),
+              fontSize: Scaler(18),
               height:Scaler(32),
               lineHeight: Scaler(32),
             },

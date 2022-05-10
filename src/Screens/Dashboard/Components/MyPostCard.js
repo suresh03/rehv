@@ -1,4 +1,4 @@
-import React, { Children, useRef, useState } from "react";
+import React, { Children, useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   FlatList,
   TouchableWithoutFeedback,
   Alert,
+  Linking,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -37,23 +38,16 @@ import { DayTheme } from "../../../Constants/theme";
 import { capitalize, isImage } from "../../../Utils/Helpers";
 import VideoPausedIcon from "../../Community/Components/VideoPausedIcon";
 const windowWidth = Dimensions.get("window").width;
-import { useAppValue } from "../../../Recoil/appAtom";
 import ViewShotModal from "../../../Components/Modals/ViewShotModal";
 import Lang from "../../../Language";
 import Icon from "react-native-vector-icons/Ionicons";
 import useApiServices from "../../../Services/useApiServices";
 import dynamicLinks from "@react-native-firebase/dynamic-links";
+import VideoBufferIndicator from "../../../Utils/VideoBufferIndicator";
 
 function MyPostCard(props) {
-  const {
-    data,
-    profileClick,
-    onLike,
-    onDeletePost,
-    listHeader,
-    flag,
-    EmptyList,
-  } = props;
+  const { data, profileClick, onLike, onDeletePost, listHeader, EmptyList } =
+    props;
   const theme = useTheme();
   const navigation = useNavigation();
   const _menu = [];
@@ -63,10 +57,23 @@ function MyPostCard(props) {
   //const [IndexCheck, setIndexCheck] = useState(props.currentIndex);
   let videoComponent = useRef();
   const { ApiPostMethod, ApiGetMethod } = useApiServices();
-  const [getDescStatus, setDescStatus] = useState(false);
+  const [currentDescriptionIndex, setCurrentDescriptionIndex] = useState(null);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [opacity, setOpacity] = useState(0);
   // Workaround to display thumbnail in android.
-  const load = () => {
-    videoComponent?.seek(0);
+
+  const [LangType, setLangType] = useState("");
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol);
+      })
+      .finally(() => console.log("success"));
   };
   // const onShare = async () => {
   //   await Share.open({
@@ -147,7 +154,7 @@ function MyPostCard(props) {
       message: "Check out my Post",
       url: getLink,
     };
-    console.log("resData",getLink,resData)
+    console.log("resData", getLink, resData);
     Share.open(resData)
       .then((res) => {
         console.log("resData", res);
@@ -155,6 +162,7 @@ function MyPostCard(props) {
       })
       .catch((err) => {
         err && console.log(err);
+        shareApiHit(item);
       });
   };
 
@@ -207,6 +215,22 @@ function MyPostCard(props) {
 
   const pausePlayVideo2 = (indexData) => {
     setVisibleItemIndex(indexData);
+  };
+
+  const onLoadStart = () => {
+    setOpacity(1);
+    console.log("onLoadStart");
+  };
+
+  const onLoad = () => {
+    setOpacity(0);
+    videoComponent?.seek(0);
+    console.log("onLoad");
+  };
+
+  const onBuffer = ({ isBuffering }) => {
+    setOpacity(isBuffering ? 1 : 0);
+    console.log("onBuffer");
   };
 
   const ItemView = (item, index, indexData, itemData) => {
@@ -265,13 +289,22 @@ function MyPostCard(props) {
                 // paused={isPaused}
                 style={styles.video}
                 repeat={true}
-                onLoad={load}
+               
                 resizeMode={"cover"}
                 volume={sound ? 1.0 : 0.0}
+                onLoad={onLoad}
+                onBuffer={onBuffer}
+                onLoadStart={onLoadStart}
               />
             </TouchableWithoutFeedback>
+
+            <VideoBufferIndicator
+              opacity={opacity}
+              color={theme.colors.primary}
+            />
+
             <TouchableOpacity
-              style={{ position: "absolute", right: 20, bottom: 294 }}
+              style={{ position: "absolute", right: 20, bottom: 300 }}
               onPress={() => setSound(!sound)}
             >
               <Icon
@@ -308,30 +341,30 @@ function MyPostCard(props) {
         />
         <View style={styles.indicatorContainer}>
           {renderIndicators(singleContent)}
+          {itemData.postData ? null : itemData?.eventType == "POST" ||
+            itemData?.eventType == "" ? null : (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("PostDetailScreen", {
+                  postId: itemData._id,
+                  eventType: itemData.eventType,
+                  creator: itemData?.userName + " " + itemData?.userLast,
+                  creatorRole: itemData?.role,
+                  pictureUrl: itemData?.pictureUrl,
+                  isLikes: itemData?.isLikes,
+                  totalLikes: itemData.totalLikes,
+                  totalComments: itemData.totalComments,
+                  questions: itemData.questions,
+                })
+              }
+              style={styles.rollViewStyle}
+            >
+              <Text style={[CommonStyle.rollTextStyle]}>
+                {itemData?.eventType}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
-        {itemData.postData ? null : itemData?.eventType == "POST" ||
-          itemData?.eventType == "" ? null : (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("PostDetailScreen", {
-                postId: itemData._id,
-                eventType: itemData.eventType,
-                creator: itemData?.userName + " " + itemData?.userLast,
-                creatorRole: itemData?.role,
-                pictureUrl: itemData?.pictureUrl,
-                isLikes: itemData?.isLikes,
-                totalLikes: itemData.totalLikes,
-                totalComments: itemData.totalComments,
-                questions: itemData.questions,
-              })
-            }
-            style={styles.rollViewStyle}
-          >
-            <Text style={[CommonStyle.rollTextStyle]}>
-              {itemData?.eventType}
-            </Text>
-          </TouchableOpacity>
-        )}
       </>
     );
   };
@@ -351,7 +384,7 @@ function MyPostCard(props) {
         >
           <TouchableOpacity
             onPress={() =>
-              profileClick(item?.postCreatedUserType, item?.createdBy)
+              profileClick(item, item?.postCreatedUserType, item?.createdBy)
             }
             style={[
               {
@@ -465,7 +498,19 @@ function MyPostCard(props) {
                       ...theme.fonts.regular,
                     }}
                   >
-                    {item.communityData[0].name}
+                    {/* {item.communityData[0].name} */}
+
+                    {item.communityData[0].name.length < 25
+                      ? `${
+                          LangType === "en"
+                            ? item.communityData[0].name
+                            : item.communityData[0].frenchName
+                        }`
+                      : `${
+                          LangType === "en"
+                            ? item.communityData[0].name.substring(0, 25)
+                            : item.communityData[0].frenchName.substring(0, 25)
+                        }...`}
                   </Text>
                 </View>
               )}
@@ -608,14 +653,14 @@ function MyPostCard(props) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onPress={() =>
-                  navigation.navigate("MemberScreen", {
-                    data: {
-                      postId: item?._id,
-                      isLikes: false,
-                    },
-                  })
-                }
+                // onPress={() =>
+                //   navigation.navigate("MemberScreen", {
+                //     data: {
+                //       postId: item?._id,
+                //       isLikes: false,
+                //     },
+                //   })
+                // }
               >
                 <Text
                   style={[
@@ -641,27 +686,43 @@ function MyPostCard(props) {
           </TouchableOpacity>
         </View>
         <Spacer />
-        <TouchableOpacity onPress={() => setDescStatus((data) => !data)} style={{ paddingHorizontal: Scaler(15) }}>
-          {/* <Text
-            style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
-            numberOfLines={2}
-          >
-            {item.description}
-          </Text> */}
-          {getDescStatus === false ? (
+        <TouchableOpacity
+          onPress={() => {
+            setCurrentDescriptionIndex(index);
+            setShowFullDescription(
+              index === currentDescriptionIndex && showFullDescription
+                ? false
+                : true
+            );
+          }}
+          style={{ paddingHorizontal: Scaler(15) }}
+        >
+          {showFullDescription == true &&
+          currentDescriptionIndex != null &&
+          currentDescriptionIndex == index ? (
             <Text
-              numberOfLines={2}
-              style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
+              style={{
+                ...theme.fonts.regular,
+                fontSize: Scaler(13),
+                color: theme.colors.disabledText,
+              }}
             >
               {item?.description}
             </Text>
           ) : (
-            <Text style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}>
+            <Text
+              numberOfLines={2}
+              style={{
+                ...theme.fonts.regular,
+                fontSize: Scaler(13),
+                color: theme.colors.disabledText,
+              }}
+            >
               {item?.description}
             </Text>
           )}
         </TouchableOpacity>
-         {item?.postUrl === "" ||
+        {item?.postUrl === "" ||
         item?.postUrl == null ||
         item?.postUrl == undefined ? null : (
           <View style={{ marginLeft: 15 }}>
@@ -697,6 +758,7 @@ function MyPostCard(props) {
             width: wp(100) - Scaler(30),
             height: Scaler(1),
             alignSelf: "center",
+            marginTop: Scaler(17),
           }}
         />
       </View>
@@ -780,11 +842,12 @@ const styles = StyleSheet.create({
     height: Scaler(240),
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#000",
   },
   media: {
     height: Scaler(245),
-    width: windowWidth,
-    // resizeMode: "contain",
+    width: wp(100),
+    resizeMode: "contain",
     alignSelf: "center",
   },
   backgroundVideo: {
@@ -814,7 +877,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: Scaler(10),
     zIndex: 2,
-    bottom: Scaler(110),
+    bottom: Scaler(15),
     right: Scaler(10),
     position: "absolute",
   },

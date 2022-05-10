@@ -45,9 +45,9 @@ export default function BottomTabs() {
               <Text
               numberOfLines={1}
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontFamily: "Poppins-Medium",
-                  color: focused ? "#4D39E9" : "#CECECE",
+                  color: focused ? "#4D39E9" : "#9698a4",
                 }}
               >
                 {Lang.HOME}
@@ -66,7 +66,7 @@ export default function BottomTabs() {
               <Image
                 style={{ alignSelf: "center", width: 20, height: 20 }}
                 resizeMode={"contain"}
-                source={focused ? HomebottomactiveIcon : HomebottomunactiveIcon}
+                source={focused ? require("../Assets/Images/Home.png") : require("../Assets/Images/homeicon1.png")}
               />
             </View>
           ),
@@ -81,9 +81,9 @@ export default function BottomTabs() {
               <Text
               numberOfLines={1}
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontFamily: "Poppins-Medium",
-                  color: focused ? "#4D39E9" : "#CECECE",
+                  color: focused ? "#4D39E9" : "#9698a4",
                 }}
               >
                 {Lang.TRENDING}
@@ -104,8 +104,8 @@ export default function BottomTabs() {
                 resizeMode={"contain"}
                 source={
                   focused
-                    ? trendingbottomactiveIcon
-                    : trendinfbottomunactiveIcon
+                    ? require("../Assets/Images/SelectedTrending.png")
+                    : require("../Assets/Images/UnSelectedTrending.png")
                 }
               />
             </View>
@@ -146,9 +146,9 @@ export default function BottomTabs() {
               <Text
               numberOfLines={1}
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontFamily: "Poppins-Medium",
-                  color: focused ? "#4D39E9" : "#CECECE",
+                  color: focused ? "#4D39E9" : "#9698a4",
                  
                 }}
               >
@@ -171,8 +171,8 @@ export default function BottomTabs() {
                 resizeMode={"contain"}
                 source={
                   focused
-                    ? communitybottomactiveIcon
-                    : communitybottomunactiveIcon
+                    ? require("../Assets/Images/SelectedCommunity.png")
+                    : require("../Assets/Images/UnSelectedCommunity.png")
                 }
               />
             </View>
@@ -188,9 +188,9 @@ export default function BottomTabs() {
               <Text
               numberOfLines={1}
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontFamily: "Poppins-Medium",
-                  color: focused ? "#4D39E9" : "#CECECE",
+                  color: focused ? "#4D39E9" : "#9698a4",
                 }}
               >
                 {Lang.PROFILE}
@@ -212,7 +212,7 @@ export default function BottomTabs() {
                 source={
                   focused
                     ? require("../Assets/Images/prof.png")
-                    : require("../Assets/Images/noun-profile-339269.png")
+                    : require("../Assets/Images/noun_profile_339269-1.png")
                 }
               />
             </View>

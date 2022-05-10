@@ -43,7 +43,7 @@ export default function FollowerScreen({ navigation }) {
       <HeaderBackAction
         back_nav={() => navigation.pop()}
         headerText={true}
-        headerContain={"Followers"}
+        headerContain={Lang.FOLLOWERS}
         headerViewStyle={{ backgroundColor: "#fff" }}
       />
       <StatusBar barStyle="default" />

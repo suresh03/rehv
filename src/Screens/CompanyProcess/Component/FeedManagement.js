@@ -1,13 +1,9 @@
 import React from "react";
-import { View, Image, TouchableOpacity, Text, ScrollView } from "react-native";
+import { View, Image, Text, ScrollView } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import {
-  responsiveSize,
-  getFontSize,
-} from "../../../Components/SharedComponents/ResponsiveSize";
 import { TextField } from "../../../Components/SharedComponents/TextField";
 import Spacer from "../../../Components/SharedComponents/Space";
 import CommonStyle from "../../../Components/CustomComponents/CommonStyle";
@@ -25,10 +21,7 @@ function FeedManagement(props) {
   return (
     <View style={{ flex: 1, width: wp(100) }}>
       <Spacer size={Scaler(8)} />
-      <TextField
-        textStyle={CommonStyle.tittleStyle}
-        status={Lang.CONGRATS}
-      />
+      <TextField textStyle={CommonStyle.tittleStyle} status={Lang.CONGRATS} />
       <Spacer size={Scaler(8)} />
       <View style={{ flexDirection: "row" }}>
         <TextField
@@ -47,9 +40,9 @@ function FeedManagement(props) {
                     borderColor: "lightgrey",
                     height: hp(7.5),
                     paddingRight: Scaler(20),
-                    marginVertical: responsiveSize(10),
-                    borderWidth: responsiveSize(0.8),
-                    borderRadius: responsiveSize(10),
+                    marginVertical: Scaler(10),
+                    borderWidth: Scaler(0.8),
+                    borderRadius: Scaler(10),
                     alignItems: "center",
                     justifyContent: "flex-start",
                   }}
@@ -77,7 +70,7 @@ function FeedManagement(props) {
                       ...theme.fonts.medium,
                       alignItems: "center",
                       justifyContent: "center",
-                      color: theme.colors.text
+                      color: theme.colors.text,
                     }}
                   >
                     {item.name}
@@ -90,7 +83,6 @@ function FeedManagement(props) {
               showsHorizontalScrollIndicator={false}
             >
               {item.users.map((user, index) => {
-
                 return (
                   <View
                     style={[ChangeStyle.congratulationViewStyle, {}]}
@@ -98,8 +90,8 @@ function FeedManagement(props) {
                   >
                     <View style={{ height: Scaler(70) }}>
                       {user?.profilePic == undefined ||
-                        user?.profilePic == null ||
-                        user?.profilePic?.trim() == "" ? (
+                      user?.profilePic == null ||
+                      user?.profilePic?.trim() == "" ? (
                         <Image
                           style={{
                             height: Scaler(70),

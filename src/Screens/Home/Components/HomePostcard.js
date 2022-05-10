@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
   Linking,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -40,7 +40,6 @@ import { capitalize, isImage } from "../../../Utils/Helpers";
 import VideoPausedIcon from "../../Community/Components/VideoPausedIcon";
 import Lang from "../../../Language";
 const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
 const FULL_WIDTH = Dimensions.get("window").width;
 import { useAppValue } from "../../../Recoil/appAtom";
 import ViewShotModal from "../../../Components/Modals/ViewShotModal";
@@ -48,6 +47,7 @@ import dynamicLinks from "@react-native-firebase/dynamic-links";
 import Icon from "react-native-vector-icons/Ionicons";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import useApiServices from "../../../Services/useApiServices";
+import VideoBufferIndicator from "../../../Utils/VideoBufferIndicator";
 
 function HomePostcard(props) {
   const { user } = useAppValue();
@@ -59,11 +59,11 @@ function HomePostcard(props) {
     onDeletePost,
     selectedCommunityId,
     SharePost,
-    refReshData
+    refReshData,
   } = props;
   const theme = useTheme();
   const [sound, setSound] = React.useState(false);
-  const [refreshing, setRefreshing] = useState(false)
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
   const _menu = [];
   const [CompName, setCompName] = useState("");
@@ -73,7 +73,10 @@ function HomePostcard(props) {
   const [isPaused, setIsPaused] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const { ApiGetMethod, ApiPostMethod } = useApiServices();
-  const [getDescStatus, setDescStatus] = useState(false);
+  const [currentDescriptionIndex, setCurrentDescriptionIndex] = useState(null);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [opacity, setOpacity] = useState(0);
+
   //const [IndexCheck, setIndexCheck] = useState(props.currentIndex);
   let videoComponent = useRef();
   //console.log("useruseruser", user);
@@ -84,6 +87,20 @@ function HomePostcard(props) {
   setTimeout(() => {
     setIsLoading(false);
   }, 1000);
+
+  const [LangType, setLangType] = useState("");
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol);
+      })
+      .finally(() => console.log("success"));
+  };
 
   const generateLink = async (item) => {
     let postId = item._id;
@@ -128,38 +145,39 @@ function HomePostcard(props) {
     }
   };
 
-  const shareApiHit = async(item)=>{
-    console.log("helloitem", item)
+  const shareApiHit = async (item) => {
+    console.log("helloitem", item);
     ApiGetMethod(`coach/sharePost?id=${item._id}`)
-    .then((res) => {
-      console.log("data", res);
-    })
-    .catch((error) => {
-      console.assert(error);
-    })
-    .finally(() => setLoading(false));
-  }
+      .then((res) => {
+        console.log("Share data", res);
+      })
+      .catch((error) => {
+        console.assert(error);
+      })
+      .finally(() => setLoading(false));
+  };
 
   const onShare = async (item) => {
     const getLink = await generateLink(item);
-    const resData ={
+    const resData = {
       message: "Check out my Post",
       url: getLink,
-    }
+    };
     Share.open(resData)
-    .then((res) => {
-      console.log("resData",res);
-      shareApiHit(item)
-    })
-    .catch((err) => {
-      err && console.log(err);
-    });
+      .then((res) => {
+        console.log("resData", res);
+        shareApiHit(item);
+      })
+      .catch((err) => {
+        err && console.log("err", err);
+        shareApiHit(item);
+      });
   };
 
   const _onRefresh = () => {
-    console.log('_onRefresh')
-    refReshData()
-};
+    console.log("_onRefresh");
+    refReshData();
+  };
 
   const renderIndicators = (contents) => {
     return contents.map((content, index) => {
@@ -217,8 +235,25 @@ function HomePostcard(props) {
   const pausePlayVideo2 = (indexData) => {
     setVisibleItemIndex(indexData);
   };
+
+  const onLoadStart = () => {
+    setOpacity(1);
+    console.log("onLoadStart");
+  };
+
+  const onLoad = () => {
+    setOpacity(0);
+    videoComponent?.seek(0);
+    console.log("onLoad");
+  };
+
+  const onBuffer = ({ isBuffering }) => {
+    setOpacity(isBuffering ? 1 : 0);
+    console.log("onBuffer");
+  };
+
+
   const ItemView = (item, index, indexData, itemData) => {
-    //  console.log("ItemView =>", index, currentIndex, indexData, visibleItemIndex, indexData !== visibleItemIndex, currentIndex != index && indexData === visibleItemIndex)
     return (
       <Pressable
         onPress={() =>
@@ -278,8 +313,18 @@ function HomePostcard(props) {
                 resizeMode={"contain"}
                 ignoreSilentSwitch={"ignore"}
                 volume={sound ? 1.0 : 0.0}
+                onLoad={onLoad}
+                onBuffer={onBuffer}
+                onLoadStart={onLoadStart}
               />
             </TouchableWithoutFeedback>
+
+            <VideoBufferIndicator
+              opacity={opacity}
+              color={theme.colors.primary}
+            />
+
+
             <TouchableOpacity
               style={{ position: "absolute", right: 10, bottom: 240 }}
               onPress={() => setSound(!sound)}
@@ -315,7 +360,6 @@ function HomePostcard(props) {
           viewabilityConfig={viewConfigRef.current}
           onViewableItemsChanged={onViewRef.current}
           showsHorizontalScrollIndicator={false}
-          
         />
         <View style={styles.indicatorContainer}>
           {renderIndicators(singleContent)}
@@ -351,7 +395,6 @@ function HomePostcard(props) {
   };
 
   const ItemView2 = ({ item, index }) => {
-    //console.log("checkitem", item);
     return (
       <View style={styles.outerBoundary}>
         <View
@@ -471,6 +514,7 @@ function HomePostcard(props) {
                     backgroundColor: "#EEEBFF",
                     padding: Scaler(4),
                     borderRadius: Scaler(5),
+                    width: "100%",
                   }}
                 >
                   <Text
@@ -478,9 +522,22 @@ function HomePostcard(props) {
                       fontSize: 10,
                       color: theme.colors.primary,
                       ...theme.fonts.regular,
+                      width: "100%",
                     }}
                   >
-                    {item?.communitiesData?.name}
+                    {/* {item?.communitiesData?.name} */}
+
+                    {item?.communitiesData?.name.length < 25
+                      ? `${
+                          LangType === "en"
+                            ? item?.communitiesData?.name
+                            : item?.communitiesData?.frenchName
+                        }`
+                      : `${
+                          LangType === "en"
+                            ? item?.communitiesData?.name.substring(0, 25)
+                            : item?.communitiesData?.frenchName.substring(0, 25)
+                        }...`}
                   </Text>
                 </View>
               )}
@@ -626,14 +683,14 @@ function HomePostcard(props) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onPress={() =>
-                  navigation.navigate("MemberScreen", {
-                    data: {
-                      postId: item?._id,
-                      isLikes: false,
-                    },
-                  })
-                }
+                // onPress={() =>
+                //   navigation.navigate("MemberScreen", {
+                //     data: {
+                //       postId: item?._id,
+                //       isLikes: false,
+                //     },
+                //   })
+                // }
               >
                 <Text
                   style={[
@@ -659,22 +716,38 @@ function HomePostcard(props) {
           </TouchableOpacity>
         </View>
         <Spacer />
-        <TouchableOpacity onPress={() => setDescStatus((data) => !data)} style={{ paddingHorizontal: Scaler(15) }}>
-          {/* <Text
-            style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
-            numberOfLines={2}
-          >
-            {item.description}
-          </Text> */}
-          {getDescStatus === false ? (
+        <TouchableOpacity
+          onPress={() => {
+            setCurrentDescriptionIndex(index);
+            setShowFullDescription(
+              index === currentDescriptionIndex && showFullDescription
+                ? false
+                : true
+            );
+          }}
+          style={{ paddingHorizontal: Scaler(15) }}
+        >
+          {showFullDescription == true &&
+          currentDescriptionIndex != null &&
+          currentDescriptionIndex == index ? (
             <Text
-              numberOfLines={2}
-              style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
+              style={{
+                ...theme.fonts.regular,
+                fontSize: Scaler(13),
+                color: theme.colors.disabledText,
+              }}
             >
               {item?.description}
             </Text>
           ) : (
-            <Text style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}>
+            <Text
+              numberOfLines={2}
+              style={{
+                ...theme.fonts.regular,
+                fontSize: Scaler(13),
+                color: theme.colors.disabledText,
+              }}
+            >
               {item?.description}
             </Text>
           )}
@@ -819,11 +892,8 @@ function HomePostcard(props) {
           showsVerticalScrollIndicator={false}
           style={{ marginBottom: Scaler(125) }}
           refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={_onRefresh}
-          />
-        }
+            <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
+          }
         />
       )}
     </View>
@@ -836,7 +906,7 @@ HomePostcard.propTypes = {
   onLike: PropTypes.func,
   onComment: PropTypes.func,
   onDeletePost: PropTypes.func,
-  refReshData: PropTypes.func
+  refReshData: PropTypes.func,
 };
 
 HomePostcard.defaultProps = {
@@ -845,7 +915,7 @@ HomePostcard.defaultProps = {
   onLike: () => {},
   onComment: () => {},
   onDeletePost: () => {},
-  refReshData: () => {}
+  refReshData: () => {},
 };
 
 const styles = StyleSheet.create({

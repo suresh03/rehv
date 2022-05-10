@@ -7,20 +7,15 @@ import {
   Text,
   TouchableOpacity,
   Image,
-  Pressable,
   FlatList,
 } from "react-native";
 import CommonStyle from "../../Components/CustomComponents/CommonStyle";
 import { HeaderBackAction } from "../../Components/CustomHeader/Header";
 import {
-  getFontSize,
-  responsiveSize,
-} from "../../Components/SharedComponents/ResponsiveSize";
-import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { profileIcon1, wwwee, www, profilePic } from "../../Assets/icon";
+import { profilePic } from "../../Assets/icon";
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
 const dimensions = { window, screen };
@@ -30,19 +25,26 @@ import { useAppValue } from "../../Recoil/appAtom";
 import Lang from "../../Language";
 
 export default function CommunitiesScreen({ navigation }) {
-  const [manegemnetButton, setManegemnetButton] = useState(true);
-  const [employeeButton, setEmployeeButton] = useState(false);
-  const [managementData, setManagementData] = useState([]);
-  const [employeeData, setEmployeeData] = useState([]);
   const [communityList, setCommunityList] = useState([]);
-  const [managementIds, setManagementIds] = useState([]);
-  const [commIds, setCommIds] = useState([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState("");
-  const [selectedCommunityDetails, setSelectedCommunityDetails] = useState([]);
   const { ApiGetMethod } = useApiServices();
   const { user } = useAppValue();
   const { role } = user;
   console.log("role", role);
+
+
+  const [LangType, setLangType] = useState("")
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol)
+      })
+      .finally(() => console.log("success"));
+  };
 
   useEffect(() => {
     getSelectedCommunity();
@@ -98,13 +100,13 @@ export default function CommunitiesScreen({ navigation }) {
                   : hp(25)
                 : hp(22),
             borderWidth: 1.5,
-            marginHorizontal: responsiveSize(8),
-            borderRadius: responsiveSize(10),
+            marginHorizontal: Scaler(8),
+            borderRadius: Scaler(10),
             borderColor: "#E9E5E4",
             marginTop: Scaler(20),
           }}
         >
-          <View style={{ marginHorizontal: responsiveSize(10) }}>
+          <View style={{ marginHorizontal: Scaler(10) }}>
             <View
               style={{
                 marginVertical: 10,
@@ -113,14 +115,14 @@ export default function CommunitiesScreen({ navigation }) {
             >
               <Text
                 style={{
-                  fontSize: getFontSize(20),
-                  lineHeight: responsiveSize(25),
+                  fontSize: Scaler(20),
+                  lineHeight: Scaler(25),
                   fontFamily: "Poppins-Medium",
                   color: "#000",
                 }}
                 numberOfLines={2}
               >
-                {item.data[0].name}
+                {LangType === "en" ? item.data[0].name:item.data[0].frenchName}
               </Text>
             </View>
             <View
@@ -145,7 +147,7 @@ export default function CommunitiesScreen({ navigation }) {
                       : hp(0.2),
                 }}
               >
-                {item.isJoined == true ? "Joined" : "Join"}
+                {item.isJoined == true ? Lang.JOINED : Lang.JOIN}
               </Text>
             </View>
             <View
@@ -185,17 +187,17 @@ export default function CommunitiesScreen({ navigation }) {
             <Text
               style={{
                 color: "#7F8190",
-                fontSize: getFontSize(13),
+                fontSize: Scaler(13),
                 top:
                   Platform.OS === "ios"
                     ? dimensions.window.height > 800
                       ? hp(2)
                       : hp(2)
-                    : hp(2),
+                    : hp(1.4),
                 fontWeight: "500",
               }}
             >
-              {item.data.length} Members
+              {item.data.length} {Lang.MEMBERS}
             </Text>
           </View>
         </TouchableOpacity>

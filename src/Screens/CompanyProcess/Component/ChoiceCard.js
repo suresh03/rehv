@@ -87,7 +87,6 @@ function ChoiceCard(props) {
         style={{
           alignSelf: "center",
           alignItems: "center",
-          width: Scaler(90),
           flexDirection: "row",
           justifyContent: "space-between",
         }}
@@ -103,6 +102,7 @@ function ChoiceCard(props) {
               fontFamily: "Poppins-Regular",
               color: "grey",
               alignSelf: "center",
+              marginRight: Scaler(10),
             },
           ]}
         >

@@ -1,10 +1,7 @@
 import React from "react";
 /* eslint-disable react-native/no-inline-styles */
 import { Text, View } from "react-native";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
-import { responsiveSize } from "../../../Components/SharedComponents/ResponsiveSize";
-import Padding from "../../../Components/SharedComponents/Padding";
-import { TextField } from "../../../Components/SharedComponents/TextField";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Spacer from "../../../Components/SharedComponents/Space";
 import CommonStyle from "../../../Components/CustomComponents/CommonStyle";
 import PropTypes from "prop-types";
@@ -15,18 +12,14 @@ import Lang from "../../../Language";
 
 function UserRoles(props) {
   const { toggleNo, toggleYes, managerSelectButton } = props;
-  console.log("toggleNo", toggleNo, "toggleYes", toggleYes)
+  console.log("toggleNo", toggleNo, "toggleYes", toggleYes);
   return (
-    <View style={{  height: hp(63) }}>
+    <View style={{ height: hp(63) }}>
       <View>
-      <Spacer/>
-        <Text
-          style={commonStyle.tittleStyle}
-        >
-          {Lang.PEOPLE_MANAGER}
-        </Text>
+        <Spacer />
+        <Text style={commonStyle.tittleStyle}>{Lang.PEOPLE_MANAGER}</Text>
         <Spacer size={Scaler(30)} />
-        <View style={{ justifyContent: "center", }}>
+        <View style={{ justifyContent: "center" }}>
           <CustomButton
             onPress={() => managerSelectButton("yes")}
             style={[
@@ -43,7 +36,7 @@ function UserRoles(props) {
             }}
             status={Lang.YES}
           />
-          <Spacer size={responsiveSize(20)} />
+          <Spacer size={Scaler(20)} />
           <CustomButton
             onPress={() => managerSelectButton("no")}
             style={[
@@ -59,9 +52,7 @@ function UserRoles(props) {
               fontSize: 20,
             }}
             status={Lang.NO}
-          >
-            
-          </CustomButton>
+          ></CustomButton>
         </View>
       </View>
     </View>

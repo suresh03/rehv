@@ -28,7 +28,7 @@ function PollDetailTitle(props) {
             color: "#fff",
             fontSize: Scaler(14),
             ...theme.fonts.medium,
-            top: hp(2.5),
+            top: hp(1),
             opacity: 0.8,
           }}
         >

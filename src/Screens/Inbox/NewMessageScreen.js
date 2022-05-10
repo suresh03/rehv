@@ -15,8 +15,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { useTheme } from "react-native-paper";
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 import OutlinedInput from "../../Components/SharedComponents/OutlinedInput";
 import Lang from "../../Language";
 import Scaler from "../../Utils/Scaler";
@@ -27,9 +26,7 @@ import SnackbarHandler from "../../Utils/SnackbarHandler";
 import Loader from "../../Utils/Loader";
 
 export default function NewMessageScreen({ navigation }) {
-  const theme = useTheme();
   const { ApiGetMethod } = useApiServices();
-
   const [searchText, setSearchText] = useState();
   const [friendsList, setFriendsList] = useState([]);
   const [friendsListCopy, setFriendsListCopy] = useState([]);

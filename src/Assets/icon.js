@@ -183,3 +183,7 @@ export const thirteenIcon = require("./Images/badges/thirteen.png");
 export const fourteenIcon = require("./Images/badges/fourteen.png");
 export const onButton = require("./Images/onButton.png");
 export const offButton = require("./Images/offButton.png");
+
+export const moversFront = require("./Images/logoFrontm.png");
+export const newJoinerFront = require("./Images/logoFrontn.png");
+export const trendSetterFront = require("./Images/logoFrontt.png");

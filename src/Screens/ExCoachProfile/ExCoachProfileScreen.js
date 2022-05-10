@@ -18,11 +18,9 @@ import {
 import { ActivityIndicator } from "react-native-paper";
 import { HeaderBackAction } from "../../Components/CustomHeader/Header";
 import { getFontSize } from "../../Components/SharedComponents/ResponsiveSize";
-import Share from "react-native-share";
 import useApiServices from "../../Services/useApiServices";
 import Scaler from "../../Utils/Scaler";
 import Spacer from "../../Components/SharedComponents/Space";
-import { useAppValue } from "../../Recoil/appAtom";
 import Lang from "../../Language";
 import ProfilePost from "./Components/ProfilePost";
 import SnackbarHandler from "../../Utils/SnackbarHandler";
@@ -31,41 +29,32 @@ import useCommunityServices from "../../ServiceHooks/useCommunityServices";
 export default function ExCoachProfileScreen({ navigation, route }) {
   const { ApiGetMethod, ApiPostMethod } = useApiServices();
   const [manegemnetButton, setmanegemnetButton] = useState(true);
-
   const [userData, setUserData] = useState({});
   const [getBtnLoading, setBtnLoading] = useState(false);
-
   const [loading, setLoading] = useState(false);
 
   const [postData, setPostData] = useState([]);
 
   const { likeOrCommentHome } = useCommunityServices();
   const [selectedCommunityId, setSelectedCommunityId] = useState("");
-  const { user } = useAppValue();
-  const { role } = user;
-  console.log("role", role);
-
-  console.log("hi", route.params);
-  const onShare = async () => {
-    await Share.open({
-      message: "Check out my Post",
-    })
-      .then((result) => console.log("neeraj==>", result))
-      .catch((errorMsg) => console.log(errorMsg));
-  };
 
   const getUserData = () => {
     ApiGetMethod(`user/getUserDetails?userId=${route.params._id}`).then(
       (res) => {
         console.log("user/getUserDetails", res);
         setUserData(res.data[0]);
+        getTrendingPostList(res.data[0]._id);
+        getHomePostList(res.data[0]._id);
       }
     );
   };
 
   useEffect(() => {
-    setLoading(true);
-    getUserData();
+    const unsubscribe = navigation.addListener("focus", () => {
+      setLoading(true);
+      getUserData();
+    });
+    return unsubscribe;
   }, []);
 
   const followFunction = async (id) => {
@@ -78,6 +67,9 @@ export default function ExCoachProfileScreen({ navigation, route }) {
       console.log("resp block => ", resp);
       if (resp.statusCode) {
         console.log("follow request success");
+        if (resp?.statusCode === 200) {
+          item.requestPending = true;
+        }
       }
       setBtnLoading(false);
     } catch (error) {
@@ -120,17 +112,11 @@ export default function ExCoachProfileScreen({ navigation, route }) {
     }
   };
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      getHomePostList();
-      getTrendingPostList();
-    });
-    return unsubscribe;
-  }, []);
-
-  const getHomePostList = () => {
+  const getHomePostList = (userId) => {
     let status = "Home";
-    ApiGetMethod(`post/homeAndTrendingPostList?status=${status}`)
+    ApiGetMethod(
+      `post/homeAndTrendingPostList?status=${status}&userId=${userId}`
+    )
       .then((res) => {
         let temp = [...res?.data?.postList];
         temp.map((item) => {
@@ -146,12 +132,16 @@ export default function ExCoachProfileScreen({ navigation, route }) {
       .catch((error) => {
         SnackbarHandler.errorToast("Message", JSON.stringify(error));
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
-  const getTrendingPostList = () => {
+  const getTrendingPostList = (userId) => {
     let status = "Trending";
-    ApiGetMethod(`post/homeAndTrendingPostList?status=${status}`)
+    ApiGetMethod(
+      `post/homeAndTrendingPostList?status=${status}&userId=${userId}`
+    )
       .then((res) => {
         console.log("homeAndTrendingPostList res => ", res);
         let temp = [...res?.data?.postList];
@@ -174,10 +164,10 @@ export default function ExCoachProfileScreen({ navigation, route }) {
   const ChangeButton = (item) => {
     if (item === "NewsFeed") {
       setmanegemnetButton(true);
-      getHomePostList();
+      getHomePostList(userData._id);
     } else {
       setmanegemnetButton(false);
-      getTrendingPostList();
+      getTrendingPostList(userData._id);
     }
   };
 
@@ -198,11 +188,11 @@ export default function ExCoachProfileScreen({ navigation, route }) {
       .finally(() => console.log());
   };
 
-  const profileClick = (role, _id) => {
+  const profileClick = (item, role, _id) => {
     if (role.toLowerCase() == "excoach") {
-      navigation.navigate("ExCoachProfileScreen", { _id });
+      navigation.navigate("ExCoachProfileScreen", { item, _id });
     } else {
-      navigation.navigate("MemberProfileScreen", { _id });
+      navigation.navigate("MemberProfileScreen", { item, _id });
     }
   };
 
@@ -584,7 +574,7 @@ export default function ExCoachProfileScreen({ navigation, route }) {
             <View>
               <ProfilePost
                 data={postData}
-                profileClick={(role, id) => profileClick(role, id)}
+                profileClick={(item, role, id) => profileClick(item, role, id)}
                 onLike={(action, val, postId, index) =>
                   likeOrCommentAction(action, val, postId, index)
                 }
@@ -598,7 +588,7 @@ export default function ExCoachProfileScreen({ navigation, route }) {
             <View>
               <ProfilePost
                 data={postData}
-                profileClick={(role, id) => profileClick(role, id)}
+                profileClick={(item, role, id) => profileClick(item, role, id)}
                 onLike={(action, val, postId, index) =>
                   likeOrCommentAction(action, val, postId, index)
                 }

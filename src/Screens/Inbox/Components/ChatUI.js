@@ -6,6 +6,8 @@ import Scaler from "../../../Utils/Scaler";
 import { useTheme } from "react-native-paper";
 import { profilePic } from "../../../Assets/icon";
 import FastImage from "react-native-fast-image";
+import { LinkPreview } from "@flyerhq/react-native-link-preview";
+
 function ChatUI(props) {
   const { item, index, secondPerson } = props;
   // console.warn(secondPerson)
@@ -34,10 +36,10 @@ function ChatUI(props) {
             secondPerson?.profilePic === null ? (
               <FastImage
                 style={{
-                  height: Scaler(50),
-                  width: Scaler(50),
+                  height: Scaler(40),
+                  width: Scaler(40),
                   resizeMode: "cover",
-                  borderRadius: Scaler(25),
+                  borderRadius: Scaler(20),
                 }}
                 source={profilePic}
               />
@@ -46,9 +48,10 @@ function ChatUI(props) {
                 source={{ uri: secondPerson?.profilePic }}
                 resizeMode={"cover"}
                 style={{
-                  height: Scaler(50),
-                  width: Scaler(50),
-                  borderRadius: Scaler(25),
+                  height: Scaler(40),
+                  width: Scaler(40),
+                  resizeMode: "cover",
+                  borderRadius: Scaler(20),
                 }}
               />
             )}
@@ -65,13 +68,21 @@ function ChatUI(props) {
           >
             <Text
               style={{
-                color: "#000",
+                color: "#fff",
                 width: wp(60),
                 fontFamily: "Poppins-Regular",
                 fontSize: 15,
               }}
             >
-              {item.message}
+            <LinkPreview
+              text={item.message}
+              style={{
+                color: "#fff",
+                width: wp(60),
+                fontFamily: "Poppins-Regular",
+                fontSize: 15,
+              }}
+            />
             </Text>
           </View>
         </View>
@@ -93,16 +104,24 @@ function ChatUI(props) {
               padding: Scaler(10),
             }}
           >
-            <Text
+            {/* <Text
               style={{
                 color: "#fff",
                 width: wp(60),
                 fontFamily: "Poppins-Regular",
                 fontSize: 15,
               }}
-            >
-              {item.message}
-            </Text>
+            > */}
+            <LinkPreview
+              text={item.message}
+              style={{
+                color: "#fff",
+                width: wp(60),
+                fontFamily: "Poppins-Regular",
+                fontSize: 15,
+              }}
+            />
+            {/* </Text> */}
           </View>
 
           <View
@@ -117,10 +136,10 @@ function ChatUI(props) {
             item?.user?.profilePic === null ? (
               <FastImage
                 style={{
-                  height: Scaler(50),
-                  width: Scaler(50),
+                  height: Scaler(40),
+                  width: Scaler(40),
                   resizeMode: "cover",
-                  borderRadius: Scaler(25),
+                  borderRadius: Scaler(20),
                 }}
                 source={profilePic}
               />
@@ -129,9 +148,10 @@ function ChatUI(props) {
                 source={{ uri: item?.user?.profilePic }}
                 resizeMode={"cover"}
                 style={{
-                  height: Scaler(50),
-                  width: Scaler(50),
-                  borderRadius: Scaler(25),
+                  height: Scaler(40),
+                  width: Scaler(40),
+                  resizeMode: "cover",
+                  borderRadius: Scaler(20),
                 }}
               />
             )}

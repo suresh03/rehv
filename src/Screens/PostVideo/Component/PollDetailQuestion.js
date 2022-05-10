@@ -75,6 +75,7 @@ function PollDetailQuestion(props) {
       console.log("percent", percent, "index");
       return (
         <TouchableOpacity
+        key={index.toString()}
           activeOpacity={0.8}
           onPress={() => {
             console.log("percent", percent, "index");
@@ -286,8 +287,8 @@ function PollDetailQuestion(props) {
           width: Scaler(145),
           height: Scaler(65),
           borderRadius: Scaler(15),
-          justifyContent: "center"
-          // top: Scaler(15),
+          justifyContent: "center",
+          top: -Scaler(15),
         }}
       >
         <View

@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useValidation } from "react-native-form-validator";
 
@@ -74,6 +75,8 @@ let maximumBirthDate = new Date(
   date.getSeconds(),
   date.getMilliseconds()
 );
+
+
 import { DeptJson } from "../../Utils/DepartmentData";
 import ValidationConstants from "../../Constants/ValidationConstants";
 import { useTheme } from "react-native-paper";
@@ -120,6 +123,7 @@ export default function EditProfileScreen({ navigation, route }) {
   const [twitterValue, setTwitterValue] = useState("");
   const [camera, setCamera] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
   const [imageServerUrl, setImageServerUrl] = useState([]);
   const [states, setStates] = useState([]);
   const [countries, setCountries] = useState([]);
@@ -130,7 +134,7 @@ export default function EditProfileScreen({ navigation, route }) {
   const [countryToggle, setCountryToggle] = useState(false);
   const [selectedProvinceId, setSelectedProvinceId] = useState("");
   const [selectedCountryId, setSelectedCountryId] = useState("");
-
+  const [Gender, setGender] = useState("");
   const [provinceField, setProvinceField] = useState("");
   const [cityField, setCityField] = useState("");
   const [imageSourceData, setImageSourceData] = useState({});
@@ -163,6 +167,9 @@ export default function EditProfileScreen({ navigation, route }) {
       setProfilePicUrl(profile.profilePic);
       setFirstName(profile.name);
       setLastName(profile.lastName);
+      setGender(
+        profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)
+      );
       setEmail(profile.email);
       setMobileNo(profile.phoneNo);
       setEmailEditable(profile.email === undefined || profile.email == "");
@@ -328,6 +335,7 @@ export default function EditProfileScreen({ navigation, route }) {
   };
 
   const onUploadProfilePicture = async (imageData) => {
+    setLoading2(true);
     console.log("imageSourceData", imageSourceData);
     var formData = new FormData();
     formData.append("image", imageData);
@@ -345,6 +353,7 @@ export default function EditProfileScreen({ navigation, route }) {
           setProfilePicUrl(res.data.original.trim());
         }
       }
+      setLoading2(false);
     } catch (error) {
       console.error(error);
     }
@@ -400,7 +409,7 @@ export default function EditProfileScreen({ navigation, route }) {
         twitterUrl: twitterValue,
         companyCode: companyCode,
         country: country,
-      //  languageId: languageId,
+        //  languageId: languageId,
       };
       console.log("data", data);
       try {
@@ -535,16 +544,9 @@ export default function EditProfileScreen({ navigation, route }) {
             headerViewStyle={{ backgroundColor: "#fff" }}
           />
           <ScrollView showsVerticalScrollIndicator={false}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignSelf: "center",
-                marginVertical: hp(2),
-                left: wp(5),
-              }}
-            >
-              {profilePicUrl === "" ? (
-                <Image
+            {loading2 ? (
+              <>
+                <View
                   style={{
                     overflow: "hidden",
                     width: Scaler(110),
@@ -552,35 +554,61 @@ export default function EditProfileScreen({ navigation, route }) {
                     left: wp(5),
                     borderRadius: Scaler(60),
                   }}
-                  source={profilePic}
                 />
-              ) : (
-                <Image
-                  style={{
-                    overflow: "hidden",
-                    width: Scaler(110),
-                    height: Scaler(110),
-                    left: wp(5),
-                    borderRadius: Scaler(60),
-                  }}
-                  source={{ uri: profilePicUrl }}
+                <ActivityIndicator
+                  size="small"
+                  color={theme.colors.primary}
+                  style={{ top: -50 }}
                 />
-              )}
+              </>
+            ) : (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "center",
+                  marginVertical: hp(2),
+                  left: wp(5),
+                }}
+              >
+                {profilePicUrl === "" ? (
+                  <Image
+                    style={{
+                      overflow: "hidden",
+                      width: Scaler(110),
+                      height: Scaler(110),
+                      left: wp(5),
+                      borderRadius: Scaler(60),
+                    }}
+                    source={profilePic}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      overflow: "hidden",
+                      width: Scaler(110),
+                      height: Scaler(110),
+                      left: wp(5),
+                      borderRadius: Scaler(60),
+                    }}
+                    source={{ uri: profilePicUrl }}
+                  />
+                )}
 
-              <TouchableOpacity onPress={() => openPicker()}>
-                <Image
-                  style={{
-                    width: wp(25),
-                    height: hp(15),
-                    alignSelf: "flex-start",
-                    zIndex: 1,
-                    right: wp(10),
-                    top: 50,
-                  }}
-                  source={balckCamera}
-                />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity onPress={() => openPicker()}>
+                  <Image
+                    style={{
+                      width: wp(25),
+                      height: hp(15),
+                      alignSelf: "flex-start",
+                      zIndex: 1,
+                      right: wp(10),
+                      top: 50,
+                    }}
+                    source={balckCamera}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
             <OutlinedInput
               img={nameIcon}
               inputViewStyle={{ alignSelf: "center" }}
@@ -609,6 +637,16 @@ export default function EditProfileScreen({ navigation, route }) {
               //handleChange={(text) => setState({ email: text })}
             />
 
+            <OutlinedInput
+              placeholder={Lang.EMAIL}
+              placeholderTextColor={"grey"}
+              img={nameIcon}
+              editable={emailEditable}
+              inputViewStyle={{ alignSelf: "center" }}
+              value={Gender}
+              //handleChange={(text) => setState({ email: text })}
+            />
+
             <View
               style={{
                 justifyContent: "center",
@@ -623,14 +661,9 @@ export default function EditProfileScreen({ navigation, route }) {
                   renderItem={({ item, index }) => (
                     <TouchableOpacity
                       onPress={() => setCountryFlag(item.dialCode, item.icon)}
-                      style={ChangeStyle.counteryStyle}
                     >
-                      <Text style={ChangeStyle.counternameStyle}>
-                        {item.name}
-                      </Text>
-                      <Text style={ChangeStyle.countercodeStyle}>
-                        {item.dialCode}
-                      </Text>
+                      <Text style={{}}>{item.name}</Text>
+                      <Text style={{}}>{item.dialCode}</Text>
                     </TouchableOpacity>
                   )}
                   keyExtractor={(item, index) => index}
@@ -742,14 +775,15 @@ export default function EditProfileScreen({ navigation, route }) {
                     modal
                     open={dateToggle}
                     date={date}
-                    maximumDate={maximumBirthDate}
+                    // maximumDate={maximumBirthDate}
                     onConfirm={(date) => {
                       dateset(date);
                     }}
                     onCancel={() => {
                       setDateToggle(false);
                     }}
-                    mode="date"
+                    mode={"date"}
+                    locale={"en"}
                   />
                 </View>
               )}

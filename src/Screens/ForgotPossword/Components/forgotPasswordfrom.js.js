@@ -199,7 +199,7 @@ console.log('res.message =>',res.message);
             fontFamily: "Poppins-Medium",
           }}
         >
-          {Lang.BACK_TO}
+          {Lang.BACK_TO}{" "}
         </Text>
         <TouchableOpacity onPress={() => navigation.navigate("SignInScreen")}>
           <Text

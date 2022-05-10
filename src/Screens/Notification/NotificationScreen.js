@@ -132,6 +132,8 @@ export default function NotificationScreen({ navigation }) {
       navigation.navigate("Acheivement");
     } else if (item.type === 9) {
       navigation.navigate("Acheivement");
+    }else if (item.type === 17) {
+      navigation.navigate("Dashboard");
     }
     let id = item._id;
     ApiGetMethod(`user/readNotification?isReadAll=false&notificationId=${id}`)
@@ -199,7 +201,7 @@ export default function NotificationScreen({ navigation }) {
                 />
               </View>
               <Text
-              numberOfLines={3}
+              numberOfLines={4}
                 style={{
                   top: hp(-1),
                   width: wp(68),
@@ -212,7 +214,7 @@ export default function NotificationScreen({ navigation }) {
                 {item.message}
               </Text>
             </View>
-            <Text style={ChangeStyle.notiTimeStyle}>{moment(item.date).fromNow()}</Text>
+            <Text style={[ChangeStyle.notiTimeStyle, {marginTop:10}]}>{moment(item.date).fromNow()}</Text>
             <Divider
               style={{ width: wp(90), alignSelf: "center", top: hp(-1) }}
             />
@@ -236,7 +238,7 @@ export default function NotificationScreen({ navigation }) {
             elevation: 5,
             borderRadius: 10,
             width: "90%",
-            height: hp(55),
+            height: hp(75),
           }}
         >
           <Image

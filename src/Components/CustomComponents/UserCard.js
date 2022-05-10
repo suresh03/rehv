@@ -164,9 +164,7 @@ export default function UserCard(props) {
               }}
               numberOfLines={1}
             >
-              {userData.userName
-                ? (userData?.userName ?? "") + " " + (userData?.userLast ?? "")
-                : (userData?.name ?? "") + " " + (userData?.lastName ?? "")}
+              {(userData?.name ?? "") + " " + (userData?.lastName ?? "")}
             </Text>
             <Text
               style={{

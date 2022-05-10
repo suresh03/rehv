@@ -1,25 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
-  Pressable,
   Platform,
   ActivityIndicator,
   Dimensions,
   StatusBar,
-  FlatList,
-  ScrollView,
   SafeAreaView,
   StyleSheet,
 } from "react-native";
-import {
-  getFontSize,
-  responsiveSize,
-} from "../../Components/SharedComponents/ResponsiveSize";
-import { backblack, whiteback, onIcon, offIcon } from "../../Assets/icon";
+
+import { backblack } from "../../Assets/icon";
 import Scaler from "../../Utils/Scaler";
 import Persona from "./Components/Persona";
 import Badges from "./Components/Badges";
@@ -40,9 +34,9 @@ export default function InsightCompany({ navigation }) {
 
   const renderTabBar = () => {
     const tabOption = [
-      { title: "Persona" },
-      { title: "Badges" },
-      { title: "Medals" },
+      { title: Lang.Persona },
+      { title: Lang.Badge },
+      { title: Lang.Medal },
     ];
     return (
       <View style={styles.barContainer}>
@@ -66,7 +60,7 @@ export default function InsightCompany({ navigation }) {
             >
               <Text
                 style={{
-                  fontSize: getFontSize(14),
+                  fontSize: Scaler(14),
                   fontFamily: "Poppins-Regular",
                   color: "#505460",
                   textAlign: "center",
@@ -124,7 +118,7 @@ export default function InsightCompany({ navigation }) {
                 </TouchableOpacity>
                 <Text
                   style={{
-                    fontSize: getFontSize(20),
+                    fontSize: Scaler(20),
                     fontFamily: "Poppins-SemiBold",
                     color: "#000",
                     textAlign: "center",
@@ -136,11 +130,11 @@ export default function InsightCompany({ navigation }) {
             </View>
             <Text
               style={{
-                fontSize: getFontSize(16),
+                fontSize: Scaler(16),
                 alignSelf: "center",
                 color: "#110D26",
                 fontFamily: "Poppins-Medium",
-                fontSize: getFontSize(15),
+                fontSize: Scaler(15),
                 marginVertical: 10,
                 width: "85%",
               }}
@@ -151,9 +145,7 @@ export default function InsightCompany({ navigation }) {
             {getOptionIndex === 0 ? (
               <Persona onPopUp={() => setAndroidShield((data) => !data)} />
             ) : getOptionIndex === 1 ? (
-              <Badges
-                onPopUp={() => setAndroidShield((data) => !data)}
-              />
+              <Badges onPopUp={() => setAndroidShield((data) => !data)} />
             ) : (
               <Medal />
             )}

@@ -82,7 +82,7 @@ function ProfileDescription(props) {
               borderRadius: 10,
               zIndex: 1,
               right: wp(8),
-              top: Platform.OS == "ios" ? hp(5) : hp(3),
+              top: Platform.OS == "ios" ? hp(3) : hp(2),
             }}
           >
             <Text
@@ -91,7 +91,7 @@ function ProfileDescription(props) {
                 fontFamily: "Poppins-Regular",
                 lineHeight: 18,
                 alignItems: "center",
-                fontSize: Scaler(11),
+                fontSize: Scaler(10),
               }}
             >
               {Lang.SELF_DESC_EXAMPLE}

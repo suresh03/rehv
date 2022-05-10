@@ -1,4 +1,4 @@
-import React, { Children, useRef, useState } from "react";
+import React, { Children, useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -47,6 +47,7 @@ import dynamicLinks from "@react-native-firebase/dynamic-links";
 import Icon from "react-native-vector-icons/Ionicons";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import useApiServices from "../../../Services/useApiServices";
+import VideoBufferIndicator from "../../../Utils/VideoBufferIndicator";
 
 function CommunityTrendingPost(props) {
   const { user } = useAppValue();
@@ -71,19 +72,33 @@ function CommunityTrendingPost(props) {
   const [isLoading, setIsLoading] = useState(true);
   const { ApiGetMethod, ApiPostMethod } = useApiServices();
 
-  const onBuffer = () => {};
   const videoError = () => {};
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentIndex2, setCurrentIndex2] = useState(0);
-  const scrollViewRef = useRef();
+
   const [isPaused, setIsPaused] = useState(true);
   const [getDescStatus, setDescStatus] = useState(false);
+  const [opacity, setOpacity] = useState(0);
+
   //const [IndexCheck, setIndexCheck] = useState(props.currentIndex);
   let videoComponent = useRef();
   console.log("currentIndex", props.currentIndex);
   // Workaround to display thumbnail in android.
   const load = ({ duration }) => {
     videoComponent?.seek(0);
+  };
+
+  const [LangType, setLangType] = useState("");
+
+  useEffect(() => {
+    getUserDetails();
+  }, [LangType]);
+
+  const getUserDetails = () => {
+    ApiGetMethod(`user/getUserDetails`)
+      .then((res) => {
+        setLangType(res.data[0].langSymbol);
+      })
+      .finally(() => console.log("success"));
   };
   // const onShare = async () => {
   //   await Share.open({
@@ -149,32 +164,33 @@ function CommunityTrendingPost(props) {
     }
   };
 
-  const shareApiHit = async(item)=>{
-    console.log("helloitem", item)
+  const shareApiHit = async (item) => {
+    console.log("helloitem", item);
     ApiGetMethod(`coach/sharePost?id=${item._id}`)
-    .then((res) => {
-      console.log("data", res);
-    })
-    .catch((error) => {
-      console.assert(error);
-    })
-    .finally(() => setLoading(false));
-  }
+      .then((res) => {
+        console.log("data", res);
+      })
+      .catch((error) => {
+        console.assert(error);
+      })
+      .finally(() => setLoading(false));
+  };
 
   const onShare = async (item) => {
     const getLink = await generateLink(item);
-    const resData ={
+    const resData = {
       message: "Check out my Post",
       url: getLink,
-    }
+    };
     Share.open(resData)
-    .then((res) => {
-      console.log("resData",res);
-      shareApiHit(item)
-    })
-    .catch((err) => {
-      err && console.log(err);
-    });
+      .then((res) => {
+        console.log("resData", res);
+        shareApiHit(item);
+      })
+      .catch((err) => {
+        err && console.log(err);
+        shareApiHit(item);
+      });
   };
 
   const renderIndicators = (contents) => {
@@ -222,6 +238,22 @@ function CommunityTrendingPost(props) {
 
   const pausePlayVideo2 = (indexData) => {
     setVisibleItemIndex(indexData);
+  };
+
+  const onLoadStart = () => {
+    setOpacity(1);
+    console.log("onLoadStart");
+  };
+
+  const onLoad = () => {
+    setOpacity(0);
+    videoComponent?.seek(0);
+    console.log("onLoad");
+  };
+
+  const onBuffer = ({ isBuffering }) => {
+    setOpacity(isBuffering ? 1 : 0);
+    console.log("onBuffer");
   };
 
   const ItemView = (item, index, indexData, itemData) => {
@@ -281,11 +313,17 @@ function CommunityTrendingPost(props) {
                 // paused={isPaused}
                 style={styles.video}
                 repeat={true}
-                onLoad={load}
                 resizeMode={"cover"}
                 volume={sound ? 1.0 : 0.0}
+                onLoad={onLoad}
+                onBuffer={onBuffer}
+                onLoadStart={onLoadStart}
               />
             </TouchableWithoutFeedback>
+            <VideoBufferIndicator
+              opacity={opacity}
+              color={theme.colors.primary}
+            />
             <TouchableOpacity
               style={{ position: "absolute", right: 10, bottom: 240 }}
               onPress={() => setSound(!sound)}
@@ -369,7 +407,7 @@ function CommunityTrendingPost(props) {
         >
           <TouchableOpacity
             onPress={() =>
-              profileClick(item?.postCreatedUserType, item?.createdBy)
+              profileClick(item, item?.postCreatedUserType, item?.createdBy)
             }
             style={[
               {
@@ -483,7 +521,18 @@ function CommunityTrendingPost(props) {
                       ...theme.fonts.regular,
                     }}
                   >
-                    {item?.communitiesData?.name}
+                    {/* {item?.communitiesData?.name} */}
+                    {item?.communitiesData?.name.length < 25
+                      ? `${
+                          LangType === "en"
+                            ? item?.communitiesData?.name
+                            : item?.communitiesData?.frenchName
+                        }`
+                      : `${
+                          LangType === "en"
+                            ? item?.communitiesData?.name.substring(0, 25)
+                            : item?.communitiesData?.frenchName.substring(0, 25)
+                        }...`}
                   </Text>
                 </View>
               )}
@@ -556,14 +605,14 @@ function CommunityTrendingPost(props) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onPress={() =>
-                  navigation.navigate("MemberScreen", {
-                    data: {
-                      postId: item?._id,
-                      isLikes: true,
-                    },
-                  })
-                }
+                // onPress={() =>
+                //   navigation.navigate("MemberScreen", {
+                //     data: {
+                //       postId: item?._id,
+                //       isLikes: true,
+                //     },
+                //   })
+                // }
               >
                 <Text
                   style={[
@@ -627,14 +676,14 @@ function CommunityTrendingPost(props) {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                onPress={() =>
-                  navigation.navigate("MemberScreen", {
-                    data: {
-                      postId: item?._id,
-                      isLikes: false,
-                    },
-                  })
-                }
+                // onPress={() =>
+                //   navigation.navigate("MemberScreen", {
+                //     data: {
+                //       postId: item?._id,
+                //       isLikes: false,
+                //     },
+                //   })
+                // }
               >
                 <Text
                   style={[
@@ -660,7 +709,10 @@ function CommunityTrendingPost(props) {
           </TouchableOpacity>
         </View>
         <Spacer />
-        <TouchableOpacity onPress={() => setDescStatus((data) => !data)} style={{ paddingHorizontal: Scaler(15) }}>
+        <TouchableOpacity
+          onPress={() => setDescStatus((data) => !data)}
+          style={{ paddingHorizontal: Scaler(15) }}
+        >
           {/* <Text
             style={{ ...theme.fonts.regular, fontSize: Scaler(13) }}
             numberOfLines={2}

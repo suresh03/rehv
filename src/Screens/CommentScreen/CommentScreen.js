@@ -48,14 +48,20 @@ import Share from "react-native-share";
 import useApiServices from "../../Services/useApiServices";
 
 export default function CommentScreen({ navigation, route }) {
-  const { data, item } = route.params;
+  const { item } = route.params;
+  const [data, setData] = useState(route?.params?.data);
   const [ProfilePic, SetProfilePic] = useState("");
   const [commentsCount, setCommentsCount] = useState(0);
   const [commentDetails, setCommentDetails] = useState([]);
   const [comment, setComment] = useState("");
   const [commenting, setCommenting] = useState(false);
-  const { likeOrComment, likeOrCommentList, getPostDetailsById, getPollDetails, getSurveyDetailsById } =
-    useCommunityServices();
+  const {
+    likeOrComment,
+    likeOrCommentList,
+    getPostDetailsById,
+    getPollDetails,
+    getSurveyDetailsById,
+  } = useCommunityServices();
   const inputRef = useRef(null);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -77,7 +83,7 @@ export default function CommentScreen({ navigation, route }) {
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       getPostDetail(data?.postId, data?.eventType);
-      getPostDetails(data?.postId, data?.eventType)
+      getPostDetails(data?.postId, data?.eventType);
     });
     return unsubscribe;
   }, []);
@@ -93,7 +99,7 @@ export default function CommentScreen({ navigation, route }) {
       // PollDetails.userData[0].department
     } else if (type.toLowerCase() === "survey") {
       const res = await getSurveyDetailsById(id);
-      console.log("resresres", res)
+      console.log("resresres", res);
       setSurveyDetail(res.surveyDetails[0]);
       setSurveyDetailLikes(res.surveyDetails);
       setQuestion(res.surveyDetails[0].questions.length);
@@ -103,7 +109,7 @@ export default function CommentScreen({ navigation, route }) {
       type?.toLowerCase() === "post"
     ) {
       const res = await getPostDetailsById(id);
-      console.log("resresres", res)
+      console.log("resresres", res);
       setPostDetailLikes(res.postDetails);
       let temp = [...res.postDetails];
       temp.map((item) => {
@@ -119,25 +125,22 @@ export default function CommentScreen({ navigation, route }) {
     }
   };
 
-
-    const getPostDetails = async (id, type) => {
+  const getPostDetails = async (id, type) => {
     const res = await getPostDetailsById(id);
-      console.log("resresres", res)
-      setPostDetailLikes(res.postDetails);
-      let temp = [...res.postDetails];
-      temp.map((item) => {
-        if (item?.eventType == "POST") {
-          item.pictureUrl = item.pictureUrlArray.reduce(
-            (acc, item) => acc.concat(item.image),
-            []
-          );
-        }
-      });
-      setPostDetail(temp);
-      console.log("temptemp", temp);
-  }
-
-
+    console.log("resresres", res);
+    setPostDetailLikes(res.postDetails);
+    let temp = [...res.postDetails];
+    temp.map((item) => {
+      if (item?.eventType == "POST") {
+        item.pictureUrl = item.pictureUrlArray.reduce(
+          (acc, item) => acc.concat(item.image),
+          []
+        );
+      }
+    });
+    setPostDetail(temp);
+    console.log("temptemp", temp);
+  };
 
   let videoComponent = useRef();
   const load = () => {
@@ -165,13 +168,29 @@ export default function CommentScreen({ navigation, route }) {
     inputRef.current.blur();
     setCommenting(true);
     likeOrComment(action, data.postId, data.selectedCommunityId, comment)
-      .then(() => {
+      .then((res) => {
+        console.log("likeOrCommentAction", res);
+        let x = { ...data };
+        x.isLikes = res.likes;
+        setData(x);
+        
+        if (ButtonTitle === "survey") {
+          let x = [...SurveyDetailLikes];
+          x[0].totalLikes=  x[0]?.totalLikes + (res.likes ? 1 : -1);
+          x[0].isLikes=res.likes
+          setSurveyDetailLikes(x);
+        } else {
+          let x = [...PostDetailLikes];
+          x[0].totalLikes= x[0]?.totalLikes + (res.likes ? 1 : -1);
+          x[0].isLikes=res.likes
+          setPostDetailLikes(x);
+        }
+
         setComment("");
       })
       .catch((error) => {
         console.log("likeOrCommentAction", error);
         SnackbarHandler.errorToast(Lang.MESSAGE, error?.message ?? "");
-        console.log("error?.message", error?.message);
       })
       .finally(() => {
         getLikeOrCommentList();
@@ -221,32 +240,33 @@ export default function CommentScreen({ navigation, route }) {
     }
   };
 
-  const shareApiHit = async(item)=>{
-    console.log("helloitem", item)
+  const shareApiHit = async (item) => {
+    console.log("helloitem", item);
     ApiGetMethod(`coach/sharePost?id=${item._id}`)
-    .then((res) => {
-      console.log("data", res);
-    })
-    .catch((error) => {
-      console.assert(error);
-    })
-    .finally(() => setLoading(false));
-  }
+      .then((res) => {
+        console.log("data", res);
+      })
+      .catch((error) => {
+        console.assert(error);
+      })
+      .finally(() => setLoading(false));
+  };
 
   const onShare = async (item) => {
     const getLink = await generateLink(item);
-    const resData ={
+    const resData = {
       message: "Check out my Post",
       url: getLink,
-    }
+    };
     Share.open(resData)
-    .then((res) => {
-      console.log("resData",res);
-      shareApiHit(item)
-    })
-    .catch((err) => {
-      err && console.log(err);
-    });
+      .then((res) => {
+        console.log("resData", res);
+        shareApiHit(item);
+      })
+      .catch((err) => {
+        err && console.log(err);
+        shareApiHit(item);
+      });
   };
 
   const postDetailsNav = () => {
@@ -345,7 +365,7 @@ export default function CommentScreen({ navigation, route }) {
     setIsPaused(true);
     navigation.pop();
   };
-console.log("SurveyDetailLikesSurveyDetailLikes", SurveyDetailLikes, surveyDetail)
+
   const theme = useTheme();
   return (
     <View style={CommonStyle.container}>
@@ -411,6 +431,7 @@ console.log("SurveyDetailLikesSurveyDetailLikes", SurveyDetailLikes, surveyDetai
           />
         </View>
       </View>
+
       <View
         style={{
           flexDirection: "row",
@@ -482,7 +503,7 @@ console.log("SurveyDetailLikesSurveyDetailLikes", SurveyDetailLikes, surveyDetai
             }}
           >
             <TouchableOpacity
-              //onPress={() => likeOrCommentAction("like")}
+              onPress={() => likeOrCommentAction("like")}
               style={{ flexDirection: "row" }}
             >
               <Image
@@ -506,6 +527,7 @@ console.log("SurveyDetailLikesSurveyDetailLikes", SurveyDetailLikes, surveyDetai
                 }
                 resizeMode={"contain"}
               />
+
               <Text
                 style={[
                   CommonStyle.likeTextStyle,
@@ -525,6 +547,7 @@ console.log("SurveyDetailLikesSurveyDetailLikes", SurveyDetailLikes, surveyDetai
                   : PostDetailLikes[0]?.totalLikes}
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={{ flexDirection: "row", right: wp(15) }}>
               <Image
                 style={CommonStyle.commenticonStyle}
@@ -544,6 +567,7 @@ console.log("SurveyDetailLikesSurveyDetailLikes", SurveyDetailLikes, surveyDetai
                 {commentsCount}
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               // onPress={() => navigation.navigate("CommentPictureScreen")}
               onPress={() => onShare(item)}
@@ -689,6 +713,7 @@ console.log("SurveyDetailLikesSurveyDetailLikes", SurveyDetailLikes, surveyDetai
                 }}
               />
               <TextInput
+                multiline={true}
                 ref={inputRef}
                 style={{
                   backgroundColor: "#F8F9F9",

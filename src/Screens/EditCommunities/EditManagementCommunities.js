@@ -34,6 +34,7 @@ function EditManagementCommunities({ navigation, route }) {
   const { managementIds, commIds } = route.params;
 
   useEffect(() => {
+    alert("hi")
     setSelectedCommunityIds(managementIds);
     setManagementCounter(managementIds.length >= 2 ? 2 : managementIds.length);
     console.log("EditManagementCommunities => ", managementIds, commIds);

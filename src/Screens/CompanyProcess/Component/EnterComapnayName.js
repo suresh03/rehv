@@ -1,20 +1,23 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {Component} from 'react';
-import {SafeAreaView, View, Text, TouchableOpacity, Image} from 'react-native';
-import CommonStyle from '../../../Components/CustomComponents/CommonStyle';
-import Padding from '../../../Components/SharedComponents/Padding';
+import React, { Component } from "react";
 import {
-  getFontSize,
-  responsiveSize,
-} from '../../../Components/SharedComponents/ResponsiveSize';
-import Spacer from '../../../Components/SharedComponents/Space';
-import {TextField} from '../../../Components/SharedComponents/TextField';
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+} from "react-native";
+import CommonStyle from "../../../Components/CustomComponents/CommonStyle";
+import Padding from "../../../Components/SharedComponents/Padding";
+
+import Spacer from "../../../Components/SharedComponents/Space";
+import { TextField } from "../../../Components/SharedComponents/TextField";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Body from '../../../Components/SharedComponents/Body';
-import ChangeStyle from '../../../Components/CustomComponents/ChangeStyle';
+} from "react-native-responsive-screen";
+import Body from "../../../Components/SharedComponents/Body";
+import ChangeStyle from "../../../Components/CustomComponents/ChangeStyle";
 import Lang from "../../../Language";
 import {
   rightdropdwon,
@@ -32,83 +35,84 @@ import {
   calender,
   blubIcon,
   bodyIcon,
-} from '../../../Assets/icon';
+} from "../../../Assets/icon";
+import Scaler from "../../../Utils/Scaler";
 
 export default class EnterCompanyName extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      itemdiseble: '',
-      checkNav: '',
+      itemdiseble: "",
+      checkNav: "",
       choiceCommunities: [
         {
           img: giftIcon,
-          value: 'Having Fun',
+          value: "Having Fun",
           status: false,
         },
         {
           img: thum,
-          value: 'Doing the Right Thing',
+          value: "Doing the Right Thing",
           status: false,
         },
         {
           img: calender,
-          value: 'Current Events',
+          value: "Current Events",
           status: false,
         },
         {
           img: handIcon,
-          value: 'Making Things Better',
+          value: "Making Things Better",
           status: false,
         },
         {
           img: fingerIcon,
-          value: 'Doing a Great Job',
+          value: "Doing a Great Job",
           status: false,
         },
         {
           img: blubIcon,
-          value: 'Sparking Innovation',
+          value: "Sparking Innovation",
           status: false,
         },
         {
           img: roketIcon,
-          value: 'Inspiring & Motivating',
+          value: "Inspiring & Motivating",
           status: false,
         },
         {
           img: teaCupIcon,
-          value: 'Amazing Food',
+          value: "Amazing Food",
           status: false,
         },
         {
           img: kingIcon,
-          value: 'Great Leadership',
+          value: "Great Leadership",
           status: false,
         },
         {
           img: cupIcon,
-          value: 'Getting Involved',
+          value: "Getting Involved",
           status: false,
         },
         {
           img: openGiftIcon,
-          value: 'Learning Insights',
+          value: "Learning Insights",
           status: false,
         },
         {
           img: bodyIcon,
-          value: 'Exercise & Wellbeing',
+          value: "Exercise & Wellbeing",
           status: false,
         },
         {
           img: treeIcon,
-          value: 'Eco-Friendly',
+          value: "Eco-Friendly",
           status: false,
         },
         {
           img: starIcon,
-          value: 'Enhancing Our Culture',
+          value: "Enhancing Our Culture",
           status: false,
         },
       ],
@@ -116,8 +120,8 @@ export default class EnterCompanyName extends Component {
     };
   }
 
-  handleItemClick = index => {
-    const {choiceCommunities} = this.state;
+  handleItemClick = (index) => {
+    const { choiceCommunities } = this.state;
     choiceCommunities[index].status = !choiceCommunities[index].status;
     let counter = choiceCommunities.reduce((a, b) => {
       if (b.status) {
@@ -125,16 +129,17 @@ export default class EnterCompanyName extends Component {
       }
       return a;
     }, 0);
-    this.setState({itemdiseble: counter, counter});
+    this.setState({ itemdiseble: counter, counter });
   };
-  
+
   render() {
     return (
       <SafeAreaView style={CommonStyle.container}>
         <Body
           keyboardDismissMode="interactive"
-          contentContainerStyle={{flexGrow: 1}}>
-          <Padding horizontal size={responsiveSize(25)}>
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <Padding horizontal size={Scaler(25)}>
             <TextField
               textStyle={CommonStyle.tittleStyle}
               status="Manegement"
@@ -145,14 +150,14 @@ export default class EnterCompanyName extends Component {
               status="Communities"
             />
             <Spacer size={5} />
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: "row" }}>
               <TextField
                 textStyle={ChangeStyle.interesttextStyle}
                 status="Select 3 communities of interest that make you happy!"
               />
               {this.state.counter < 4 ? (
                 <Text style={CommonStyle.interestCountStyle}>
-                  {`${this.state.counter}/3`}{' '}
+                  {`${this.state.counter}/3`}{" "}
                 </Text>
               ) : (
                 <Text style={CommonStyle.interestCountStyle}>3/3 </Text>
@@ -167,42 +172,46 @@ export default class EnterCompanyName extends Component {
                         ChangeStyle.choicequestionStyle,
                         {
                           borderColor:
-                            item.status == false ? 'lightgrey' : '#6111f4',
+                            item.status == false ? "lightgrey" : "#6111f4",
                           height: hp(7),
                         },
-                      ]}>
-                      <View style={{flexDirection: 'row', width: wp(50)}}>
+                      ]}
+                    >
+                      <View style={{ flexDirection: "row", width: wp(50) }}>
                         <TouchableOpacity
                           onPress={() => this.handleItemClick(index)}
-                          style={{width: wp(52)}}>
+                          style={{ width: wp(52) }}
+                        >
                           <Image
                             source={item.img}
                             style={[
                               ChangeStyle.interestimgStyle,
-                              {right: responsiveSize(30)},
+                              { right: Scaler(30) },
                             ]}
-                            resizeMode={'contain'}
+                            resizeMode={"contain"}
                           />
                           <Text
                             style={{
-                              alignItems: 'center',
-                              left: responsiveSize(55),
-                              fontWeight: '500',
-                              fontSize: getFontSize(17),
-                              top: responsiveSize(-40),
-                            }}>
+                              alignItems: "center",
+                              left: Scaler(55),
+                              fontWeight: "500",
+                              fontSize: Scaler(17),
+                              top: Scaler(-40),
+                            }}
+                          >
                             {item.value}
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                          style={ChangeStyle.rightarrowTouchStyle}>
+                          style={ChangeStyle.rightarrowTouchStyle}
+                        >
                           <Text style={[ChangeStyle.statictextStyle]}>
                             {Lang.LEARN}
                           </Text>
                           <Image
                             source={rightdropdwon}
                             style={ChangeStyle.rightArrowStyle}
-                            resizeMode={'contain'}
+                            resizeMode={"contain"}
                           />
                         </TouchableOpacity>
                       </View>
