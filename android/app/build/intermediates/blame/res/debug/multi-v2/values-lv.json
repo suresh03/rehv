@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\ReactNative\\Freelancing\\Muthukumar freelance project\\Backup_rehv\\Backup_rehv\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-lv\\values-lv.xml",
+            "outputFile": "D:\\ReactNative\\Freelancing\\Muthukumar freelance project\\Backup_rehv\\rehv\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-lv\\values-lv.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Gnana\\.gradle\\caches\\transforms-2\\files-2.1\\9eda4a0b7dbc15f27d4fdb1e067e4c11\\biometric-1.0.1\\res\\values-lv\\values-lv.xml",

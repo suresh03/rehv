@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\ReactNative\\Freelancing\\Muthukumar freelance project\\Backup_rehv\\Backup_rehv\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-it\\values-it.xml",
+            "outputFile": "D:\\ReactNative\\Freelancing\\Muthukumar freelance project\\Backup_rehv\\rehv\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-it\\values-it.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Gnana\\.gradle\\caches\\transforms-2\\files-2.1\\be529570bfc0153a0466d03a2d80b855\\jetified-ucrop-2.2.6-native\\res\\values-it\\values-it.xml",

@@ -39,6 +39,33 @@
         "splits": [
           {
             "filterType": "ABI",
+            "value": "armeabi-v7a"
+          }
+        ],
+        "versionCode": 1001,
+        "versionName": "1.0",
+        "filterName": "armeabi-v7a",
+        "outputFile": "app-armeabi-v7a-debug.apk",
+        "fullName": "armeabi-v7aDebug",
+        "baseName": "armeabi-v7a-debug",
+        "dirName": "armeabi-v7a\\"
+      },
+      "path": "resources-armeabi-v7aDebug.ap_",
+      "properties": {
+        "packageId": "com.rehvup",
+        "split": "",
+        "minSdkVersion": "21"
+      }
+    },
+    {
+      "outputType": {
+        "type": "PROCESSED_RES"
+      },
+      "apkData": {
+        "type": "FULL_SPLIT",
+        "splits": [
+          {
+            "filterType": "ABI",
             "value": "x86_64"
           }
         ],
@@ -78,33 +105,6 @@
         "dirName": "x86\\"
       },
       "path": "resources-x86Debug.ap_",
-      "properties": {
-        "packageId": "com.rehvup",
-        "split": "",
-        "minSdkVersion": "21"
-      }
-    },
-    {
-      "outputType": {
-        "type": "PROCESSED_RES"
-      },
-      "apkData": {
-        "type": "FULL_SPLIT",
-        "splits": [
-          {
-            "filterType": "ABI",
-            "value": "armeabi-v7a"
-          }
-        ],
-        "versionCode": 1001,
-        "versionName": "1.0",
-        "filterName": "armeabi-v7a",
-        "outputFile": "app-armeabi-v7a-debug.apk",
-        "fullName": "armeabi-v7aDebug",
-        "baseName": "armeabi-v7a-debug",
-        "dirName": "armeabi-v7a\\"
-      },
-      "path": "resources-armeabi-v7aDebug.ap_",
       "properties": {
         "packageId": "com.rehvup",
         "split": "",

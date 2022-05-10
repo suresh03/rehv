@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\ReactNative\\Freelancing\\Muthukumar freelance project\\Backup_rehv\\Backup_rehv\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-zu\\values-zu.xml",
+            "outputFile": "D:\\ReactNative\\Freelancing\\Muthukumar freelance project\\Backup_rehv\\rehv\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-zu\\values-zu.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Gnana\\.gradle\\caches\\transforms-2\\files-2.1\\4692d8df983c00cacc1adb2047f1e27e\\jetified-play-services-base-18.0.1\\res\\values-zu\\values.xml",

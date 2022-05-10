@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\ReactNative\\Freelancing\\Muthukumar freelance project\\Backup_rehv\\Backup_rehv\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-as\\values-as.xml",
+            "outputFile": "D:\\ReactNative\\Freelancing\\Muthukumar freelance project\\Backup_rehv\\rehv\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-as\\values-as.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Gnana\\.gradle\\caches\\transforms-2\\files-2.1\\91e6c28b32fac86cbe5931db71bb2e76\\jetified-firebase-messaging-23.0.0\\res\\values-as\\values.xml",
