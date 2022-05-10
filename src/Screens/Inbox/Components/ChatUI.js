@@ -6,7 +6,7 @@ import Scaler from "../../../Utils/Scaler";
 import { useTheme } from "react-native-paper";
 import { profilePic } from "../../../Assets/icon";
 import FastImage from "react-native-fast-image";
-import { LinkPreview } from "@flyerhq/react-native-link-preview";
+//import { LinkPreview } from "@flyerhq/react-native-link-preview";
 
 function ChatUI(props) {
   const { item, index, secondPerson } = props;
@@ -74,7 +74,7 @@ function ChatUI(props) {
                 fontSize: 15,
               }}
             >
-            <LinkPreview
+            {/* <LinkPreview
               text={item.message}
               style={{
                 color: "#fff",
@@ -82,7 +82,7 @@ function ChatUI(props) {
                 fontFamily: "Poppins-Regular",
                 fontSize: 15,
               }}
-            />
+            /> */}
             </Text>
           </View>
         </View>
@@ -112,7 +112,7 @@ function ChatUI(props) {
                 fontSize: 15,
               }}
             > */}
-            <LinkPreview
+            {/* <LinkPreview
               text={item.message}
               style={{
                 color: "#fff",
@@ -120,7 +120,7 @@ function ChatUI(props) {
                 fontFamily: "Poppins-Regular",
                 fontSize: 15,
               }}
-            />
+            /> */}
             {/* </Text> */}
           </View>
 
