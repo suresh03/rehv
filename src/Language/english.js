@@ -94,7 +94,7 @@ export const ENGLISH = {
   POST_LIST: "Post lists",
   TAKE_SURVEY: "Take Survey",
   PARTICIPATE: "Participate",
-  POLL: "Poll",
+  POLL: "Polls",
   NOTIFICATION: "Notifications",
   POST_DETAIL: "Post details",
   SURVEY: "Survey",
