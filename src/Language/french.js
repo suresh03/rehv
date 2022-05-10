@@ -83,6 +83,7 @@ export const FRENCH = {
   TAKE_SURVEY: "Répondre au sondage",
   PARTICIPATE: "Participer",
   POLL: "Enquête",
+  POLLS: "Les sondages",
   NOTIFICATION: "Avis",
   POST_DETAIL: "Détails de la publication",
   SURVEY: "Sondage",
@@ -189,6 +190,7 @@ export const FRENCH = {
   JOINED: "Rejointe",
   MANAGEMENT: "La gestion",
   EMPLOYEE: "Employée",
+  CONTESTS: "Concours",
   NO_COMMUNITY_POST:
     "Vous n'avez pas de message dans cette communauté pour le moment. Revenez plus tard.",
   LEARN: "Apprendre",
@@ -382,6 +384,7 @@ export const FRENCH = {
   NO_BLOCK_USR: "Aucun utilisateur bloqué trouvé.",
   NO_FREEZE_USR: "Aucun utilisateur gelé trouvé",
   POST: "Poster",
+  POSTS: "DES POSTES",
   NO_FREZZEDUSER:
     "Vous navez aucun utilisateur gelé pour le moment. Revenez plus tard.",
   NO_BLOCKEDUSER:

@@ -121,13 +121,13 @@ export default function InsightCompany({ navigation }) {
       let data = res.data;
       setOptions([
         {
-          title: Lang.POST,
+          title: Lang.POSTS,
           image: require("../../Assets/Images/post.png"),
           value: data.totalPost,
           icon: "image",
         },
         {
-          title: Lang.CONTEST,
+          title: Lang.CONTESTS,
           image: require("../../Assets/Images/contest.png"),
           value: data.totalContest,
           icon: "certificate",
@@ -139,7 +139,7 @@ export default function InsightCompany({ navigation }) {
           icon: "star",
         },
         {
-          title: Lang.POLL,
+          title: Lang.POLLS,
           image: require("../../Assets/Images/poll.png"),
           value: data.totalPoll,
           icon: "bar-chart",
