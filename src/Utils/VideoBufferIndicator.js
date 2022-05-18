@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { ActivityIndicator } from "react-native-paper";
-
+import Scaler from "./Scaler";
 export default class VideoBufferIndicator extends PureComponent {
   render() {
     return (
@@ -11,10 +11,11 @@ export default class VideoBufferIndicator extends PureComponent {
         style={{
           opacity: this.props.opacity,
           position: "absolute",
-          bottom: 208,
-          left: 70,
-          right: 70,
-          height: 50,
+          bottom: Scaler(120),
+          left: 0,
+          right: 0,
+          height: 0,
+          justifyContent: 'center', alignItems: 'center'
         }}
       />
     );

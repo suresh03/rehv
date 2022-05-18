@@ -300,7 +300,7 @@ function MyPostCard(props) {
 
             <VideoBufferIndicator
               opacity={opacity}
-              color={theme.colors.primary}
+              color={theme.colors.background}
             />
 
             <TouchableOpacity
@@ -894,7 +894,7 @@ const styles = StyleSheet.create({
   },
   content: {
     width: windowWidth,
-    height: Scaler(450),
+    height: Scaler(240),
     marginVertical: 8,
   },
 });

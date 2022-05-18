@@ -310,7 +310,7 @@ function HomePostcard(props) {
                 style={styles.video}
                 repeat={true}
                 onLoad={load}
-                resizeMode={"contain"}
+                resizeMode={"cover"}
                 ignoreSilentSwitch={"ignore"}
                 volume={sound ? 1.0 : 0.0}
                 onLoad={onLoad}
@@ -321,7 +321,7 @@ function HomePostcard(props) {
 
             <VideoBufferIndicator
               opacity={opacity}
-              color={theme.colors.primary}
+              color={theme.colors.background}
             />
 
 
@@ -988,14 +988,14 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginHorizontal: 2,
   },
-  content: {
-    width: windowWidth,
-    height: 450,
-    marginVertical: 8,
-  },
+  // content: {
+  //   width: windowWidth,
+  //   height: Scaler(240),
+  //   marginVertical: 8,
+  // },
   content: {
     width: FULL_WIDTH,
-    height: 340,
+    height: Scaler(240),
     marginVertical: 8,
   },
   video: {
